@@ -1,0 +1,17 @@
+{
+  "name": "nova-salon",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon server/app.js",
+    "start": "node server/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
