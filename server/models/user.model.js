@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["pelanggan", "karyawan", "pemilik"],
+      enum: ["pelanggan", "admin", "pemilik"],
       default: "pelanggan",
     },
     email: {
@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "password wajib ada"],
+    },
+    profilePicture: {
+      type: String,
+      default:
+        "https://img.freepik.com/premium-vector/man-avatar-profile-picture-vector-illustration_268834-538.jpg",
     },
   },
   { timestamps: true }
