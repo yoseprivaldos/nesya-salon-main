@@ -2,11 +2,17 @@ import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 
-errorHandler;
-export const test = (req, res) => {
-  res.json({
-    message: "Server API is working",
-  });
+// get all user
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ error: "Terjadi Kesalahan dalam mengambil data user" });
+  }
 };
 
 // Update user
@@ -21,7 +27,7 @@ export const updateUser = async (req, res, next) => {
       req.body.password = bcryptjs.hashSync(req.body.password, 10);
     }
 
-    const updateUser = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       {
         $set: {
@@ -33,7 +39,8 @@ export const updateUser = async (req, res, next) => {
       },
       { new: true }
     );
-    const { password, ...rest } = updateUser._doc;
+    const { password, ...rest } = updatedUser._doc;
+    res.status(200).json(rest);
   } catch (error) {
     next(error);
   }

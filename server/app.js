@@ -7,13 +7,13 @@ import helmet from "helmet";
 import morgan from "morgan";
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
-import generalRoutes from "./routes/general.route.js";
-import salesRoutes from "./routes/employee.route.js";
-import managementRoutes from "./routes/management.route.js";
+import categoryRoutes from "./routes/category.route.js";
+import cookieParser from "cookie-parser";
 
 /*CONFIGURATION */
 dotenv.config();
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
@@ -36,6 +36,7 @@ mongoose
 //routes
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/category", categoryRoutes);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

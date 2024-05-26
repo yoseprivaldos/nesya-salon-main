@@ -11,7 +11,7 @@ import {
 
 const Account = () => {
   return (
-    <Box sx={{ padding: 3, bgcolor: "#121212", color: "white" }}>
+    <Box sx={{ padding: 3, bgcolor: "#7B5F43", color: "white" }}>
       <Typography variant="h4" gutterBottom>
         My Account
       </Typography>

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const serviceSchema = new mongoose.Schema(
   {
@@ -10,14 +10,24 @@ const serviceSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    kategori: {
-      type: String,
-      enum: ["Rambut", "Wajah", "Tubuh"], //segera ubah ini buat referensi dari tabel kategori
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: [true, "Kategori layanan harus ada"],
+    },
+    subCategory: {
+      type: String, // Simpan nama subkategori atau ObjectId jika Anda ingin membuat referensi langsung
+      required: [true, "Subkategori layanan harus ada"],
     },
     duration: {
       type: Number,
       required: [true, "durasi layanan wajib ada"],
-      min: 0,
+      min: [0, "durasi layanan tidak boleh kurang dari 0"],
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: [0, "harga layanan tidak boleh kurang dari 0"],
     },
     imageService: [
       {
@@ -28,10 +38,20 @@ const serviceSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    numberOfViews: {
+      type: Number,
+      default: 0,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: [0, "rating tidak boleh kurang dari 0"],
+      max: [5, "rating tidak boleh lebih dari 5"],
+    },
   },
   { timestamps: true }
 );
 
 const Service = mongoose.model("Service", serviceSchema);
 
-export default Service;
+module.exports = Service;

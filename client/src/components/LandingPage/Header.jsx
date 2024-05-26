@@ -44,7 +44,7 @@ function Header(props) {
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        BEAUTY SALON
+        NESYA SALON
       </Typography>
       <Divider />
       <List>
@@ -63,8 +63,8 @@ function Header(props) {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box className="header" sx={{ display: "flex", bgColor: "#121212" }}>
-      <AppBar component="nav" sx={{ bgColor: "#123123" }}>
+    <Box className="header" sx={{ display: "flex" }}>
+      <AppBar component="nav" sx={{ backgroundColor: "#7B5F43" }}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -107,7 +107,7 @@ function Header(props) {
                   <Avatar
                     alt="Remy Sharp"
                     src={currentUser.profilePicture}
-                    sx={{ m: 1 }}
+                    sx={{ m: 1, objectFit: "cover" }}
                   />
                 ) : (
                   <Typography variant="h7">Login</Typography>
@@ -145,6 +145,7 @@ function Header(props) {
           </Box>
         </Toolbar>
       </AppBar>
+
       <nav>
         <Drawer
           container={container}
