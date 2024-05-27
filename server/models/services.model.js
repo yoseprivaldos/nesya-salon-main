@@ -9,6 +9,7 @@ const serviceSchema = new mongoose.Schema(
     },
     description: {
       type: String,
+      default: "",
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
@@ -16,7 +17,8 @@ const serviceSchema = new mongoose.Schema(
       required: [true, "Kategori layanan harus ada"],
     },
     subCategory: {
-      type: String, // Simpan nama subkategori atau ObjectId jika Anda ingin membuat referensi langsung
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: [true, "Subkategori layanan harus ada"],
     },
     duration: {
@@ -54,4 +56,4 @@ const serviceSchema = new mongoose.Schema(
 
 const Service = mongoose.model("Service", serviceSchema);
 
-module.exports = Service;
+export default Service;

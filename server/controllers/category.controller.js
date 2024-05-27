@@ -28,10 +28,23 @@ export const createCategory = async (req, res) => {
       savedCategory.subCategories = createdSubCategories.map((sub) => sub._id);
       await savedCategory.save();
     }
-    res.status(201).json(savedCategory);
+    res.status(201).json({ message: "Kategori berhasil dibuat" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error creating category", error });
+  }
+};
+
+// mengambil semua kategori
+export const getCategories = async (req, res) => {
+  try {
+    const categories = await Category.find();
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan mengambil data kategori" });
   }
 };
 
