@@ -55,7 +55,9 @@ export const createService = async (req, res) => {
 //getAllServices
 export const getAllServices = async (req, res) => {
   try {
-    const services = await Service.find().populate("category");
+    const services = await Service.find()
+      .populate("category", "name")
+      .populate("subCategory", "name");
     res.status(200).json(services);
   } catch (error) {
     console.error(error);
@@ -64,6 +66,7 @@ export const getAllServices = async (req, res) => {
       .json({ message: "Terjadi kesalahan ketika menampilkan semua service" });
   }
 };
+
 //getService
 export const getService = async (req, res) => {
   try {
@@ -150,6 +153,7 @@ export const updateService = async (req, res) => {
     res.status(500).json({ message: "Error updating service", error });
   }
 };
+
 //deleteService
 export const deleteService = async (req, res) => {
   try {
@@ -158,7 +162,7 @@ export const deleteService = async (req, res) => {
     const deletedService = await Service.findByIdAndDelete(serviceId);
 
     if (!deletedService) {
-      res.status(404).json({ message: "Layanan tidak ditemukan" });
+      return res.status(404).json({ message: "Layanan tidak ditemukan" });
     }
     res.status(200).json({ message: "layanan berhasil dihapus" });
   } catch (error) {

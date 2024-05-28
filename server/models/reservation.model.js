@@ -1,43 +1,53 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const reservationSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: "true",
+    required: [true, "Id User pembuat harus ada"],
   },
-  employee: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee",
-    required: true,
+  reservationName: {
+    type: String,
+    required: [true, "reservasi name harus diisi"],
+  },
+  reservationEmail: {
+    type: String,
+    required: [true, "Email harus diisi"],
+    validate: {
+      validator: function (v) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid email!`,
+    },
+  },
+  note: {
+    type: String,
+    default: "",
   },
   service: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Service",
-    required: true,
+    required: [true, "id service harus diisi"],
   },
-  reservationDate: {
+  date: {
     type: Date,
-    required: true,
+    required: [true, "tanggal harus diisi"],
   },
-  timeSlot: {
-    startTime: {
-      type: String,
-      required: true,
-    },
-    endTime: {
-      type: String,
-      required: true,
-    },
+  startTime: {
+    type: String,
+    required: [true, "waktu mulai harus diisi"],
+  },
+  endTime: {
+    type: String,
+    required: [true, "waktu selesai harus diisi"],
   },
   status: {
     type: String,
-    enum: ["Diproses", "Selesai", "Dibatalkan"],
-    default: "Diproses",
-    required: true,
+    enum: ["pending", "confirmed", "canceled", "completed"],
+    default: "pending",
   },
 });
 
 const Reservation = mongoose.model("Reservation", reservationSchema);
 
-module.exports = Reservation;
+export default Reservation;

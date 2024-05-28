@@ -10,6 +10,8 @@ import authRoutes from "./routes/auth.route.js";
 import categoryRoutes from "./routes/category.route.js";
 import serviceRoutes from "./routes/service.route.js";
 import productRoutes from "./routes/product.route.js";
+import employeeRoutes from "./routes/employee.route.js";
+import reservationRoutes from "./routes/reservation.route.js";
 import cookieParser from "cookie-parser";
 
 /*CONFIGURATION */
@@ -41,6 +43,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/employee", employeeRoutes);
+app.use("/api/reservation", reservationRoutes);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

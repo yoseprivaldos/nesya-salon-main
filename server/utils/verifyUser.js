@@ -36,6 +36,6 @@ export const requirePelanggan = (req, res, next) => {
   } else {
     return res
       .status(403)
-      .json({ message: "hannya pelanggan yang bisa melakukan tindakan ini" });
+      .json({ message: "hanya pelanggan yang bisa melakukan tindakan ini" });
   }
 };
