@@ -91,17 +91,70 @@ export const getMyReservation = async (req, res) => {
   }
 };
 
-//getMyReservation (pelanggan), All reservation status ("pending", "confirm", "canceled", "completed")
-
-//confirmReservation(admin), reservation.status => "confirm"
-export const confirmReservation = async (req, res) => {
+//updateReservation status
+export const updateReservationStatus = async (req, res) => {
   try {
     const { reservationId } = req.params;
-    const matchReservation = await Reservation.findById(reservationId);
+    const { status } = req.body;
 
-    if (!matchReservation) {
-      return res.status(404).json({ message: "reservasi tidak tersedia" });
+    // validasi status value
+    const validStatuses = ["pending", "confirm", "canceled", "completed"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Statuus tidak valid" });
     }
-  } catch (error) {}
+
+    //temukan reservasi dari id dan update status
+    const updatedReservation = await Reservation.findByIdAndUpdate(
+      reservationId,
+      { status },
+      { new: true, runValidator: true }
+    );
+
+    if (!updatedReservation) {
+      return res.status(404).json({ message: "Reservasi tidak ditemukan" });
+    }
+
+    res.status(200).json({
+      message: "Status reservasi berhasil diubah",
+      reservation: updatedReservation,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Terjadi kesalahan saat mengubah status reservasi",
+      error: error.message,
+    });
+  }
 };
-//declineReservation(admin), reservation.status => "canceled"
+
+//getServiceReservations //mengambil semua reservasi untuk layanan tertentu
+export const getServiceReservation = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const service = await Service.findById(serviceId);
+    if (!service) {
+      return res.status(404).json({ message: "Layanan tidak ditemukan" });
+    }
+
+    const reservations = await Reservation.find({
+      service: serviceId,
+    }).populate("user");
+    if (!reservations) {
+      return res
+        .status(404)
+        .json({ message: "belum ada reservasi untuk layanan tersebut" });
+    }
+
+    res.status(200).json({
+      message: "Reservasi layanan berhasil diambil",
+      reservations,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Terjadi kesalahan server saat mengambil reservasi layanan",
+      error: error.message,
+    });
+  }
+};
+
+//setelah buat review model
+//addReviewToReservation
