@@ -9,6 +9,7 @@ import {
   Typography,
   ListItemIcon,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Reservation = () => {
   return (
@@ -53,9 +54,11 @@ const Reservation = () => {
                 <CheckCircle sx={{ color: "lightblue" }} />
               </ListItemIcon>
               <ListItemText primary="Belum ada reservasi" />
-              <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                Buat Rerservasi
-              </Button>
+              <Link to="/services">
+                <Button variant="outlined" color="primary" sx={{ mt: 2 }}>
+                  Buat Rerservasi
+                </Button>
+              </Link>
             </ListItem>
           </Box>
         </Grid>

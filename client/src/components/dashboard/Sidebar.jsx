@@ -1,5 +1,6 @@
 import {
   Box,
+  Collapse,
   Drawer,
   IconButton,
   List,
@@ -11,20 +12,16 @@ import {
   useTheme,
 } from "@mui/material";
 import {
-  SettingsOutlined,
   ChevronLeft,
   ChevronRightOutlined,
   HomeOutlined,
   ShoppingCartOutlined,
   Groups2Outlined,
   ReceiptLongOutlined,
-  PublicOutlined,
   PointOfSaleOutlined,
   TodayOutlined,
-  CalendarMonthOutlined,
-  AdminPanelSettingsOutlined,
-  TrendingUpOutlined,
-  PieChartOutlined,
+  ExpandLess,
+  ExpandMore,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -34,83 +31,47 @@ const navItems = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
-  },
-  {
-    text: "Managemen Janji Temu",
-    icon: null,
-  },
-  {
-    text: "Daftar Janji Temu",
-    icon: <ShoppingCartOutlined />,
-  },
-  {
-    text: "Buat Janji Temu",
-    icon: <Groups2Outlined />,
-  },
-  {
-    text: "Kalender Janji Temu",
-    icon: <ReceiptLongOutlined />,
-  },
-  {
-    text: "Status Janji Temu",
-    icon: <PointOfSaleOutlined />,
-  },
-  {
-    text: "Manajemen Layanan",
-    icon: null,
+    path: "/dashboard",
   },
 
   {
-    text: "Daftar Layanan",
-    icon: <TodayOutlined />,
+    text: "Pelanggan",
+    icon: <ShoppingCartOutlined />,
+    path: "/dashboard/pelanggan",
+    subItems: [
+      { text: "Daftar Pelanggan", path: "/dashboard/pelanggan/daftar" },
+      { text: "Riwayat Layanan", path: "/dashboard/pelanggan/riwayat" },
+    ],
   },
   {
-    text: "Tambah Layanan Baru",
-    icon: <PieChartOutlined />,
+    text: "Janji Temu",
+    icon: <Groups2Outlined />,
+    path: "/dashboard/janjitemu",
+  },
+
+  {
+    text: "Layanan",
+    icon: <ReceiptLongOutlined />,
+    path: "/dashboard/services",
   },
   {
-    text: "Manajemen Produk",
-    icon: null,
+    text: "Produk",
+    icon: <PointOfSaleOutlined />,
+    path: "/dashboard/products",
+    subItems: [
+      { text: "Daftar Produk", path: "/dashboard/produk/daftar" },
+      { text: "Stok Produk", path: "/dashboard/produk/stok" },
+    ],
   },
   {
-    text: "Daftar Produk",
-    icon: <AdminPanelSettingsOutlined />,
-  },
-  {
-    text: "Manajemen Staf",
-    icon: null,
-  },
-  {
-    text: "Lihat Staf",
-    icon: <TrendingUpOutlined />,
+    text: "Karyawan",
+    icon: <ShoppingCartOutlined />,
+    path: "/dashboard/employees",
   },
   {
     text: "Laporan",
-    icon: null,
-  },
-  {
-    text: "laporan layanan",
-    icon: <TrendingUpOutlined />,
-  },
-  {
-    text: "laporan staf",
-    icon: <TrendingUpOutlined />,
-  },
-  {
-    text: "laporan review",
-    icon: <TrendingUpOutlined />,
-  },
-  {
-    text: "Pengaturan",
-    icon: null,
-  },
-  {
-    text: "Profil Salon",
-    icon: <TrendingUpOutlined />,
-  },
-  {
-    text: "Pengaturan Umum",
-    icon: <TrendingUpOutlined />,
+    icon: <TodayOutlined />,
+    path: "/dashboard/report",
   },
 ];
 
@@ -124,10 +85,15 @@ const Sidebar = ({
   const [active, setActive] = useState("");
   const navigate = useNavigate();
   const theme = useTheme();
+  const [openSubmenus, setOpenSubmenus] = useState({});
 
   useEffect(() => {
     setActive(pathname.substring(1));
   }, [pathname]);
+
+  const handleSubmenuClick = (text) => {
+    setOpenSubmenus((prev) => ({ ...prev, [text]: !prev[text] }));
+  };
 
   return (
     <Box component="nav">
@@ -149,11 +115,11 @@ const Sidebar = ({
           }}
         >
           <Box width="100%">
-            <Box m="1.5rem 2rem 1.5rem 4rem">
+            <Box m="2rem 2rem 3rem 2.5rem">
               <FlexBetween color={theme.palette.secondary.main}>
                 <Box display="flex" alignItems="center" gap="0.5rem">
-                  <Typography variant="h4" fontWeight="bold">
-                    NovaSalon
+                  <Typography variant="h2" fontWeight="bold">
+                    NesyaSalon
                   </Typography>
                 </Box>
                 {!isNonMobile && (
@@ -163,11 +129,93 @@ const Sidebar = ({
                 )}
               </FlexBetween>
             </Box>
+
             <List>
+              {navItems.map(({ text, icon, path, subItems }) => (
+                <div key={text}>
+                  <ListItemButton
+                    onClick={() => {
+                      if (subItems) {
+                        handleSubmenuClick(text);
+                      } else {
+                        navigate(path);
+                        setActive(text.toLowerCase());
+                      }
+                    }}
+                    sx={{
+                      backgroundColor:
+                        active === text.toLowerCase()
+                          ? theme.palette.secondary[300]
+                          : "transparent",
+                      color:
+                        active === text.toLowerCase()
+                          ? theme.palette.primary[600]
+                          : theme.palette.secondary[100],
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        ml: "2rem",
+                        minWidth: 0,
+                        width: "2rem",
+                        color:
+                          active === text.toLowerCase()
+                            ? theme.palette.primary[600]
+                            : theme.palette.secondary[200],
+                      }}
+                    >
+                      {icon}
+                    </ListItemIcon>
+                    <ListItemText primary={text} />
+                    {subItems &&
+                      (openSubmenus[text] ? <ExpandLess /> : <ExpandMore />)}
+                    {active === text.toLowerCase() && (
+                      <ChevronRightOutlined sx={{ ml: "auto" }} />
+                    )}
+                  </ListItemButton>
+
+                  {/* Render sub-items jika ada */}
+                  {subItems && (
+                    <Collapse
+                      in={openSubmenus[text]}
+                      timeout="auto"
+                      unmountOnExit
+                    >
+                      <List component="div" disablePadding>
+                        {subItems.map(({ text, path }) => (
+                          <ListItemButton
+                            key={text}
+                            sx={{
+                              pl: 10,
+                              backgroundColor:
+                                active === text.toLowerCase()
+                                  ? theme.palette.secondary[300]
+                                  : "transparent",
+                              color:
+                                active === text.toLowerCase()
+                                  ? theme.palette.primary[600]
+                                  : theme.palette.secondary[100],
+                            }}
+                            onClick={() => {
+                              navigate(path);
+                              setActive(text.toLowerCase());
+                            }}
+                          >
+                            <ListItemText primary={text} />
+                          </ListItemButton>
+                        ))}
+                      </List>
+                    </Collapse>
+                  )}
+                </div>
+              ))}
+            </List>
+
+            {/* <List>
               {navItems.map(({ text, icon }) => {
                 if (!icon) {
                   return (
-                    <Typography key={text} sx={{ m: "1rem 0 1rem 1rem" }}>
+                    <Typography key={text} sx={{ m: "2rem 0 2rem 3rem" }}>
                       {text}
                     </Typography>
                   );
@@ -178,7 +226,7 @@ const Sidebar = ({
                   <ListItem key={text} disablePadding>
                     <ListItemButton
                       onClick={() => {
-                        navigate(`/${lcText}`);
+                        navigate(`/dahboard/${lcText}`);
                         setActive(lcText);
                       }}
                       sx={{
@@ -211,7 +259,7 @@ const Sidebar = ({
                   </ListItem>
                 );
               })}
-            </List>
+            </List> */}
           </Box>
         </Drawer>
       )}
