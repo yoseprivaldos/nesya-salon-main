@@ -17,19 +17,21 @@ import Menu from "@mui/material/Menu";
 import Tooltip from "@mui/material/Tooltip";
 import Avatar from "@mui/material/Avatar";
 import MenuItem from "@mui/material/MenuItem";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { signOut } from "../../redux/user/userSlice";
 
 const drawerWidth = 240;
 const navItems = ["Layanan", "Produk", "Berita"];
-const settings = ["Account", "Logout"];
+const settings = ["Akun Saya", "Reservasi Saya", "Log Out"];
 
 function Header(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   // const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
 
   const handleDrawerToggle = () => {
@@ -40,6 +42,20 @@ function Header(props) {
   };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/signout");
+      handleCloseUserMenu();
+      dispatch(signOut());
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLogin = () => {
+    navigate("/login");
   };
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
@@ -100,20 +116,24 @@ function Header(props) {
               </Button>
             ))}
           </Box>
+
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                {currentUser ? (
+            <Tooltip>
+              {currentUser ? (
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar
                     alt="Remy Sharp"
                     src={currentUser.profilePicture}
                     sx={{ m: 1, objectFit: "cover" }}
                   />
-                ) : (
-                  <Typography variant="h7">Login</Typography>
-                )}
-              </IconButton>
+                </IconButton>
+              ) : (
+                <Button onClick={handleLogin} sx={{ color: "#fff" }}>
+                  Login
+                </Button>
+              )}
             </Tooltip>
+
             <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"
@@ -132,12 +152,20 @@ function Header(props) {
             >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography
-                    textAlign="center"
-                    component={Link}
-                    to={`/${setting.toLowerCase()}`}
-                  >
-                    {setting}
+                  <Typography textAlign="center">
+                    {setting === "Akun Saya" ? (
+                      <Link to="/account" onClick={handleCloseUserMenu}>
+                        {setting}
+                      </Link>
+                    ) : setting === "Reservasi Saya" ? (
+                      <Link to="/reservation" onClick={handleCloseUserMenu}>
+                        {setting}
+                      </Link>
+                    ) : (
+                      <Link to="/login" onClick={handleLogout}>
+                        {setting}
+                      </Link>
+                    )}
                   </Typography>
                 </MenuItem>
               ))}

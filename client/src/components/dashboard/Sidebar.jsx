@@ -4,7 +4,6 @@ import {
   Drawer,
   IconButton,
   List,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
@@ -26,7 +25,7 @@ import {
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
-
+import PropTypes from "prop-types";
 const navItems = [
   {
     text: "Dashboard",
@@ -265,6 +264,14 @@ const Sidebar = ({
       )}
     </Box>
   );
+};
+
+Sidebar.propTypes = {
+  isNonMobile: PropTypes.bool.isRequired,
+  drawerWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+    .isRequired, // Bisa number atau string
+  isSidebarOpen: PropTypes.bool.isRequired,
+  setIsSidebarOpen: PropTypes.func.isRequired,
 };
 
 export default Sidebar;

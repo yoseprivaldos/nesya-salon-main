@@ -1,11 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material";
 import { themeDashboard } from "./utils/dashboard.theme.js";
 import { useSelector } from "react-redux";
 import { useMemo } from "react";
-import Dashboard from "./pages/DashboardPanel/Dashboard/index.jsx";
-import LayoutDashboard from "./pages/DashboardPanel/Layout/index.jsx";
+import Dashboard from "./pages/DashboardPanel/Dashboard.jsx";
+import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
+import ServiceDashboard from "./pages/DashboardPanel/Services/index.jsx";
+import ProductDashboard from "./pages/DashboardPanel/Product.jsx";
+import EmployeeDashboard from "./pages/DashboardPanel/Employee.jsx";
+import LayoutDashboard from "./pages/DashboardPanel/Layout.jsx";
 import LayoutLandingPage from "./pages/LandingPage/Layout.jsx";
 import Home from "./pages/LandingPage/Home.jsx";
 import Login from "./pages/LandingPage/Login.jsx";
@@ -40,6 +44,24 @@ export default function App() {
 
           {/* Dashboard Route */}
           <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <ThemeProvider theme={themeDash}>
+                  <CssBaseline />
+                  <LayoutDashboard />{" "}
+                  {/* Render LayoutDashboard di level atas */}
+                </ThemeProvider>
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />{" "}
+            <Route path="services" element={<ServiceDashboard />} />{" "}
+            <Route path="products" element={<ProductDashboard />} />{" "}
+            <Route path="employees" element={<EmployeeDashboard />} />{" "}
+          </Route>
+
+          {/* <Route
             path="/dashboard/*"
             element={
               <ThemeProvider theme={themeDash}>
@@ -51,12 +73,20 @@ export default function App() {
                       element={<Navigate to="/dashboard" replace />}
                     />
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route
+                      path="/dashboard/services"
+                      element={<ServiceDashboard />}
+                    />
+                    <Route
+                      path="/dashboard/products"
+                      element={<ProductDashboard />}
+                    />
                   </Route>
                 </Routes>
               </ThemeProvider>
             }
-          />
-          {/* estingUI */}
+          /> */}
+          {/* testingUI */}
           <Route>
             <Route path="/account" element={<Account />} />
             <Route

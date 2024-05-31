@@ -47,7 +47,11 @@ export default function Login() {
         return;
       }
       dispatch(signInSuccess(data));
-      navigate("/");
+      if (data.role === "admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       dispatch(signInFailure(error));
     }
