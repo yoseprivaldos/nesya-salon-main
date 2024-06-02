@@ -20,9 +20,11 @@ import MenuItem from "@mui/material/MenuItem";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "../../redux/user/userSlice";
+import { Grid, useTheme } from "@mui/material";
+import { FiberManualRecord } from "@mui/icons-material";
 
-const drawerWidth = 240;
-const navItems = ["Layanan", "Produk", "Berita"];
+const drawerWidth = "100%";
+const navItems = ["SERVICES", "PRODUCTS", "NEWS"];
 const settings = ["Akun Saya", "Reservasi Saya", "Log Out"];
 
 function Header(props) {
@@ -30,6 +32,7 @@ function Header(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   // const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const theme = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
@@ -58,18 +61,22 @@ function Header(props) {
     navigate("/login");
   };
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        NESYA SALON
-      </Typography>
-      <Divider />
+    <Box
+      onClick={handleDrawerToggle}
+      color={theme.palette.secondary.main}
+      backgroundColor={theme.palette.background.alt}
+      sx={{ textAlign: "center" }}
+    >
       <List>
         {navItems.map((item) => (
-          <ListItem key={item} disablePadding>
-            <ListItemButton component={Link} to={`/${item.toLowerCase()}`}>
-              <ListItemText primary={item} />
-            </ListItemButton>
-          </ListItem>
+          <React.Fragment key={item}>
+            <ListItem disablePadding>
+              <ListItemButton component={Link} to={`/${item.toLowerCase()}`}>
+                <ListItemText primary={item} sx={{ textAlign: "center" }} />
+              </ListItemButton>
+            </ListItem>
+            <Divider />
+          </React.Fragment>
         ))}
       </List>
     </Box>
@@ -79,122 +86,151 @@ function Header(props) {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box className="header" sx={{ display: "flex" }}>
-      <AppBar component="nav" sx={{ backgroundColor: "#7B5F43" }}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2 }}
+    <>
+      {/* Header Section */}
+      <Box>
+        <AppBar
+          component="nav"
+          sx={{
+            backgroundColor: theme.palette.background.alt,
+            position: "static",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1100,
+            borderBottom: `0.5px solid ${theme.palette.secondary.main}`,
+          }}
+        >
+          <Toolbar
+            sx={{ justifyContent: "space-between", mb: "2.5px", mt: "2.5px" }}
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            component="div"
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="space-between"
+              color={theme.palette.secondary.main}
+            >
+              <Grid item>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ ml: 1 }}
+                >
+                  <MenuIcon sx={{ width: "30px", height: "30px" }} />
+                </IconButton>
+              </Grid>
+              <Grid item display="flex">
+                <Link to="/">
+                  <Typography
+                    variant="h2"
+                    component="div"
+                    fontWeight="bold"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    Nesya{" "}
+                    <FiberManualRecord fontSize="small" sx={{ m: "2px" }} />{" "}
+                    Salon
+                  </Typography>
+                </Link>
+              </Grid>
+              <Grid item>
+                <Box sx={{ flexGrow: 0 }}>
+                  <Tooltip>
+                    {currentUser ? (
+                      <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                        <Avatar
+                          src={currentUser.profilePicture}
+                          sx={{
+                            m: 1,
+                            objectFit: "cover",
+                            width: "30px",
+                            height: "30px",
+                          }}
+                        />
+                      </IconButton>
+                    ) : (
+                      <Button onClick={handleLogin}>
+                        <Typography color={theme.palette.secondary.main}>
+                          Login
+                        </Typography>
+                      </Button>
+                    )}
+                  </Tooltip>
+
+                  <Menu
+                    sx={{ mt: "45px" }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    {settings.map((setting) => (
+                      <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                        <Typography textAlign="center">
+                          {setting === "Akun Saya" ? (
+                            <Link to="/account" onClick={handleCloseUserMenu}>
+                              {setting}
+                            </Link>
+                          ) : setting === "Reservasi Saya" ? (
+                            <Link
+                              to="/reservation"
+                              onClick={handleCloseUserMenu}
+                            >
+                              {setting}
+                            </Link>
+                          ) : (
+                            <Link to="/login" onClick={handleLogout}>
+                              {setting}
+                            </Link>
+                          )}
+                        </Typography>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+              </Grid>
+            </Grid>
+          </Toolbar>
+        </AppBar>
+
+        <nav>
+          <Drawer
+            container={container}
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            anchor="top"
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
             sx={{
-              flexGrow: 1,
-              display: {
-                xs: "none",
-                sm: "block",
+              display: { xs: "block", sm: "block" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
               },
             }}
           >
-            BEAUTY SALON
-          </Typography>
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            {navItems.map((item) => (
-              <Button
-                key={item}
-                component={Link}
-                to={`/${item.toLowerCase()}`}
-                sx={{ color: "#fff" }}
-              >
-                {item}
-              </Button>
-            ))}
-          </Box>
-
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip>
-              {currentUser ? (
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar
-                    alt="Remy Sharp"
-                    src={currentUser.profilePicture}
-                    sx={{ m: 1, objectFit: "cover" }}
-                  />
-                </IconButton>
-              ) : (
-                <Button onClick={handleLogin} sx={{ color: "#fff" }}>
-                  Login
-                </Button>
-              )}
-            </Tooltip>
-
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">
-                    {setting === "Akun Saya" ? (
-                      <Link to="/account" onClick={handleCloseUserMenu}>
-                        {setting}
-                      </Link>
-                    ) : setting === "Reservasi Saya" ? (
-                      <Link to="/reservation" onClick={handleCloseUserMenu}>
-                        {setting}
-                      </Link>
-                    ) : (
-                      <Link to="/login" onClick={handleLogout}>
-                        {setting}
-                      </Link>
-                    )}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
-      <nav>
-        <Drawer
-          container={container}
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
-      </nav>
-    </Box>
+            {drawer}
+          </Drawer>
+        </nav>
+      </Box>
+    </>
   );
 }
 

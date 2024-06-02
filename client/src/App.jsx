@@ -2,11 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material";
 import { themeDashboard } from "./utils/dashboard.theme.js";
+import themePublic from "./utils/public.theme.js";
 import { useSelector } from "react-redux";
 import { useMemo } from "react";
 import Dashboard from "./pages/DashboardPanel/Dashboard.jsx";
 import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
-import ServiceDashboard from "./pages/DashboardPanel/Services/index.jsx";
+import ServiceDashboard from "./pages/DashboardPanel/Services.jsx";
 import ProductDashboard from "./pages/DashboardPanel/Product.jsx";
 import EmployeeDashboard from "./pages/DashboardPanel/Employee.jsx";
 import LayoutDashboard from "./pages/DashboardPanel/Layout.jsx";
@@ -32,16 +33,25 @@ export default function App() {
           <Route
             path="/*"
             element={
-              <Routes>
-                <Route element={<LayoutLandingPage />}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                </Route>
-              </Routes>
+              <ThemeProvider theme={themePublic}>
+                <CssBaseline />
+                <Routes>
+                  <Route element={<LayoutLandingPage />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/reservation" element={<Reservation />} />
+                    <Route path="/account" element={<Account />} />
+                    <Route
+                      path="/account/edit-account/information"
+                      element={<EditUserInformation />}
+                    />
+                  </Route>
+                </Routes>
+              </ThemeProvider>
             }
           />
-
           {/* Dashboard Route */}
           <Route
             path="/dashboard"
@@ -61,44 +71,19 @@ export default function App() {
             <Route path="employees" element={<EmployeeDashboard />} />{" "}
           </Route>
 
-          {/* <Route
-            path="/dashboard/*"
-            element={
-              <ThemeProvider theme={themeDash}>
-                <CssBaseline />
-                <Routes>
-                  <Route element={<LayoutDashboard />}>
-                    <Route
-                      path="/"
-                      element={<Navigate to="/dashboard" replace />}
-                    />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route
-                      path="/dashboard/services"
-                      element={<ServiceDashboard />}
-                    />
-                    <Route
-                      path="/dashboard/products"
-                      element={<ProductDashboard />}
-                    />
-                  </Route>
-                </Routes>
-              </ThemeProvider>
-            }
-          /> */}
           {/* testingUI */}
           <Route>
-            <Route path="/account" element={<Account />} />
-            <Route
+            {/* <Route path="/account" element={<Account />} /> */}
+            {/* <Route
               path="/account/edit-account/information"
               element={<EditUserInformation />}
-            />
+            /> */}
             <Route
               path="/account/edit-account/password"
               element={<EditUserPassword />}
             />
-            <Route path="/reservation" element={<Reservation />} />
-            <Route path="/services" element={<Services />} />
+            {/* <Route path="/reservation" element={<Reservation />} /> */}
+            {/* <Route path="/services" element={<Services />} /> */}
           </Route>
         </Routes>
       </BrowserRouter>

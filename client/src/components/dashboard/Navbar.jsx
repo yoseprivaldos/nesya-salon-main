@@ -1,16 +1,16 @@
-import { useState } from "react";
+// import { useState } from "react";
 import {
   LightModeOutlined,
   DarkModeOutlined,
   Menu as MenuIcon,
   Search,
   SettingsOutlined,
-  ArrowDropDownOutlined,
+  // ArrowDropDownOutlined,
 } from "@mui/icons-material";
 import FlexBetween from "./FlexBetween";
 import { useDispatch } from "react-redux";
 import { setMode } from "../../redux/index";
-import profileImage from "../../assets/profile.png";
+// import profileImage from "../../assets/profile.png";
 import {
   AppBar,
   IconButton,

@@ -6,9 +6,12 @@ import Footer from "../../components/LandingPage/Footer";
 
 const LayoutLandingPage = () => {
   return (
-    <Box>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
-      <Outlet />
+
+      <Box flexGrow={1} sx={{ position: "relative" }}>
+        <Outlet />
+      </Box>
       <Footer />
     </Box>
   );

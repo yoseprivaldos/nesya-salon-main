@@ -52,13 +52,17 @@ const navItems = [
     text: "Layanan",
     icon: <ReceiptLongOutlined />,
     path: "/dashboard/services",
+    subItems: [
+      { text: "Daftar Layanan", path: "/dashboard/services" },
+      { text: "Update Layanan", path: "/dashboard/services/updates" },
+    ],
   },
   {
     text: "Produk",
     icon: <PointOfSaleOutlined />,
     path: "/dashboard/products",
     subItems: [
-      { text: "Daftar Produk", path: "/dashboard/produk/daftar" },
+      { text: "Daftar Produk", path: "/dashboard/products" },
       { text: "Stok Produk", path: "/dashboard/produk/stok" },
     ],
   },
@@ -66,11 +70,20 @@ const navItems = [
     text: "Karyawan",
     icon: <ShoppingCartOutlined />,
     path: "/dashboard/employees",
+    subItems: [
+      { text: "Daftar Karyawan", path: "/dashboard/employees" },
+      { text: "Tambah Karyawan", path: "/dashboard/pelanggan/create" },
+      { text: "Atur Karyawan", path: "/dashboard/pelanggan/atur" },
+    ],
   },
   {
     text: "Laporan",
     icon: <TodayOutlined />,
     path: "/dashboard/report",
+    subItems: [
+      { text: "Laporan Reservasi", path: "/dashboard/report" },
+      { text: "Unduh Laporan", path: "/dashboard/report/download" },
+    ],
   },
 ];
 
