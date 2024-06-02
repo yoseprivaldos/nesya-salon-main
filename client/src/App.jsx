@@ -18,8 +18,7 @@ import Register from "./pages/LandingPage/Register.jsx";
 import Account from "./pages/LandingPage/Account.jsx";
 import Reservation from "./pages/LandingPage/Reservation.jsx";
 import Services from "./pages/LandingPage/Services.jsx";
-import EditUserInformation from "./pages/LandingPage/EditUserInformation.jsx";
-import EditUserPassword from "./pages/LandingPage/EditUserPassword.jsx";
+import Product from "./pages/LandingPage/Product.jsx";
 
 export default function App() {
   const mode = useSelector((state) => state.global.mode);
@@ -43,10 +42,7 @@ export default function App() {
                     <Route path="/services" element={<Services />} />
                     <Route path="/reservation" element={<Reservation />} />
                     <Route path="/account" element={<Account />} />
-                    <Route
-                      path="/account/edit-account/information"
-                      element={<EditUserInformation />}
-                    />
+                    <Route path="/products" element={<Product />} />
                   </Route>
                 </Routes>
               </ThemeProvider>
@@ -78,10 +74,7 @@ export default function App() {
               path="/account/edit-account/information"
               element={<EditUserInformation />}
             /> */}
-            <Route
-              path="/account/edit-account/password"
-              element={<EditUserPassword />}
-            />
+
             {/* <Route path="/reservation" element={<Reservation />} /> */}
             {/* <Route path="/services" element={<Services />} /> */}
           </Route>

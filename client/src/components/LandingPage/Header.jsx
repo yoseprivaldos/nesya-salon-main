@@ -151,6 +151,7 @@ function Header(props) {
                             objectFit: "cover",
                             width: "30px",
                             height: "30px",
+                            backgroundColor: "grey",
                           }}
                         />
                       </IconButton>

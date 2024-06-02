@@ -87,25 +87,25 @@ function Footer() {
               }}
             >
               <IconButton
-                color="inherit"
+                color="secondary"
                 href="https://www.facebook.com/saloncantik"
               >
                 <Facebook />
               </IconButton>
               <IconButton
-                color="inherit"
+                color="secondary"
                 href="https://www.instagram.com/nesya_beauty_salon"
               >
                 <Instagram />
               </IconButton>
               <IconButton
-                color="inherit"
+                color="secondary"
                 href="https://www.twitter.com/saloncantik"
               >
                 <Twitter />
               </IconButton>
               <IconButton
-                color="inherit"
+                color="secondary"
                 href="https://www.youtube.com/saloncantik"
               >
                 <YouTube />
