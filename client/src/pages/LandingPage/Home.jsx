@@ -1,5 +1,5 @@
 // import ToolsSection from "../../components/LandingPage/ToolsSection";
-import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
+import { Box, Button, Grid, Paper, Typography, useTheme } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -10,7 +10,10 @@ import tools2 from "../../assets/tools/tools2.png";
 import tools3 from "../../assets/tools/tools3.png";
 import tools4 from "../../assets/tools/tools4.png";
 import tools5 from "../../assets/tools/tools5.png";
+import SwiperCore from "swiper";
 
+// Initialize Swiper core components
+SwiperCore.use([Navigation]);
 const tools = [
   {
     nameTools: "Services",
@@ -91,56 +94,74 @@ export default function Home() {
         sx={{ padding: "50px", backgroundColor: theme.palette.background.alt }}
       >
         <Swiper
-          spaceBetween={20}
           slidesPerView={4}
+          spaceBetween={20}
           navigation
           modules={[Navigation]}
-          style={{ padding: "20px 0" }}
+          breakpoints={{
+            // Mobile breakpoint (≤ 767px)
+            767: {
+              spaceBetween: 5,
+            },
+            // Tablet breakpoint (768px - 1023px)
+            1023: {
+              spaceBetween: 15,
+            },
+            // Desktop breakpoint (≥ 1024px)
+            1024: {
+              spaceBetween: 20,
+            },
+          }}
         >
           {tools.map((tool, index) => (
             <SwiperSlide key={index}>
-              <Box
+              <Paper
+                onClick={() => handleImageClick(tool.path)}
                 sx={{
+                  height: { xs: "150px", sm: "250px", md: "300px" },
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "center",
-                  margin: "0 5px",
-                  "&:hover img": {
+                  "&:hover img ": {
                     transform: "scale(1.05)",
                   },
+                  "&:hover Button ": {
+                    transform: "scale(1.05)",
+                  },
+                  transition: "transform 0.3s ease-in-out",
+                  cursor: "pointer",
                 }}
               >
-                <Box
-                  component="img"
-                  src={tool.image}
-                  alt={tool.nameTools}
-                  onClick={() => handleImageClick(tool.path)}
-                  sx={{
-                    width: "90%",
-                    height: "300px",
-                    objectFit: "cover",
-                    transition: "transform 0.3s ease-in-out",
-
-                    cursor: "pointer",
-                  }}
-                ></Box>
-                <Typography // Text overlay positioned over the image
-                  variant="h4"
-                  sx={{
-                    width: "85px",
-                    position: "absolute", // Position the text
-                    backgroundColor: theme.palette.primary.main,
-                    textAlign: "center",
-                    color: theme.palette.secondary.main,
-                    opacity: 1, // Initially hidden
-                    padding: 2,
-                    margin: "90%",
-                    transition: "opacity 0.3s ease-in-out", // Smooth transition
-                  }}
-                >
-                  {tool.nameTools}
-                </Typography>
-              </Box>
+                <Box sx={{ flexBasis: "70%", overflow: "hidden" }}>
+                  <img
+                    src={tool.image}
+                    alt={tool.nameTools}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Box>
+                <Box sx={{ flexBasis: "30%", overflow: "hidden" }}>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      borderRadius: 0,
+                      height: "100%",
+                      fontSize: {
+                        xs: "0.5rem",
+                        sm: "0.875rem",
+                        md: "2rem",
+                      },
+                      color: theme.palette.secondary.main,
+                      bgcolor: "primary.main",
+                    }}
+                  >
+                    {tool.nameTools}
+                  </Button>
+                </Box>
+              </Paper>
             </SwiperSlide>
           ))}
         </Swiper>
@@ -148,7 +169,7 @@ export default function Home() {
 
       {/* tagline 1 */}
       <Box sx={{ backgroundColor: theme.palette.secondary.main, padding: 0 }}>
-        <Grid container spacing={2} alignContent="center">
+        <Grid container spacing={0} alignContent="center">
           <Grid item sm={5} xs={12}>
             {/* Gambar */}
             <Box
@@ -156,44 +177,82 @@ export default function Home() {
               src={tools1}
               sx={{
                 width: "100%",
-                height: "700px",
+                height: { xs: "350px", sm: "500px", md: "700px" },
                 objectFit: "cover",
               }}
-            ></Box>
+            />
           </Grid>
           <Grid item sm={7} xs={12}>
             <Box
               backgroundColor={theme.palette.secondary.main}
               sx={{
                 height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-around",
               }}
             >
-              <Box width="550px" className="main-tittle" sx={{ mx: "auto" }}>
-                <Typography variant="h1" fontWeight="bold">
-                  Waktu Berharga,
-                </Typography>
-                <Typography variant="h1">
-                  Booking Salon Lebih Cepat dan Mudah.
-                </Typography>
-              </Box>
-              <Box width="550px" className="second-tittle" sx={{ mx: "auto" }}>
-                <Typography variant="h3">
-                  Langkah Awal Menuju Transformasai Diri yang Menabjubkan.
-                  Jadilah Versi Terbaikmu!
-                </Typography>
-                <Button
-                  variant="contained"
-                  href="/services"
+              <Box
+                padding={4}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-around",
+                  height: "100%",
+                }}
+              >
+                <Box
+                  className="main-tittle"
                   sx={{
-                    marginTop: "2.5rem",
-                    color: theme.palette.secondary.main,
+                    mx: "auto",
+                    width: { xs: "350px", sm: "540px", md: "550px" },
                   }}
                 >
-                  Booking Sekarang
-                </Button>
+                  <Typography
+                    variant="h1"
+                    fontWeight="bold"
+                    sx={{
+                      fontSize: { xs: "1.6rem", sm: "1.25rem", md: "4rem" },
+                    }}
+                  >
+                    Waktu Berharga,
+                  </Typography>
+                  <Typography
+                    variant="h1"
+                    sx={{
+                      fontSize: { xs: "1.5rem", sm: "1.25rem", md: "3rem" },
+                    }}
+                  >
+                    Booking Salon Lebih Cepat dan Mudah.
+                  </Typography>
+                </Box>
+                <Box
+                  className="second-tittle"
+                  sx={{
+                    mx: "auto",
+                    width: { xs: "350px", sm: "540px", md: "550px" },
+                  }}
+                >
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      marginTop: { xs: "0.8rem", sm: "1.25rem", md: "2.5rem" },
+                      fontSize: { xs: "1.2rem", sm: "1.25rem", md: "2rem" },
+                    }}
+                  >
+                    Langkah awal menuju transformasai diri yang menabjubkan.
+                    Jadilah versi terbaikmu!
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    href="/services"
+                    sx={{
+                      marginTop: { xs: "0.8rem", sm: "1.25rem", md: "2.5rem" },
+                      color: theme.palette.secondary.main,
+                      fontSize: { xs: "0.7rem", sm: "0.8rem", md: "1rem" },
+                      borderRadius: 0,
+                    }}
+                  >
+                    Booking Sekarang
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Grid>

@@ -76,7 +76,7 @@ export const getMyReservation = async (req, res) => {
 
     // temukan semua reservasi yang terkait dengan pengguna
     const reservations = await Reservation.find({ user: userId })
-      .populate("service", "name")
+      .populate("service", "name price imageService")
       .populate("user", "username");
 
     if (!reservations || reservations.length === 0) {

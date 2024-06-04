@@ -65,7 +65,7 @@ function Header(props) {
       onClick={handleDrawerToggle}
       color={theme.palette.secondary.main}
       backgroundColor={theme.palette.background.alt}
-      sx={{ textAlign: "center" }}
+      sx={{ textAlign: "center", width: "100%" }}
     >
       <List>
         {navItems.map((item) => (

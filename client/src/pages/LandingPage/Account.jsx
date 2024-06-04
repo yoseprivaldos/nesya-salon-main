@@ -10,7 +10,7 @@ import {
   Avatar,
   TextField,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
@@ -55,35 +55,38 @@ const Account = () => {
     fetchData();
   }, [userId]);
 
+  const handleFileUpload = useCallback(
+    async (image) => {
+      const storage = getStorage(app);
+      const fileName = new Date().getTime() + image.name;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, image);
+      uploadTask.on(
+        "stage_change",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setImagePercent(Math.round(progress));
+        },
+        () => {
+          setImageError(true);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
+            setFormData({ ...formData, profilePicture: downloadURL })
+          );
+        }
+      );
+    },
+    [formData]
+  );
+
   //jika ada image upload
   useEffect(() => {
     if (image) {
       handleFileUpload(image);
     }
-  }, [image]);
-
-  const handleFileUpload = async (image) => {
-    const storage = getStorage(app);
-    const fileName = new Date().getTime() + image.name;
-    const storageRef = ref(storage, fileName);
-    const uploadTask = uploadBytesResumable(storageRef, image);
-    uploadTask.on(
-      "stage_change",
-      (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setImagePercent(Math.round(progress));
-      },
-      () => {
-        setImageError(true);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-          setFormData({ ...formData, profilePicture: downloadURL })
-        );
-      }
-    );
-  };
+  }, [image, handleFileUpload]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });

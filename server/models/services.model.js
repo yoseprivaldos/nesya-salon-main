@@ -33,7 +33,7 @@ const serviceSchema = new mongoose.Schema(
     },
     imageService: [
       {
-        type: String, //URL gambar
+        type: String,
       },
     ],
     active: {

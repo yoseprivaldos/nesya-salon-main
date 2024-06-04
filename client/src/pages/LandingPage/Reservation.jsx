@@ -7,63 +7,65 @@ import {
   useTheme,
   Avatar,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-
-const dataReservation = [
-  {
-    name: "reservasi 1 selesai",
-    status: "selesai",
-  },
-  {
-    name: "reservasi 2 selesai",
-    status: "selesai",
-  },
-  {
-    name: "reservasi 3 selesai",
-    status: "selesai",
-  },
-  {
-    name: "reservasi 4 selesai",
-    status: "selesai",
-  },
-  {
-    name: "reservasi 1 proses",
-    status: "proses",
-  },
-  {
-    name: "reservasi 2 proses",
-    status: "proses",
-  },
-  {
-    name: "reservasi 3 proses",
-    status: "proses",
-  },
-  {
-    name: "reservasi 4 proses",
-    status: "proses",
-  },
-  {
-    name: "reservasi 1 batal",
-    status: "batal",
-  },
-  {
-    name: "reservasi 2 batal",
-    status: "batal",
-  },
-  {
-    name: "reservasi 3 batal",
-    status: "batal",
-  },
-  {
-    name: "reservasi 4 proses",
-    status: "batal",
-  },
-];
+import { Link, useLocation } from "react-router-dom";
 
 const Reservation = () => {
   const theme = useTheme();
   const { currentUser } = useSelector((state) => state.user);
+  const location = useLocation();
+
+  const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchReservations = async () => {
+      try {
+        const response = await fetch("/api/reservation/my-reservation", {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setReservations(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Hanya fetch jika currentUser ada dan memiliki token
+    if (currentUser) {
+      fetchReservations();
+    }
+  }, [currentUser]);
+
+  //filter data reservasi berdasarkan status dari query parameter
+  const getFilteredReservations = () => {
+    const params = new URLSearchParams(location.search);
+    const status = params.get("status");
+    if (status) {
+      return reservations.filter(
+        (reservation) => reservation.status === status
+      );
+    }
+    return reservations;
+  };
+
+  const filteredReservations = getFilteredReservations();
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography>Error: {error}</Typography>;
+  }
 
   return (
     <Box
@@ -98,8 +100,8 @@ const Reservation = () => {
               <Avatar
                 src={currentUser.profilePicture}
                 sx={{
-                  width: "60%",
-                  height: "60%",
+                  width: "80px",
+                  height: "80px",
                   backgroundColor: "grey",
                   border: "none",
                 }}
@@ -202,7 +204,7 @@ const Reservation = () => {
               }}
             >
               <Grid container>
-                <Grid item xs={3} md={3}>
+                <Grid item md={2.4} xs={4}>
                   <Link
                     to="/reservation"
                     style={{
@@ -228,9 +230,9 @@ const Reservation = () => {
                     </Typography>
                   </Link>
                 </Grid>
-                <Grid item xs={3} md={3}>
+                <Grid item md={2.4} xs={4}>
                   <Link
-                    to="/reservation/proses"
+                    to="/reservation?status=pending"
                     style={{
                       textDecoration: "none",
                       display: "block",
@@ -254,9 +256,35 @@ const Reservation = () => {
                     </Typography>
                   </Link>
                 </Grid>
-                <Grid item xs={3} md={3}>
+                <Grid item md={2.4} xs={4}>
                   <Link
-                    to="/reservation/batal"
+                    to="/reservation?status=confirmed"
+                    style={{
+                      textDecoration: "none",
+                      display: "block",
+                      width: "100%",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        backgroundColor: "secondary.main",
+                        color: "primary.main",
+                        padding: 1,
+                        "&:hover": {
+                          backgroundColor: "primary.main",
+                          color: "secondary.main",
+                        },
+                      }}
+                      variant="body1"
+                      align="center"
+                    >
+                      DISETUJUI
+                    </Typography>
+                  </Link>
+                </Grid>
+                <Grid item md={2.4} xs={6}>
+                  <Link
+                    to="/reservation?status=canceled"
                     style={{
                       textDecoration: "none",
                       display: "block",
@@ -280,9 +308,9 @@ const Reservation = () => {
                     </Typography>
                   </Link>
                 </Grid>
-                <Grid item xs={3} md={3}>
+                <Grid item md={2.4} xs={6}>
                   <Link
-                    to="/reservation/selesai"
+                    to="/reservation?status=completed"
                     style={{
                       textDecoration: "none",
                       display: "block",
@@ -307,6 +335,19 @@ const Reservation = () => {
                   </Link>
                 </Grid>
               </Grid>
+            </Box>
+            {/* data yang bisa diambil tanggal, jam, harga, note, status, gambar */}
+            <Box>
+              {filteredReservations.map((reservation, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    marginBottom: 2,
+                    padding: 2,
+                    border: `1px solid ${theme.palette.secondary.main}`,
+                  }}
+                ></Box>
+              ))}
             </Box>
           </Grid>
         </Grid>

@@ -17,6 +17,7 @@ import Login from "./pages/LandingPage/Login.jsx";
 import Register from "./pages/LandingPage/Register.jsx";
 import Account from "./pages/LandingPage/Account.jsx";
 import Reservation from "./pages/LandingPage/Reservation.jsx";
+import FormReservation from "./pages/LandingPage/FormReservation.jsx";
 import Services from "./pages/LandingPage/Services.jsx";
 import Product from "./pages/LandingPage/Product.jsx";
 
@@ -41,6 +42,10 @@ export default function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/services" element={<Services />} />
                     <Route path="/reservation" element={<Reservation />} />
+                    <Route
+                      path="/form-reservation"
+                      element={<FormReservation />}
+                    />
                     <Route path="/account" element={<Account />} />
                     <Route path="/products" element={<Product />} />
                   </Route>
