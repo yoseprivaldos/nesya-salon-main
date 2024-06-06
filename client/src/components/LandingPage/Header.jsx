@@ -140,10 +140,14 @@ function Header(props) {
                 </Link>
               </Grid>
               <Grid item>
-                <Box sx={{ flexGrow: 0 }}>
+                <Box
+                  sx={{ flexGrow: 0 }}
+                  onMouseEnter={handleOpenUserMenu}
+                  onMouseLeave={handleCloseUserMenu}
+                >
                   <Tooltip>
                     {currentUser ? (
-                      <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <IconButton sx={{ p: 0 }}>
                         <Avatar
                           src={currentUser.profilePicture}
                           sx={{
