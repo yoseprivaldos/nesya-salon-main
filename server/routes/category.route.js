@@ -2,8 +2,6 @@ import express from "express";
 import {
   createCategory,
   deleteCategory,
-  getCategoriesByParent,
-  getMainCategories,
   getCategories,
   getCategoryById,
   updateCategory,
@@ -16,8 +14,6 @@ const router = express.Router();
 router.post("/", verifyToken, requireAdmin, createCategory);
 router.get("/", getCategories);
 router.get("/", getCategoryById);
-router.get("/main", getMainCategories);
-router.get("/:parentId", getCategoriesByParent);
 router.delete("/:categoryId", verifyToken, requireAdmin, deleteCategory);
 router.patch("/:categoryId", verifyToken, requireAdmin, updateCategory);
 

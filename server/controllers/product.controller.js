@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Product from "../models/products.model.js";
 
-//createProduct
+//createProduct by admin
 export const createProduct = async (req, res) => {
   try {
     const {
@@ -9,21 +9,21 @@ export const createProduct = async (req, res) => {
       description,
       ingredients,
       category,
-      brand,
       price,
-      productType,
       imageProduct,
+      stock,
     } = req.body;
 
     //validasi input
-    if (!name || !category || !brand || !price || !productType) {
-      return res.status(400).json({ message: "Semua field wajib diisi" });
+    if (!name || !category || !price) {
+      return res
+        .status(400)
+        .json({ message: "Nama, Kategori dan Harga Wajib diisi" });
     }
 
-    //validasi field  productType
-    const validProductTypes = Product.schema.path("productType").enumValues;
-    if (!validProductTypes.includes(productType)) {
-      return res.status(400).json({ message: "Jenis produk tidak valid" });
+    // Pastikan kategori adalah array
+    if (!Array.isArray(category)) {
+      return res.status(400).json({ message: "Kategori harus berupa array" });
     }
 
     const newProduct = new Product({
@@ -31,10 +31,9 @@ export const createProduct = async (req, res) => {
       description,
       ingredients,
       category,
-      brand,
       price,
-      productType,
       imageProduct,
+      stock,
     });
     await newProduct.save();
     res.status(201).json({ message: "Product berhasil dibuat" });
@@ -82,7 +81,7 @@ export const getProducts = async (req, res) => {
   }
 };
 
-//UpdateProduct
+//UpdateProduct-only by admin
 export const updateProduct = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -93,16 +92,17 @@ export const updateProduct = async (req, res) => {
       return res.status(400).json({ message: "ID produk tidak valid" });
     }
 
-    //validasi productType (jika ada di updateData)
-    if (updatedData.productType) {
-      const validProductTypes = Product.schema.path("productType").enumValues;
-      if (!validProductTypes.includes(updatedData.productType)) {
-        return res.status(400).json({ message: "Jenis produk tidak valid" });
-      }
+    // Pastikan kategori adalah array jika ada dalam updatedData
+    if (updatedData.category && !Array.isArray(updatedData.category)) {
+      return res.status(400).json({ message: "Kategori harus berupa array" });
     }
 
-    // //Query Update
-    // const updateQuery = { $set: updatedData };
+    // pastikan iamge adalah array jika ada dalam updateData
+    if (updatedData.imageProduct && !Array.isArray(updatedData.imageProduct)) {
+      return res
+        .status(400)
+        .json({ message: "imageProduct harus berupa array" });
+    }
 
     //Update Produk
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -131,7 +131,7 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-//DeleteProduct
+//DeleteProduct - onlyby Admin
 export const deleteProduct = async (req, res) => {
   try {
     const { productId } = req.params;

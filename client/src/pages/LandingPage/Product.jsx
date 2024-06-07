@@ -290,7 +290,7 @@ const Product = () => {
                   />
                   <FormControlLabel
                     control={<Checkbox />}
-                    label="Pewarn Rambut"
+                    label="Pewarna Rambut"
                   />
                 </FormGroup>
               </Box>

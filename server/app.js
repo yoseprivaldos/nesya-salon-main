@@ -26,10 +26,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
+const PORT = process.env.PORT || 9000;
 /**MONGOOSE SETUP */
-const PORT = 3000;
 mongoose
-  .connect(process.env.MONGO || 9000)
+  .connect(process.env.MONGO)
   .then(() => {
     console.log("berhasil terhubung dengan mongodb");
   })

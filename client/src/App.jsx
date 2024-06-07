@@ -8,7 +8,7 @@ import { useMemo } from "react";
 import Dashboard from "./pages/DashboardPanel/Dashboard.jsx";
 import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
 import ServiceDashboard from "./pages/DashboardPanel/Services.jsx";
-import ProductDashboard from "./pages/DashboardPanel/Product.jsx";
+import ProductDashboard from "./pages/DashboardPanel/Products.jsx";
 import EmployeeDashboard from "./pages/DashboardPanel/Employee.jsx";
 import LayoutDashboard from "./pages/DashboardPanel/Layout.jsx";
 import LayoutLandingPage from "./pages/LandingPage/Layout.jsx";

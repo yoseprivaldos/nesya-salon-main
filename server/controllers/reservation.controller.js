@@ -10,7 +10,7 @@ export const createReservation = async (req, res) => {
       reservationName,
       reservationEmail,
       note,
-      service,
+      services, //Array of service IDs
       date,
       startTime,
       endTime,
@@ -22,10 +22,15 @@ export const createReservation = async (req, res) => {
       return res.status(404).json({ message: "User tidak ditemukan" });
     }
 
-    // validasi service
-    const serviceExist = await Service.findById(service);
-    if (!serviceExist) {
-      return res.status(404).json({ message: "Service tidak ditemukan" });
+    // Validasi services (pastikan semua service ID valid)
+    const validServiceIds = await Service.find({
+      _id: { $in: services },
+    }).distinct("_id");
+
+    if (validServiceIds.length !== services.length) {
+      return res
+        .status(404)
+        .json({ message: "Beberapa layanan tidak ditemukan" });
     }
 
     //Buat objek reservasi baru
@@ -34,7 +39,7 @@ export const createReservation = async (req, res) => {
       reservationName,
       reservationEmail,
       note,
-      service,
+      services,
       date,
       startTime,
       endTime,
@@ -56,7 +61,7 @@ export const getAllReservation = async (req, res) => {
   try {
     const reservations = await Reservation.find()
       .populate("user", "_id username email")
-      .populate("service", "name price duration");
+      .populate("services", "name price duration");
     if (!reservations) {
       return res.status(404).json({ message: "belum ada reservasi terdaftar" });
     }
@@ -76,7 +81,7 @@ export const getMyReservation = async (req, res) => {
 
     // temukan semua reservasi yang terkait dengan pengguna
     const reservations = await Reservation.find({ user: userId })
-      .populate("service", "name price imageService")
+      .populate("services", "name price imageService")
       .populate("user", "username");
 
     if (!reservations || reservations.length === 0) {

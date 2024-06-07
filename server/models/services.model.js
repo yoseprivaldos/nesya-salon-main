@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Category from "./category.model.js";
 
 const serviceSchema = new mongoose.Schema(
   {
@@ -11,16 +12,12 @@ const serviceSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: [true, "Kategori layanan harus ada"],
-    },
-    subCategory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: [true, "Subkategori layanan harus ada"],
-    },
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
     duration: {
       type: Number,
       required: [true, "durasi layanan wajib ada"],
@@ -36,7 +33,7 @@ const serviceSchema = new mongoose.Schema(
         type: String,
       },
     ],
-    active: {
+    isActive: {
       type: Boolean,
       default: true,
     },
@@ -53,6 +50,35 @@ const serviceSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+//memastikan categories tidak bernilai null jika terjadi penghapusan category di tabel categories
+serviceSchema.pre("save", async function (next) {
+  if (this.categories.length === 0) {
+    const defaultCategory = await Category.findOne({ name: "Lainnya" });
+    if (defaultCategory) {
+      this.categories.push(defaultCategory._id);
+    }
+  }
+  next();
+});
+
+// memastikan service tidak dapat dihapus ketika terkait dengan reservasi aktif
+serviceSchema.pre("remove", async function (next) {
+  const existingReservations = await Reservation.find({
+    services: this._id,
+    status: { $nin: ["completed", "canceled"] },
+  });
+
+  if (existingReservations.length > 0) {
+    throw new Error(
+      "Layanan tidak dapat dihapus karena masih terkait dengan reservasi yang belum selesai"
+    );
+  } else {
+    const newDefaultCategory = new Category({ name: "Lainnya" });
+    await newDefaultCategory.save();
+    this.categories.push(newDefaultCategory._id);
+  }
+  next();
+});
 
 const Service = mongoose.model("Service", serviceSchema);
 

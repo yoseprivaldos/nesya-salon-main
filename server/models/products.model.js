@@ -12,42 +12,15 @@ const productSchema = new mongoose.Schema(
       default: "",
     },
     ingredients: {
-      type: String,
+      type: [String],
       default: "",
     },
-    category: {
-      type: String,
-      required: [true, "category harus ada"],
-    },
-    brand: {
-      type: String,
-      required: [true, "Nama brand produk harus ada"],
-    },
-    productType: {
-      type: String,
-      enum: [
-        "Shampoo",
-        "Conditioner",
-        "Hair Mask",
-        "Hair Serum",
-        "Pomade",
-        "Hair Spray",
-        "Face Wash",
-        "Toner",
-        "Moisturizer",
-        "Serum",
-        "Sunscreen",
-        "Mask",
-        "Scrub",
-        "Body Lotion",
-        "Body Wash",
-        "Soap",
-        "Essential Oil",
-        "Makeup",
-        "Nail Polish",
-        "Others",
-      ],
-    },
+    category: [
+      {
+        type: String,
+        required: [true, "category harus ada"],
+      },
+    ],
     price: {
       type: Number,
       required: [true, "Harga Produk harus ada"],
@@ -58,6 +31,11 @@ const productSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    stock: {
+      type: Number,
+      default: 0,
+      min: [0, "Stok tidak boleh negatif"],
+    },
   },
   { timestamps: true }
 );

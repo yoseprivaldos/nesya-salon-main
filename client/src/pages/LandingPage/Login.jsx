@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -8,7 +7,6 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import OAuth from "../../components/LandingPage/OAuth";
-// import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import {
   signInStart,
   signInSuccess,
@@ -37,10 +35,14 @@ export default function Login() {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
-          "Content-Type": "Application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error ! status : ${res.status}`);
+      }
       const data = await res.json();
       if (data.success === false) {
         dispatch(signInFailure(data));

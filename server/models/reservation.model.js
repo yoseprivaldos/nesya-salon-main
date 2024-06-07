@@ -24,11 +24,13 @@ const reservationSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  service: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Service",
-    required: [true, "id service harus diisi"],
-  },
+  services: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Service",
+      required: true,
+    },
+  ],
   date: {
     type: Date,
     required: [true, "tanggal harus diisi"],
