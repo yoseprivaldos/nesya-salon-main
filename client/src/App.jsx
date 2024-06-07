@@ -5,12 +5,16 @@ import { themeDashboard } from "./utils/dashboard.theme.js";
 import themePublic from "./utils/public.theme.js";
 import { useSelector } from "react-redux";
 import { useMemo } from "react";
+//import Dashboard section
+import LayoutDashboard from "./pages/DashboardPanel/Layout.jsx";
 import Dashboard from "./pages/DashboardPanel/Dashboard.jsx";
 import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
 import ServiceDashboard from "./pages/DashboardPanel/Services.jsx";
 import ProductDashboard from "./pages/DashboardPanel/Products.jsx";
 import EmployeeDashboard from "./pages/DashboardPanel/Employee.jsx";
-import LayoutDashboard from "./pages/DashboardPanel/Layout.jsx";
+import AddProductsDashboard from "./pages/DashboardPanel/AddProduct.jsx";
+import EditProductDashboard from "./pages/DashboardPanel/EditProduct.jsx";
+//import landing page section
 import LayoutLandingPage from "./pages/LandingPage/Layout.jsx";
 import Home from "./pages/LandingPage/Home.jsx";
 import Login from "./pages/LandingPage/Login.jsx";
@@ -68,8 +72,16 @@ export default function App() {
           >
             <Route index element={<Dashboard />} />{" "}
             <Route path="services" element={<ServiceDashboard />} />{" "}
-            <Route path="products" element={<ProductDashboard />} />{" "}
             <Route path="employees" element={<EmployeeDashboard />} />{" "}
+            <Route path="products" element={<ProductDashboard />} />{" "}
+            <Route
+              path="products/add-product"
+              element={<AddProductsDashboard />}
+            />
+            <Route
+              path="products/edit-product/:productId"
+              element={<EditProductDashboard />}
+            />
           </Route>
 
           {/* testingUI */}

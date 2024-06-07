@@ -68,6 +68,7 @@ export const getProductById = async (req, res) => {
     res.status(500).json({ message: "Gagal fetching produk" });
   }
 };
+
 //getAllProducts
 export const getProducts = async (req, res) => {
   try {

@@ -63,7 +63,7 @@ const navItems = [
     path: "/dashboard/products",
     subItems: [
       { text: "Daftar Produk", path: "/dashboard/products" },
-      { text: "Stok Produk", path: "/dashboard/produk/stok" },
+      { text: "Tambah Produk", path: "/dashboard/products/add-product" },
     ],
   },
   {

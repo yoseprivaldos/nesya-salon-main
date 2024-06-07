@@ -30,8 +30,6 @@ const Account = () => {
   const [imagePercent, setImagePercent] = useState(0);
   const [imageError, setImageError] = useState(false);
 
-  console.log(formData);
-
   const { currentUser } = useSelector((state) => state.user);
 
   //User Id yang login saat ini

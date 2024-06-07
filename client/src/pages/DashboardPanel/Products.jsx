@@ -7,13 +7,22 @@ import {
   CardContent,
   CardMedia,
   Collapse,
+  IconButton,
   Typography,
   useMediaQuery,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import Header from "../../components/dashboard/Header";
 import { useTheme } from "@emotion/react";
-import { useGetProductsQuery } from "../../redux/api/api.js";
+import {
+  useGetProductsQuery,
+  useDeleteProductMutation,
+} from "../../redux/api/api.js";
 import { useEffect, useState } from "react";
+
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useNavigate } from "react-router-dom";
 
 const Product = ({
   name,
@@ -23,17 +32,77 @@ const Product = ({
   price,
   stock,
   category,
+  _id,
+  onDelete,
 }) => {
   const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
+  const navigate = useNavigate();
+
+  //state untuk menu setiap produk
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const handleEditClick = () => {
+    navigate(`edit-product/${_id}`);
+    handleClose();
+  };
+
   return (
     <Card
       sx={{
         backgroundImage: "none",
         backgroundColor: theme.palette.background.alt,
         borderRadius: "0.55rem",
+        position: "relative",
       }}
     >
+      <IconButton
+        aria-label="more"
+        id={`long-button-${_id}`} // ID unik untuk setiap menu
+        aria-controls={open ? `long-menu-${_id}` : undefined}
+        aria-expanded={open ? "true" : undefined}
+        aria-haspopup="true"
+        onClick={handleClick}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+        }}
+      >
+        <MoreVertIcon />
+      </IconButton>
+
+      <Menu
+        id={`long-menu-${_id}`}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        sx={{
+          ".MuiMenu-paper": {
+            maxHeight: 48 * 4.5,
+            width: "20ch",
+            mr: -8, // Margin negatif di kanan (sesuaikan nilainya)
+          },
+        }}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <MenuItem onClick={handleEditClick}>Edit</MenuItem>{" "}
+        <MenuItem onClick={onDelete}>Hapus</MenuItem>{" "}
+      </Menu>
+
       <CardMedia
         component="img"
         height="90"
@@ -75,16 +144,14 @@ const Product = ({
           <Typography>{ingredients}</Typography>
         </CardContent>
       </Collapse>
-      <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
+      <CardActions sx={{ display: "flex" }}>
         <Button
+          fullWidth
           variant="primary"
-          size="small"
+          size="large"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           Lihat Lebih
-        </Button>
-        <Button variant="primary" size="small">
-          Edit Produk
         </Button>
       </CardActions>
     </Card>
@@ -94,6 +161,7 @@ const Product = ({
 const Products = () => {
   const isNonMobile = useMediaQuery("(min-width: 1000px)");
   const { data, isLoading, refetch } = useGetProductsQuery();
+  const [deleteProduct] = useDeleteProductMutation();
 
   // Refetch data secara manual (misalnya, setelah melakukan perubahan data)
   useEffect(() => {
@@ -115,30 +183,23 @@ const Products = () => {
             "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
           }}
         >
-          {data.map(
-            ({
-              _id,
-              name,
-              ingredients,
-              description,
-              price,
-              category,
-              stock,
-              imageProduct,
-            }) => (
-              <Product
-                key={_id}
-                _id={_id}
-                name={name}
-                ingredients={ingredients}
-                description={description}
-                price={price}
-                category={category}
-                stock={stock}
-                imageProduct={imageProduct}
-              />
-            )
-          )}
+          {data.map((product) => (
+            <Product
+              key={product._id}
+              {...product}
+              onDelete={() => {
+                deleteProduct(product._id)
+                  .unwrap() // Unwrap promise untuk mendapatkan hasil atau error
+                  .then(() => {
+                    refetch(); // Refetch data setelah penghapusan berhasil
+                  })
+                  .catch((error) => {
+                    // Tangani error jika ada
+                    console.error("Error deleting product:", error);
+                  });
+              }}
+            />
+          ))}
         </Box>
       ) : (
         <>Loading...</>
