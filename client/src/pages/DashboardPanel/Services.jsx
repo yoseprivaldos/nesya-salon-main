@@ -1,23 +1,117 @@
-import { Box, Button, Typography, useTheme } from "@mui/material";
+/* eslint-disable react/prop-types */
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Collapse,
+  // Menu,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import Header from "../../components/dashboard/Header";
-import { AddCircleOutline } from "@mui/icons-material";
+// import { AddCircleOutline } from "@mui/icons-material";
+import { useGetServicesQuery } from "../../redux/api/api";
+import { useState } from "react";
 
 const Services = () => {
-  const theme = useTheme();
+  const isNonMobile = useMediaQuery("(min-width: 1000px)");
+  const { data, isLoading } = useGetServicesQuery();
+
   return (
     <Box m="1.5rem 2.5rem">
       <Header title="Layanan" subtitle="Daftar Layanan" />
-      <Box mt="40px" height="75vh">
-        <Button variant="text">
-          <AddCircleOutline
-            sx={{ color: theme.palette.secondary[200], mr: "1rem" }}
-          />
-          <Typography sx={{ color: theme.palette.primary[100] }}>
-            Tambah Layanan
-          </Typography>
-        </Button>
-      </Box>
+      {data || !isLoading ? (
+        <Box
+          mt="20px"
+          display="grid"
+          gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+          justifyContent="space-between"
+          rowGap="20px"
+          columnGap="1.33%"
+          sx={{
+            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+          }}
+        >
+          {data.map((service) => (
+            <Service key={service._id} {...service} />
+          ))}
+        </Box>
+      ) : (
+        <>Loading...</>
+      )}
     </Box>
   );
 };
+
+const Service = ({
+  _id,
+  name,
+  duration,
+  description,
+  imageService,
+  isActive,
+  categories,
+  price,
+}) => {
+  const theme = useTheme();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const imageUrl =
+    imageService?.length > 0 ? imageService[0] : "/path/to/default-image.jpg";
+
+  return (
+    <Card
+      sx={{
+        backgroundImage: "none",
+        backgroundColor: theme.palette.background.alt,
+        borderRadius: "0.55rem",
+        position: "relative",
+      }}
+    >
+      <CardContent>
+        <Typography variant="h5" component="div">
+          {name}
+        </Typography>
+        <Typography sx={{ mb: "1.5rem" }} color={theme.palette.secondary[400]}>
+          Rp.{Number(price).toFixed(2)}
+        </Typography>
+        <Typography color={theme.palette.secondary[400]}>
+          Duration: {duration} menit
+        </Typography>
+      </CardContent>
+      <Collapse
+        in={isExpanded}
+        timeout="auto"
+        unmountOnExit
+        sx={{
+          color: theme.palette.neutral[300],
+        }}
+      >
+        <CardContent>
+          <CardMedia
+            component="img"
+            height="70"
+            image={imageUrl}
+            alt={name}
+            sx={{ objectFit: "contain" }}
+          />
+        </CardContent>
+      </Collapse>
+      <CardActions sx={{ display: "flex" }}>
+        <Button
+          fullWidth
+          variant="primary"
+          size="large"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          Lihat Lebih
+        </Button>
+      </CardActions>
+    </Card>
+  );
+};
+
 export default Services;

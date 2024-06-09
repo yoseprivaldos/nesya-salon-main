@@ -10,10 +10,15 @@ import LayoutDashboard from "./pages/DashboardPanel/Layout.jsx";
 import Dashboard from "./pages/DashboardPanel/Dashboard.jsx";
 import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
 import ServiceDashboard from "./pages/DashboardPanel/Services.jsx";
+import AddServiceDashboard from "./pages/DashboardPanel/AddService.jsx";
+import EditServiceDashboard from "./pages/DashboardPanel/EditService.jsx";
 import ProductDashboard from "./pages/DashboardPanel/Products.jsx";
 import EmployeeDashboard from "./pages/DashboardPanel/Employee.jsx";
 import AddProductsDashboard from "./pages/DashboardPanel/AddProduct.jsx";
 import EditProductDashboard from "./pages/DashboardPanel/EditProduct.jsx";
+import ReservationDashboard from "./pages/DashboardPanel/Reservation.jsx";
+import CreateReservationDashboard from "./pages/DashboardPanel/CreateReservation.jsx";
+
 //import landing page section
 import LayoutLandingPage from "./pages/LandingPage/Layout.jsx";
 import Home from "./pages/LandingPage/Home.jsx";
@@ -70,10 +75,18 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Dashboard />} />{" "}
-            <Route path="services" element={<ServiceDashboard />} />{" "}
-            <Route path="employees" element={<EmployeeDashboard />} />{" "}
-            <Route path="products" element={<ProductDashboard />} />{" "}
+            <Route index element={<Dashboard />} />
+            <Route path="services" element={<ServiceDashboard />} />
+            <Route
+              path="services/create-service"
+              element={<AddServiceDashboard />}
+            />
+            <Route
+              path="services/edit-service/:serviceId"
+              element={<EditServiceDashboard />}
+            />
+            <Route path="employees" element={<EmployeeDashboard />} />
+            <Route path="products" element={<ProductDashboard />} />
             <Route
               path="products/add-product"
               element={<AddProductsDashboard />}
@@ -81,6 +94,11 @@ export default function App() {
             <Route
               path="products/edit-product/:productId"
               element={<EditProductDashboard />}
+            />
+            <Route path="reservations" element={<ReservationDashboard />} />
+            <Route
+              path="reservations/create-reservation"
+              element={<CreateReservationDashboard />}
             />
           </Route>
 

@@ -6,7 +6,7 @@ export const api = createApi({
     credentials: "include",
   }),
   reducerPath: "adminApi",
-  tagTypes: ["User", "Products"],
+  tagTypes: ["User", "Products", "Category", "Services"],
   endpoints: (build) => ({
     getUser: build.query({
       query: (id) => `api/user/${id}`,
@@ -38,6 +38,22 @@ export const api = createApi({
       }),
       invalidatesTags: ["Products"],
     }),
+    getCategory: build.query({
+      query: () => "api/category",
+      providesTags: ["Category"],
+    }),
+    createService: build.mutation({
+      query: (newService) => ({
+        url: "api/services",
+        method: "POST",
+        body: newService,
+      }),
+      invalidatesTags: ["Services"],
+    }),
+    getServices: build.query({
+      query: () => "api/services",
+      providesTags: ["Services"],
+    }),
   }),
 });
 
@@ -47,4 +63,7 @@ export const {
   useCreateProductMutation,
   useDeleteProductMutation,
   useUpdateProductMutation,
+  useGetCategoryQuery,
+  useCreateServiceMutation,
+  useGetServicesQuery,
 } = api;

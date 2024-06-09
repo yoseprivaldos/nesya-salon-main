@@ -1,0 +1,42 @@
+export const dataResevation = [
+  {
+    name: "Riski Vanni Simbolon",
+    visitors: "3.5K",
+    revenue: "$5,768",
+    sales: "590",
+    conversion: "4.8%",
+    imgSrc: "./images/brand/brand-01.svg",
+  },
+  {
+    name: "Mauritius Endoftar Lase",
+    visitors: "2.2K",
+    revenue: "$4,635",
+    sales: "467",
+    conversion: "4.3%",
+    imgSrc: "./images/brand/brand-02.svg",
+  },
+  {
+    name: "Henri Surbakti",
+    visitors: "2.1K",
+    revenue: "$4,290",
+    sales: "420",
+    conversion: "3.7%",
+    imgSrc: "./images/brand/brand-03.svg",
+  },
+  {
+    name: "Agus Prandika Tarigan",
+    visitors: "1.5K",
+    revenue: "$3,580",
+    sales: "389",
+    conversion: "2.5%",
+    imgSrc: "./images/brand/brand-04.svg",
+  },
+  {
+    name: "Rey Sembiring",
+    visitors: "1.2K",
+    revenue: "$2,740",
+    sales: "230",
+    conversion: "1.9%",
+    imgSrc: "./images/brand/brand-05.svg",
+  },
+];

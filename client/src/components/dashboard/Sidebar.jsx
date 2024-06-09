@@ -43,9 +43,16 @@ const navItems = [
     ],
   },
   {
-    text: "Janji Temu",
+    text: "Reservasi",
     icon: <Groups2Outlined />,
     path: "/dashboard/janjitemu",
+    subItems: [
+      { text: "Kelola Reservasi", path: "/dashboard/reservations" },
+      {
+        text: "Tambah Reservasi",
+        path: "/dashboard/reservations/create-reservation",
+      },
+    ],
   },
 
   {
@@ -54,7 +61,7 @@ const navItems = [
     path: "/dashboard/services",
     subItems: [
       { text: "Daftar Layanan", path: "/dashboard/services" },
-      { text: "Update Layanan", path: "/dashboard/services/updates" },
+      { text: "Tambah Layanan", path: "/dashboard/services/create-service" },
     ],
   },
   {

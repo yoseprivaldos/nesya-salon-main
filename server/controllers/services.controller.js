@@ -48,7 +48,7 @@ export const createService = async (req, res) => {
       price,
       imageService,
       isActive,
-      categories, // Langsung simpan array of category IDs
+      categories,
     });
 
     // menyimpan service baru ke database
@@ -63,9 +63,7 @@ export const createService = async (req, res) => {
 //getAllServices
 export const getAllServices = async (req, res) => {
   try {
-    const services = await Service.find()
-      .populate("category", "name")
-      .populate("subCategory", "name");
+    const services = await Service.find().populate("categories", "name");
     res.status(200).json(services);
   } catch (error) {
     console.error(error);
@@ -80,37 +78,18 @@ export const getService = async (req, res) => {
   try {
     const { serviceId } = req.params;
 
-    // Temukan service dan populate category dan subCategory
-    const service = await Service.findById(serviceId).populate({
-      path: "category",
-      select: "name subCategories",
-      populate: {
-        path: "subCategories",
-        select: "name",
-      },
-    });
+    const service = await Service.findById(serviceId).populate(
+      "categories",
+      "name"
+    );
 
     if (!service) {
       return res.status(404).json({ message: "Layanan tidak ditemukan" });
     }
-    // Temukan subkategori yang sesuai dalam kategori
-    const subCategory = service.category.subCategories.find(
-      (subCat) => subCat._id.toString() === service.subCategory.toString()
-    );
 
-    if (!subCategory) {
-      return res
-        .status(404)
-        .json({ message: "Subkategori tidak ditemukan dalam kategori" });
-    }
-
-    // Format respon agar subCategory menampilkan namanya
+    // Tidak perlu mencari subCategory karena tidak ada di skema
     const response = {
       ...service.toObject(),
-      category: service.category.name,
-      subCategory: service.category.subCategories.find(
-        (subCat) => subCat._id.toString() === service.subCategory.toString()
-      ).name,
     };
 
     res.status(200).json(response);
@@ -120,39 +99,68 @@ export const getService = async (req, res) => {
   }
 };
 
-//updateService
 export const updateService = async (req, res) => {
   try {
     const { serviceId } = req.params;
     const updatedData = req.body;
 
-    // Jika ada update categories, validasi dan update relasi langsung
+    // Validasi unik untuk nama layanan
+    if (updatedData.name) {
+      const existingService = await Service.findOne({ name: updatedData.name });
+      if (existingService && existingService._id.toString() !== serviceId) {
+        return res
+          .status(400)
+          .json({ message: "Nama layanan sudah terdaftar" });
+      }
+    }
+
+    // Validasi dan update untuk categories
     if (updatedData.categories) {
-      // Validasi categories
+      // Validasi categories sebagai array
       if (!Array.isArray(updatedData.categories)) {
         return res.status(400).json({ message: "Kategori harus berupa array" });
       }
 
-      const foundCategories = await Category.find({
+      // Pastikan kategori yang diberikan valid
+      const validCategories = await Category.find({
         _id: { $in: updatedData.categories },
       });
-
-      if (foundCategories.length !== updatedData.categories.length) {
-        return res.status(404).json({ message: "Some categories not found" });
+      if (validCategories.length !== updatedData.categories.length) {
+        return res
+          .status(404)
+          .json({ message: "Beberapa kategori tidak ditemukan" });
       }
+
+      updatedData.categories = validCategories.map((cat) => cat._id); // Update categories dalam updatedData
     }
 
+    // Perbarui layanan menggunakan findByIdAndUpdate
     const updatedService = await Service.findByIdAndUpdate(
       serviceId,
       updatedData,
-      { new: true }
+      {
+        new: true, // Mengembalikan dokumen yang baru diperbarui
+        runValidators: true, // Menjalankan validasi pada dokumen yang diperbarui
+      }
     );
 
-    if (!updateService) {
+    if (!updatedService) {
       return res.status(404).json({ message: "Layanan tidak ditemukan" });
     }
-    res.status(200).json(updatedService); // Langsung kembalikan service yang sudah diupdate
+
+    res.status(200).json(updatedService);
   } catch (error) {
+    if (error.name === "ValidationError") {
+      // Tangani kesalahan validasi dari Mongoose
+      const validationErrors = {};
+      for (const field in error.errors) {
+        validationErrors[field] = error.errors[field].message;
+      }
+      return res
+        .status(400)
+        .json({ message: "Validation Error", errors: validationErrors });
+    }
+
     console.error(error);
     res.status(500).json({ message: "Error updating service", error });
   }
@@ -163,30 +171,47 @@ export const deleteService = async (req, res) => {
   try {
     const { serviceId } = req.params;
 
-    const deletedService = await Service.findByIdAndDelete(serviceId);
-
-    if (!deletedService) {
+    // Periksa apakah layanan ada
+    const service = await Service.findById(serviceId);
+    if (!service) {
       return res.status(404).json({ message: "Layanan tidak ditemukan" });
     }
-    res.status(200).json({ message: "layanan berhasil dihapus" });
+
+    // Periksa apakah ada reservasi yang belum selesai
+    const existingReservations = await Reservation.find({
+      services: serviceId,
+      status: { $nin: ["completed", "canceled"] },
+    });
+
+    if (existingReservations.length > 0) {
+      return res.status(400).json({
+        message:
+          "Layanan tidak dapat dihapus karena masih terkait dengan reservasi yang belum selesai.",
+      });
+    }
+
+    // Hapus layanan jika tidak ada reservasi yang belum selesai
+    await Service.findByIdAndDelete(serviceId);
+
+    res.status(200).json({ message: "Layanan berhasil dihapus" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error deleting service", error });
   }
 };
 
-//soft delete -- deactiveService
+//soft delete -- deactivateService
 export const deactivateService = async (req, res) => {
   try {
     const { serviceId } = req.params;
 
-    //Periksa apakah layanan ada
-    const service = await Service.findById(serviceid);
+    // Periksa apakah layanan ada
+    const service = await Service.findById(serviceId);
     if (!service) {
       return res.status(404).json({ message: "Layanan tidak ditemukan" });
     }
 
-    //periksa apakah ada reservasi yang belum selesai untuk layanan ini
+    // Periksa apakah ada reservasi yang belum selesai untuk layanan ini
     const existingReservations = await Reservation.find({
       services: serviceId,
       status: { $nin: ["completed", "canceled"] },
@@ -198,6 +223,7 @@ export const deactivateService = async (req, res) => {
           "Layanan tidak dapat dinonaktifkan karena masih terkait dengan reservasi yang belum selesai.",
       });
     }
+
     // Update field isActive menjadi false
     service.isActive = false;
     await service.save();
@@ -205,6 +231,6 @@ export const deactivateService = async (req, res) => {
     res.status(200).json({ message: "Layanan berhasil dinonaktifkan" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Gagal menonaktifkan layanan" });
+    res.status(500).json({ message: "Gagal menonaktifkan layanan", error });
   }
 };

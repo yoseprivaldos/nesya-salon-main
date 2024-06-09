@@ -22,7 +22,7 @@ import {
 import { useEffect, useState } from "react";
 
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Product = ({
   name,
@@ -38,6 +38,8 @@ const Product = ({
   const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
+  const imageUrl =
+    imageProduct?.length > 0 ? imageProduct[0] : "/path/to/default-image.jpg";
 
   //state untuk menu setiap produk
   const [anchorEl, setAnchorEl] = useState(null);
@@ -106,7 +108,7 @@ const Product = ({
       <CardMedia
         component="img"
         height="90"
-        image={imageProduct}
+        image={imageUrl}
         alt={name}
         sx={{ objectFit: "contain" }} // Atur bagaimana gambar akan disesuaikan
       />
@@ -162,11 +164,12 @@ const Products = () => {
   const isNonMobile = useMediaQuery("(min-width: 1000px)");
   const { data, isLoading, refetch } = useGetProductsQuery();
   const [deleteProduct] = useDeleteProductMutation();
+  const location = useLocation();
 
   // Refetch data secara manual (misalnya, setelah melakukan perubahan data)
   useEffect(() => {
     refetch();
-  }, [refetch]);
+  }, [refetch, location.pathname]);
 
   return (
     <Box m="1.5rem 2.5rem">

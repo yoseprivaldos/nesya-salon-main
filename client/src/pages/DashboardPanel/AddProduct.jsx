@@ -162,8 +162,6 @@ const AddProduct = () => {
       imageProduct: imageUrls,
     };
 
-    console.log(productData);
-
     try {
       //Gunakan useCreateProductMutation untuk menyimpan produk
       const { data, error } = await createProduct(productData);
