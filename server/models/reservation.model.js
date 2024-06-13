@@ -10,6 +10,10 @@ const reservationSchema = new mongoose.Schema({
     type: String,
     required: [true, "reservasi name harus diisi"],
   },
+
+  reservationPhoneNumber: {
+    type: String,
+  },
   reservationEmail: {
     type: String,
     required: [true, "Email harus diisi"],
@@ -31,6 +35,9 @@ const reservationSchema = new mongoose.Schema({
       required: true,
     },
   ],
+  totalPrice: {
+    type: Number,
+  },
   date: {
     type: Date,
     required: [true, "tanggal harus diisi"],
@@ -45,8 +52,11 @@ const reservationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "confirmed", "canceled", "completed"],
+    enum: ["pending", "confirmed", "canceled", "completed", "absent"],
     default: "pending",
+  },
+  reservationMessage: {
+    type: String,
   },
 });
 

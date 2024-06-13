@@ -1,3 +1,4 @@
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   Box,
   Button,
@@ -6,13 +7,11 @@ import {
   ListItem,
   Typography,
   Divider,
-  useTheme,
   Avatar,
   TextField,
 } from "@mui/material";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
@@ -20,22 +19,25 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import app from "../../firebase.js";
+import {
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+} from "../../redux/user/userSlice.js";
 
 const Account = () => {
-  const theme = useTheme();
-  const [formData, setFormData] = useState({});
-  const [data, setData] = useState({});
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const fileRef = useRef(null);
-  const [image, setImage] = useState(undefined);
+  const { currentUser } = useSelector((state) => state.user);
+  const [formData, setFormData] = useState({});
+  const [profilPicture, setProfilePicture] = useState(null);
+  const [image, setImage] = useState(null);
   const [imagePercent, setImagePercent] = useState(0);
   const [imageError, setImageError] = useState(false);
 
-  const { currentUser } = useSelector((state) => state.user);
-
-  //User Id yang login saat ini
   const userId = currentUser._id;
 
-  //fetch ke "/api/user/:id" mengambil data user
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -45,7 +47,6 @@ const Account = () => {
         }
         const result = await response.json();
         setFormData(result);
-        setData(result);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -53,33 +54,53 @@ const Account = () => {
     fetchData();
   }, [userId]);
 
-  const handleFileUpload = useCallback(
-    async (image) => {
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + image.name;
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, image);
-      uploadTask.on(
-        "stage_change",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setImagePercent(Math.round(progress));
-        },
-        () => {
-          setImageError(true);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-            setFormData({ ...formData, profilePicture: downloadURL })
-          );
-        }
-      );
-    },
-    [formData]
-  );
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data));
+        return;
+      }
+      navigate("/login");
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      console.log(error);
+      dispatch(deleteUserFailure(error));
+    }
+  };
 
-  //jika ada image upload
+  const handleFileUpload = useCallback(async (image) => {
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + image.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImagePercent(Math.round(progress));
+      },
+      () => {
+        setImageError(true);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setProfilePicture(downloadURL);
+          setFormData((prevData) => ({
+            ...prevData,
+            profilePicture: downloadURL,
+          }));
+        });
+      }
+    );
+  }, []);
+
   useEffect(() => {
     if (image) {
       handleFileUpload(image);
@@ -90,7 +111,6 @@ const Account = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  //handleSubmit -- untuk update data
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -102,64 +122,70 @@ const Account = () => {
         body: JSON.stringify(formData),
       });
       if (response.ok) {
+        const updatedData = await response.json();
+        setFormData(updatedData);
         alert("Profil berhasil diperbarui");
       } else {
-        //handle error here
         const error = await response.json();
         console.error("Error updating user data: ", error);
         alert("Terjadi kesalahan saat memperbarui profil");
       }
     } catch (error) {
       console.error("Error updating user data:", error);
-      alert("Terjadi kesalahan saat memperbarui profill");
+      alert("Terjadi kesalahan saat memperbarui profil");
     }
   };
 
   return (
-    <Box
-      sx={{ padding: 4, bgcolor: theme.palette.background.alt, color: "white" }}
-    >
+    <Box sx={{ padding: 4, bgcolor: "background.alt", color: "white" }}>
       <Box>
         <Typography
           variant="h4"
           gutterBottom
           fontWeight="bold"
-          color={theme.palette.secondary.main}
+          color="secondary.main"
         >
           Akun Saya
         </Typography>
       </Box>
       <Box>
         <Grid container>
-          {/* bagian kiri */}
           <Grid item xs={12} sm={2} gap="5rem">
             <Box
               gap="0.5rem"
               sx={{
                 padding: "30px",
-                display: "flex", // Aktifkan flexbox
-                justifyContent: "center", // Pusatkan secara horizontal
-                alignItems: "center", // Pusatkan secara vertikal
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 flexDirection: "column",
                 borderBottom: 1,
-                borderBlockColor: "secondary.main",
+                borderColor: "secondary.main",
               }}
             >
               <Avatar
-                src={data.profilePicture}
+                src={formData.profilePicture || currentUser.profilePicture}
                 sx={{
                   width: "80px",
                   height: "80px",
                   backgroundColor: "grey",
-                  border: "none",
                   objectFit: "cover",
+                  border: 2,
+                  borderColor: "secondary.main",
                 }}
+                onClick={() => fileRef.current.click()}
               />
-              <Typography variant="h6" color="secondary">
-                {data.username}
+              <Typography variant="h6" color="secondary.main">
+                Halo, {formData.username}
               </Typography>
+              <input
+                type="file"
+                ref={fileRef}
+                hidden
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files[0])}
+              />
             </Box>
-
             <Box>
               <List>
                 <ListItem>
@@ -214,10 +240,9 @@ const Account = () => {
                     </Typography>
                   </Link>
                 </ListItem>
-
                 <ListItem>
                   <Link
-                    to="/whistlist"
+                    to="/wishlist"
                     style={{
                       textDecoration: "none",
                       display: "block",
@@ -237,24 +262,25 @@ const Account = () => {
                       }}
                       variant="h6"
                     >
-                      WHISTLIST
+                      WISHLIST
                     </Typography>
                   </Link>
                 </ListItem>
               </List>
             </Box>
           </Grid>
-          {/* bagian kanan */}
           <Grid item xs={12} sm={10}>
             <Box
               sx={{
-                bgcolor: theme.palette.secondary.main,
-                color: theme.palette.primary.main,
+                bgcolor: "secondary.main",
+                color: "primary.main",
                 margin: "2px 2px 0px 2px",
                 padding: 2,
               }}
             >
-              <Typography variant="h3">Profil Saya</Typography>
+              <Typography variant="h3" fontWeight="bold">
+                Profil Saya
+              </Typography>
               <Typography variant="subtitle1" mb={3}>
                 Kelola informasi profil Anda untuk mengontrol, melindungi, dan
                 mengamankan akun
@@ -268,41 +294,40 @@ const Account = () => {
               />
               <Box component="form" onSubmit={handleSubmit} noValidate>
                 <Grid container spacing={2}>
-                  {/* sebelah kiri form */}
                   <Grid item xs={12} md={8}>
                     <Box marginTop="2rem">
-                      <Typography>Ubah Username</Typography>
+                      <Typography fontWeight="bold">Ubah Username</Typography>
                       <TextField
                         margin="dense"
                         fullWidth
                         id="username"
                         name="username"
-                        value={formData.username ?? ""}
+                        value={formData.username || ""}
                         onChange={handleChange}
                         autoComplete="username"
                         autoFocus
                       />
-                      <Typography>Ubah Email</Typography>
+                      <Typography fontWeight="bold">Ubah Email</Typography>
                       <TextField
                         margin="dense"
                         fullWidth
                         id="email"
                         name="email"
-                        value={formData.email ?? ""}
+                        value={formData.email || ""}
                         onChange={handleChange}
                         autoComplete="email"
                       />
-                      <Typography>Ubah Nomor HP</Typography>
+                      <Typography fontWeight="bold">Ubah Nomor HP</Typography>
                       <TextField
                         margin="dense"
                         fullWidth
-                        id="nomorhp"
-                        name="nomorHp"
-                        value={formData.nomorHp ?? ""}
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        value={formData.phoneNumber || ""}
                         onChange={handleChange}
-                        autoComplete="noHp"
+                        autoComplete="phoneNumber"
                       />
-                      <Typography mb="0.5px" mt="3px">
+                      <Typography mb="0.5px" mt="3px" fontWeight="bold">
                         Ubah Password
                       </Typography>
                       <TextField
@@ -310,85 +335,100 @@ const Account = () => {
                         fullWidth
                         id="password"
                         name="password"
-                        value={formData.password ?? ""}
+                        value={formData.password || ""}
                         onChange={handleChange}
                         autoComplete="current-password"
                         type="password"
                       />
-                      <Typography mb="0.5px" mt="3px">
+                      <Typography mb="0.5px" mt="3px" fontWeight="bold">
                         Ubah Alamat
                       </Typography>
                       <TextField
                         margin="dense"
                         fullWidth
+                        multiline
+                        rows={3}
                         id="alamat"
-                        name="Alamat"
-                        value={formData.alamat ?? ""}
+                        name="alamat"
+                        value={formData.alamat || ""}
                         onChange={handleChange}
-                        autoComplete="address"
+                        autoComplete="alamat"
                       />
                     </Box>
                   </Grid>
-                  {/* Bagian ubah image -- sebelah kanan form */}
-                  <Grid xs={12} md={4}>
+                  <Grid item xs={12} md={4}>
                     <Box
                       display="flex"
                       flexDirection="column"
+                      justifyContent="center"
                       alignItems="center"
                       height="100%"
                     >
-                      <Box sx={{ my: "auto" }}>
-                        <input
-                          type="file"
-                          ref={fileRef}
-                          hidden
-                          accept="image/*"
-                          onChange={(e) => setImage(e.target.files[0])}
-                        />
-
-                        <Avatar
-                          src={
-                            formData.profilePicture ||
-                            currentUser.profilePicture
-                          }
-                          onClick={() => fileRef.current.click()}
-                          sx={{
-                            cursor: "pointer",
-                            backgroundColor: "grey",
-                            width: "150px",
-                            height: "150px",
-                          }}
-                        />
-                        <Typography variant="body2" align="center">
-                          Pilih Gambar
-                        </Typography>
-                        <Typography variant="body2" align="center">
-                          {imageError ? (
-                            <span style={{ color: "red" }}>
-                              Error uploading image (ukuran file maksimal 2MB)
-                            </span>
-                          ) : imagePercent > 0 && imagePercent < 100 ? (
-                            <span
-                              style={{ color: "grey" }}
-                            >{`Uploading: ${imagePercent} %`}</span>
-                          ) : imagePercent === 100 ? (
-                            <span style={{ color: "green" }}>
-                              Upload Image Berhasil
-                            </span>
-                          ) : null}
-                        </Typography>
-                      </Box>
+                      <Avatar
+                        src={
+                          profilPicture ||
+                          formData.profilePicture ||
+                          currentUser.profilePicture
+                        }
+                        onClick={() => fileRef.current.click()}
+                        sx={{
+                          cursor: "pointer",
+                          backgroundColor: "grey",
+                          width: "150px",
+                          height: "150px",
+                          border: 4,
+                          borderColor: "background.main",
+                        }}
+                      />
+                      <Typography mt={1} variant="body2" align="center">
+                        Pilih Gambar
+                      </Typography>
+                      <Typography variant="body2" align="center">
+                        {imageError && (
+                          <span style={{ color: "red" }}>
+                            Error uploading image (ukuran file maksimal 2MB)
+                          </span>
+                        )}
+                        {imagePercent > 0 && imagePercent < 100 && (
+                          <span style={{ color: "grey" }}>
+                            Uploading: {imagePercent} %
+                          </span>
+                        )}
+                        {imagePercent === 100 && (
+                          <span style={{ color: "green" }}>
+                            Upload Image Berhasil
+                          </span>
+                        )}
+                      </Typography>
+                      <input
+                        type="file"
+                        ref={fileRef}
+                        hidden
+                        accept="image/*"
+                        onChange={(e) => setImage(e.target.files[0])}
+                      />
                     </Box>
                   </Grid>
                 </Grid>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Konfirmasi
-                </Button>
+                <Box display="flex" gap={2}>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Konfirmasi
+                  </Button>
+                  <Button
+                    type="button"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2, backgroundColor: "#8c0a47" }}
+                    onClick={handleDeleteAccount}
+                  >
+                    Hapus Akun
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Grid>

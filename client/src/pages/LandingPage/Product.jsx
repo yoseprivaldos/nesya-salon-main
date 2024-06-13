@@ -11,95 +11,16 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import imgProduct from "../../assets/tools/tools3.png";
-import imgProduct2 from "../../assets/tools/tools5.png";
 import { Link } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 import { useState } from "react";
-// import { ThemeProvider, createTheme } from "@mui/material/styles";
-
-// const themeModal = createTheme({
-//   typography: {
-//     fontSize: { xs: 1, sm: 3, md: 5 },
-//   },
-// });
-
-const dataProduct = [
-  {
-    name: "Cat Rambut Pria",
-    summary: "Layanan warna sempurna akan menjadi lebih baik",
-    price: 350000,
-    imageProduct: imgProduct,
-  },
-  {
-    name: "Cat Rambut Pria",
-    summary: "Layanan warna sempurna untuk mencerahkan",
-    price: 350000,
-    imageProduct: imgProduct2,
-  },
-  {
-    name: "Cat Rambut Pria",
-    summary: "Layanan warna sempurna untuk mencerahkan seluruh",
-    price: 350000,
-    imageProduct: imgProduct,
-  },
-  {
-    name: "Cat Rambut Pria",
-    summary: "Layanan warna sempurna",
-    price: 350000,
-    imageProduct: imgProduct2,
-  },
-  {
-    name: "Cat Rambut Pria",
-    summary: "Layanan warna sempurna untuk mencerahkan seluruh rambut Anda ",
-    price: 350000,
-    imageProduct: imgProduct,
-  },
-  {
-    name: "Cat Rambut Pria",
-    summary: "Layanan warna sempurna untuk",
-    price: 350000,
-    imageProduct: imgProduct2,
-  },
-  {
-    name: "Cat Rambut Pria",
-    summary: "Layanan warna sempurna untuk mencerahkan seluruh rambut Anda",
-    price: 350000,
-    imageProduct: imgProduct,
-  },
-  {
-    name: "Cat Rambut Pria",
-    summary: "Layanan warna sempurna untuk mencerahkan Anda dari akar",
-    price: 350000,
-    imageProduct: imgProduct2,
-  },
-];
+import { useGetProductsQuery } from "../../redux/api/api";
 
 const Product = () => {
+  const { data: products } = useGetProductsQuery();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [openModal, setOpenModal] = useState(false);
-
-  // const [selectedFilters, setSelectedFilters] = useState({
-  //   //belum dipakai
-  //   makeup: [],
-  //   perawatanRambut: [],
-  //   perawatanKulit: [],
-  //   perawatanTubu: [],
-  //   alatDanAksesoris: [],
-  //   perawatanKuku: [],
-  //   kategoriTambahan: [],
-  // });
-
-  // const handleFilterChange = (category, filterName, isChecked) => {
-  //   //belum dipakai
-  //   setSelectedFilters((prevFilters) => ({
-  //     ...prevFilters,
-  //     [category]: isChecked
-  //       ? [...prevFilters[category], filterName]
-  //       : prevFilters[category].filter((item) => item !== filterName),
-  //   }));
-  // };
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
@@ -466,8 +387,8 @@ const Product = () => {
       {/* KATALOG CONTENT*/}
       <Box>
         <Grid container spacing={{ xs: 1.5, sm: 2.5, md: 5 }}>
-          {dataProduct.map((product, index) => (
-            <Grid item xs={4} sm={4} md={3} key={index}>
+          {products?.map((product) => (
+            <Grid item xs={4} sm={4} md={3} key={product._id}>
               <Link to="/">
                 <Paper
                   sx={{
@@ -523,7 +444,7 @@ const Product = () => {
                           fontSize: {
                             xs: "0.5rem",
                             sm: "1.25rem",
-                            md: "1.3rem",
+                            md: "0.95rem",
                           },
                           textDecoration: "underline",
                         }}
@@ -538,14 +459,12 @@ const Product = () => {
                             sm: "0.6rem",
                             md: "0.7rem",
                           },
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
                           display: "-webkit-box",
                           WebkitLineClamp: 3,
                           WebkitBoxOrient: "vertical",
                         }}
                       >
-                        {product.summary}
+                        {product.description}
                       </Typography>
                     </Box>
                     <Grid
@@ -560,8 +479,8 @@ const Product = () => {
                           sx={{
                             fontSize: {
                               xs: "0.6rem",
-                              sm: "1rem",
-                              md: "1.2rem",
+                              sm: "0.8rem",
+                              md: "1rem",
                             },
                           }}
                         >

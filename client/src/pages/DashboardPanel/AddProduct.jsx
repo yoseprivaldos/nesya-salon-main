@@ -22,6 +22,8 @@ import {
   AccordionDetails,
   Button,
   IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -38,6 +40,7 @@ import {
 } from "firebase/storage";
 
 const AddProduct = () => {
+  const [proses, setProses] = useState(false);
   const [ingredients, setIngredients] = useState([]);
   const [newIngredient, setNewIngredient] = useState("");
   const [images, setImages] = useState([]);
@@ -49,8 +52,26 @@ const AddProduct = () => {
   const [categories, setCategories] = useState([]);
   const { data } = useGetProductsQuery();
   const [imageFiles, setImageFiles] = useState([]);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const [createProduct, { isLoading, isError }] = useCreateProductMutation();
 
-  const [createProduct] = useCreateProductMutation();
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  useEffect(() => {
+    if (isLoading) {
+      setShowAlert(true);
+      setAlertSeverity("info");
+      setAlertMessage("memprosess....");
+    } else if (isError) {
+      setShowAlert(true);
+      setAlertSeverity("error");
+      setAlertMessage("Gagal membuat Produk. Coba lagi nanti");
+    }
+  }, [isLoading, isError]);
 
   useEffect(() => {
     if (data && data.length > 0) {
@@ -109,6 +130,7 @@ const AddProduct = () => {
   };
 
   const handleSubmit = async () => {
+    setProses(true);
     const storage = getStorage(app);
     const imageUrls = [];
 
@@ -127,9 +149,9 @@ const AddProduct = () => {
             "state_changed",
             (snapshot) => {
               // Menampilkan Progress upload
+              // eslint-disable-next-line no-unused-vars
               const progress =
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log("Upload is" + progress + "% done");
             },
             (error) => {
               // tangani error upload
@@ -168,29 +190,57 @@ const AddProduct = () => {
 
       if (data) {
         //product berhasil dibuat, lakukan tindakan selanjutnya misalnya redirect ke halaman lain
-        alert("Produk berhasil ditambahkan");
-        window.location.reload();
+        setProses(false);
+        setShowAlert(true);
+        setAlertSeverity("success");
+        setAlertMessage("Berhasil membuat layanan");
+        setProses(false);
+
+        setName("");
+        setPrice("");
+        setStock("");
+        setDescription("");
+        setIngredients([]);
+        setSelectedCategories([]);
+        setImages([]);
       } else if (error) {
         // tangani kesalahan saat membuat produk
-        alert("Gagal menambahkan produk", error.message);
+        setProses(false);
         console.error("Error createing product:", error);
+        setShowAlert(true);
+        setAlertSeverity("error");
+        setAlertMessage("Gagal membuat Produk. Coba Lagi Nanti");
       }
     } catch (error) {
       console.error("Error creating product", error);
+      setShowAlert(true);
+      setAlertSeverity("error");
+      setAlertMessage("Gagal membuat Produk. Coba lagi nanti");
+      setProses(false);
     }
   };
 
   return (
     <Box m="1.5rem 2.5rem">
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseAlert} severity={alertSeverity}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
       <Header
         title="Halaman Tambah Produk"
         subtitle="Pastikan data yang di masukkan valid"
       />
       <Grid container justifyContent="flex-end">
-        {" "}
         {/* Bungkus tombol dengan Grid */}
         <Grid item>
           <Button
+            disabled={proses}
             variant="contained"
             color="primary"
             size="large"
@@ -203,7 +253,7 @@ const AddProduct = () => {
             }}
             onClick={handleSubmit}
           >
-            TEKAN UNTUK MENAMBAHKAN
+            {proses ? "Memproses..." : "TEKAN UNTUK MENAMBAHKAN"}
           </Button>
         </Grid>
       </Grid>

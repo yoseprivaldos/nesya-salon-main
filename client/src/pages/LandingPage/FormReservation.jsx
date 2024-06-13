@@ -1,276 +1,621 @@
+import { Box } from "@mui/system";
 import {
-  Box,
-  Typography,
-  TextField,
-  FormControl,
-  Select,
-  MenuItem,
+  Alert,
   Button,
-  FormControlLabel,
-  Checkbox,
-  FormHelperText,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormLabel,
+  Grid,
+  InputAdornment,
+  Paper,
+  Snackbar,
+  TextField,
+  TextareaAutosize,
+  Typography,
 } from "@mui/material";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { useEffect, useMemo, useState } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useState } from "react";
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import "dayjs/locale/id";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import {
+  useGetServicesQuery,
+  useCreateReservationMutation,
+} from "../../redux/api/api";
+import { useSelector } from "react-redux";
 
-const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
+dayjs.extend(duration);
+dayjs.extend(localizedFormat);
+dayjs.locale("id");
 
-const options = times.map((time) => ({ value: time })); // mengubah array times menjadi array of objects
+// Fungsi untuk menghitung endTime
+const calculateEndTime = (startTime, totalDurationMinutes) => {
+  const startTimeDayjs = dayjs(startTime, "HH:mm");
+  const endTimeDayjs = startTimeDayjs.add(totalDurationMinutes, "minute");
+  return endTimeDayjs.format("HH:mm");
+};
 
 const FormReservation = () => {
-  const today = dayjs();
-  const [formData, setFormData] = useState({
-    nama: "",
-    email: "",
-    nomorHp: "",
-    pilihanLayanan: [],
-    tanggal: today,
-    waktu: "",
-    catatan: "",
-  });
-  const [errors, setErrors] = useState({});
-  const handleChange = (event) => {
-    const { name, value, checked } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]:
-        name === "pilihanLayanan"
-          ? checked
-            ? [...prevData.pilihanLayanan, value]
-            : prevData.pilihanLayanan.filter((item) => item !== value)
-          : value,
-    }));
+  const [proses, setProses] = useState(false);
+  const [endTimeFormatted, setEndTimeFormatted] = useState("");
+  const { currentUser } = useSelector((state) => state.user);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [openServiceDialog, setOpenServiceDialog] = useState(false);
+  const [openTimeDialog, setOpenTimeDialog] = useState(false);
+  const [search, setSearch] = useState("");
+  const [reservationName, setReservationName] = useState("");
+  const [reservationEmail, setReservationEmail] = useState("");
+  const [reservationPhoneNumber, setReservationPhoneNumber] = useState("");
+  const [reservationNote, setReservationNote] = useState("");
+  const [selectedServiceIds, setSelectedServiceIds] = useState([]);
+  const [selectedServiceNames, setSelectedServiceNames] = useState([]);
+  const [selectedTime, setSelectedTime] = useState("");
+  const { data } = useGetServicesQuery();
+  const [totalPrice, setTotalPrice] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const [createReservation, { isLoading, isError }] =
+    useCreateReservationMutation();
 
-    //Hapus pesan error saat input berubah
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: "",
-    }));
+  // mengambil data layanan
+  const services = useMemo(
+    () =>
+      data?.map((service) => ({
+        _id: service._id,
+        name: service.name,
+        duration: service.duration,
+        price: service.price,
+      })) || [],
+    [data]
+  );
+  const handleCloseAlert = () => {
+    setShowAlert(false);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    //Validasi input
-    const newErrors = {};
-    if (!formData.nama) newErrors.nama = "Nama harus diisi";
-    if (!formData.email) newErrors.email = "Email harus diisi";
-    if (!formData.nomorHp) newErrors.nomorHp = "Nomor HP harus diisi";
-    if (formData.pilihanLayanan.length === 0)
-      newErrors.pilihanLayanan = "Pilih setidaknya satu layanan";
-    if (!formData.tanggal) newErrors.tanggal = "Tanggal harus diisi";
-    if (!formData.waktu) newErrors.waktu = "Waktu harus diisi";
+  useEffect(() => {
+    let totalDurationMinutes = 0;
+    // Menghitung total durasi dari layanan yang dipilih
+    selectedServiceIds.forEach((serviceId) => {
+      const service = services.find((s) => s._id === serviceId);
+      if (service) {
+        totalDurationMinutes += service.duration;
+      }
+    });
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return; //hentikan pengiriman jika ada error
+    // Menghitung endTime menggunakan fungsi terpisah
+    if (selectedTime) {
+      const calculatedEndTime = calculateEndTime(
+        selectedTime,
+        totalDurationMinutes
+      );
+      setEndTimeFormatted(calculatedEndTime);
     }
-    //ubah data tanggal
-    const tanggalString = formData.tanggal.format("DD-MM-YYYY");
-    const dataToSend = {
-      ...formData,
-      tanggal: tanggalString,
+  }, [selectedServiceIds, selectedTime, services]);
+
+  useEffect(() => {
+    if (isLoading) {
+      setShowAlert(true);
+      setAlertSeverity("info");
+      setAlertMessage("memprosess....");
+    } else if (isError) {
+      setShowAlert(true);
+      setAlertSeverity("error");
+      setAlertMessage("Gagal membuat Service. Coba lagi nanti");
+    }
+  }, [isLoading, isError]);
+
+  useEffect(() => {
+    const total = selectedServiceIds.reduce((acc, id) => {
+      const service = services.find((service) => service._id === id);
+      return acc + (service ? service.price : 0);
+    }, 0);
+    setTotalPrice(total);
+  }, [selectedServiceIds, services]);
+  const availableTimes = [
+    "09:00",
+    "10:00",
+    "11:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+  ];
+
+  const handleOpenServiceDialog = () => {
+    setOpenServiceDialog(true);
+  };
+  const handleCloseServiceDialog = () => {
+    setOpenServiceDialog(false);
+  };
+  const handleOpenTimeDialog = () => {
+    setOpenTimeDialog(true);
+  };
+
+  const handleCloseTimeDialog = () => {
+    setOpenTimeDialog(false);
+  };
+
+  const handleServiceSelect = (service) => {
+    setSelectedServiceIds((prevIds) =>
+      prevIds.includes(service._id)
+        ? prevIds.filter((id) => id !== service._id)
+        : [...prevIds, service._id]
+    );
+    setSelectedServiceNames((prevNames) =>
+      prevNames.includes(service.name)
+        ? prevNames.filter((name) => name !== service.name)
+        : [...prevNames, service.name]
+    );
+  };
+
+  const handleDeleteService = (serviceId, serviceName) => {
+    setSelectedServiceIds((prevIds) =>
+      prevIds.filter((id) => id !== serviceId)
+    );
+    setSelectedServiceNames((prevNames) =>
+      prevNames.filter((name) => name !== serviceName)
+    );
+  };
+
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time);
+    handleCloseTimeDialog();
+  };
+
+  const handleDateChange = (date) => {
+    //konversi Dayjs ke JavaScript Date
+    const jsDate = date ? date.format("DD/MM/YYYY") : null;
+    setSelectedDate(jsDate);
+  };
+
+  const handleSubmit = async () => {
+    setProses(true);
+
+    const reservationData = {
+      user: currentUser._id,
+      reservationName,
+      reservationEmail,
+      reservationPhoneNumber,
+      note: reservationNote,
+      services: selectedServiceIds,
+      totalPrice,
+      date: selectedDate,
+      startTime: selectedTime,
+      endTime: endTimeFormatted,
     };
 
-    //logika kirim data ke backend
-    console.log(dataToSend);
+    try {
+      const { data, error } = await createReservation(reservationData);
+      if (data) {
+        setProses(false);
+        setShowAlert(true);
+        setAlertSeverity("success");
+        setAlertMessage("Berhasil membuat reservasi");
+
+        console.log(data);
+        //resetStateForm
+        setReservationName("");
+        setReservationEmail("");
+        setReservationPhoneNumber("");
+        setReservationNote("");
+        setSelectedServiceNames([]);
+        setSelectedDate("");
+        setTotalPrice("");
+        setEndTimeFormatted("");
+      } else if (error) {
+        console.error("Error saat membuat service");
+        setProses(false);
+        setShowAlert(true);
+        setAlertSeverity("error");
+        setAlertMessage("Gagal membuat Reservasi. Coba Lagi Nanti");
+      }
+    } catch (error) {
+      console.error("Error Creating Reservation", error);
+      setShowAlert(true);
+      setAlertSeverity("error");
+      setAlertMessage("Gagal membuat Reservasi. Coba Lagi Nanti");
+      setProses(false);
+    }
   };
 
   return (
-    <Box sx={{ bgcolor: "background.alt", padding: { xs: 2, sm: 4, md: 6 } }}>
-      <Box>
-        <Typography>FORM RESERVASI SALON</Typography>
-        <Typography>Isi data yang sesuai di kolom yang disediakan</Typography>
-      </Box>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{
-          "& .MuiTextField-root": { width: "25ch" },
-          "& .MuiPickersCalendar-root": {
-            backgroundColor: "background.paper", // Menggunakan warna dari tema Material UI
-          },
-          bgcolor: "secondary.main",
-          padding: 3,
-        }}
-        noValidate
-        autoComplete="off"
+    <Box m={"1.5rem 2.5rem"}>
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        {/* field name */}
-        <Box>
-          <Typography>Masukkan Nama</Typography>
-          <TextField
-            margin="dense"
-            fullWidth
-            id="nama"
-            name="nama"
-            value={formData.nama}
-            onChange={handleChange}
-            required
-            error={!!errors.nama}
-            helperText={errors.nama}
-          />
-        </Box>
-        {/* field email */}
-        <Box>
-          <Typography>Masukkan Email</Typography>
-          <TextField
-            margin="dense"
-            fullWidth
-            id="email"
-            label="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            error={!!errors.email}
-            helperText={errors.email}
-          />
-        </Box>
-        {/* field nomor HP */}
-        <Box>
-          <Typography>Masukkan nomo HP</Typography>
-          <TextField
-            margin="dense"
-            label="nomor Hp"
-            fullWidth
-            id="nomorHp"
-            name="nomorHp"
-            value={formData.nomorHp}
-            onChange={handleChange}
-            required
-            error={!!errors.nomorHp}
-            helperText={errors.nomorHp}
-          />
-        </Box>
-        {/* field pilih Layanan */}
-        <Box>
-          <Typography>Pilih Layanan</Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="pilihanLayanan"
-                value="Potong Rambut"
-                onChange={handleChange}
-              />
-            }
-            label="Potong Rambut"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="pilihanLayanan"
-                value="Creambath"
-                onChange={handleChange}
-              />
-            }
-            label="Creambath"
-          />
-          <FormHelperText sx={{ color: "#ef5350" }}>
-            {errors.pilihanLayanan}
-          </FormHelperText>{" "}
-          {/* Tampilkan pesan error */}
-        </Box>
-        {/* field pilih tanggal */}
-        <Box>
-          <Typography sx={{ color: "primary.main" }}>Pilih Tanggal</Typography>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
-            <DatePicker
-              value={formData.tanggal}
-              onChange={(newValue) =>
-                setFormData((prevData) => ({ ...prevData, tanggal: newValue }))
-              }
-              disablePast
-              componentsProps={{
-                textField: {
-                  // Styling untuk TextField di dalam DatePicker
-                  sx: {
-                    svg: { color: "primary.main" },
-                    input: { color: "primary.main" },
-                    ".MuiOutlinedInput-notchedOutline": {
-                      borderColor: "primary.main",
-                    },
-                    "& .Mui-focused": {
-                      ".MuiOutlinedInput-notchedOutline": {
-                        borderColor: "primary.main",
-                      },
-                    },
-                  },
-                },
-              }}
-            />
-            {!!errors.tanggal && (
-              <FormHelperText error>{errors.tanggal}</FormHelperText>
-            )}
-          </LocalizationProvider>
-        </Box>
-        {/* field pilih waktu */}
-        <Box>
-          <Typography sx={{ color: "primary.main" }}>
-            Pilih Jam Tersedia
-          </Typography>
-          <FormControl fullWidth>
-            <Select
-              name="waktu" //penting
-              labelId="time-select-label"
-              id="time-select"
-              value={formData.waktu}
-              label="pilih jam"
-              onChange={handleChange}
+        <Alert onClose={handleCloseAlert} severity={alertSeverity}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
+      {/* Header Field */}
+      <Box>
+        <Typography
+          variant="h3"
+          sx={{
+            backgroundColor: "secondary.main",
+            padding: 1.5,
+            fontWeight: "bold",
+            color: "background.alt",
+          }}
+        >
+          BUAT RESERVASI BARU
+        </Typography>
+      </Box>
+      <Box>
+        {/* Button Field */}
+        <Grid container justifyContent="flex-end">
+          <Grid item>
+            <Button
+              disabled={proses}
+              variant="contained"
+              color="primary"
+              size="large"
               sx={{
-                svg: { color: "primary.main" },
-                input: { color: "primary.main" },
-                ".MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.main",
-                },
-                "& .Mui-focused": {
-                  ".MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.main",
-                  },
-                },
+                mt: 3,
+                backgroundColor: "secondary.main",
+                color: "primary.main",
+                borderRadius: 0,
+                fontWeight: "bold",
               }}
+              onClick={handleSubmit}
             >
-              {options.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.value}
-                </MenuItem>
-              ))}
-            </Select>
-            <FormHelperText sx={{ color: "#ef5350" }}>
-              {errors.waktu}
-            </FormHelperText>{" "}
-            {/* Tampilkan pesan error */}
-          </FormControl>
-        </Box>
-        {/* Field Catatan Reservasi */}
-        <Box>
-          <Typography>Masukkan Catatan Reservasi - Opsional</Typography>
-          <TextField
-            margin="dense"
-            name="catatan"
-            value={formData.catatan}
-            onChange={handleChange}
+              {proses ? "Memproses..." : "TEKAN UNTUK MENAMBAHKAN"}
+            </Button>
+          </Grid>
+        </Grid>
+
+        {/* form Section */}
+        <Grid container spacing={4} mt={0.5}>
+          {/* pilih layanan tanggal  dan waktu*/}
+          <Grid item xs={12} sm={6}>
+            <Paper elevation={3} sx={{ p: 3, bgcolor: "secondary.main" }}>
+              <Button
+                variant="outlined"
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "secondary.main",
+                  borderRadius: 0,
+                }}
+                onClick={handleOpenServiceDialog}
+              >
+                Pilih Layanan
+              </Button>
+              <Box mt={2}>
+                {selectedServiceNames.map((serviceName, index) => (
+                  <Chip
+                    key={index}
+                    label={serviceName}
+                    onDelete={() =>
+                      handleDeleteService(
+                        selectedServiceIds[index],
+                        serviceName
+                      )
+                    }
+                    sx={{ m: 0.5 }}
+                  />
+                ))}
+              </Box>
+              {/* Field Untuk total harga */}
+              <Box mt={3}>
+                <TextField
+                  label="Total Harga"
+                  variant="outlined"
+                  fullWidth
+                  value={totalPrice}
+                  onChange={(e) => setTotalPrice(e.target.value)}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  sx={{ mt: 2 }}
+                />
+              </Box>
+            </Paper>
+
+            {/* pilih tanggal */}
+            <Paper
+              elevation={3}
+              sx={{ p: 3, mt: 3, bgcolor: "secondary.main" }}
+            >
+              <Typography
+                variant="h5"
+                component="h3"
+                gutterBottom
+                sx={{ color: "primary.main" }}
+              >
+                Pilih Tanggal
+              </Typography>
+
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="id"
+              >
+                <FormControl fullWidth>
+                  <FormLabel sx={{ mb: 1 }}></FormLabel>
+                  <DatePicker
+                    value={selectedDate ? dayjs(selectedDate) : null}
+                    onChange={handleDateChange}
+                    disablePast
+                    inputFormat="DD-MM-YYYY"
+                    componentsProps={{
+                      textField: {
+                        //styling untuk textfield didalam date picker
+                        sx: {
+                          svg: { color: "primary.main" },
+                          input: { color: "primary.main" },
+                          ".MuiOutlinedInput-notchedOutline": {
+                            borderColor: "primary.main",
+                          },
+                          "& .Mui-focused": {
+                            ".MuiOutlinedInput-notchedOutline": {
+                              borderColor: "primary.main",
+                            },
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </FormControl>
+              </LocalizationProvider>
+            </Paper>
+
+            {/* Pilih waktu */}
+            <Paper
+              elevation={3}
+              sx={{ p: 3, mt: 3, bgcolor: "secondary.main" }}
+            >
+              <Button
+                variant="outlined"
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "secondary.main",
+                  borderRadius: 0,
+                }}
+                onClick={handleOpenTimeDialog}
+              >
+                Pilih Waktu
+              </Button>
+
+              <Box>
+                {selectedTime && (
+                  <Typography variant="h5" sx={{ mt: 2 }}>
+                    <AccessTimeIcon /> {selectedTime} WIB - {endTimeFormatted}{" "}
+                    WIB
+                  </Typography>
+                )}
+              </Box>
+            </Paper>
+          </Grid>
+
+          {/* Informasi pelanggan */}
+          <Grid item xs={12} sm={6}>
+            {/* informasi pelanggan */}
+            <Paper elevation={3} sx={{ p: 3, bgcolor: "secondary.main" }}>
+              <Typography
+                variant="h5"
+                component="h3"
+                gutterBottom
+                sx={{ color: "primary.main" }}
+              >
+                Informasi Pelanggan
+              </Typography>
+
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <FormLabel sx={{ mb: 1 }}>Nama Pelanggan</FormLabel>
+                    <TextField
+                      variant="outlined"
+                      placeholder="name"
+                      value={reservationName}
+                      onChange={(e) => setReservationName(e.target.value)}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <FormLabel sx={{ mb: 1 }}>Nomor HP Pelanggan</FormLabel>
+                    <TextField
+                      variant="outlined"
+                      placeholder="+62"
+                      value={reservationPhoneNumber}
+                      onChange={(e) =>
+                        setReservationPhoneNumber(e.target.value)
+                      }
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <FormLabel sx={{ mb: 1 }}>Email Pelanggan</FormLabel>
+                    <TextField
+                      variant="outlined"
+                      placeholder="username@gmail.com"
+                      value={reservationEmail}
+                      onChange={(e) => setReservationEmail(e.target.value)}
+                    />
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Paper>
+
+            {/* note field */}
+            <Paper
+              elevation={3}
+              sx={{ p: 3, mt: 3, bgcolor: "secondary.main" }}
+            >
+              <Typography
+                variant="h5"
+                component="h3"
+                gutterBottom
+                sx={{ color: "primary.main" }}
+              >
+                Tambahkan Catatan (opsional)
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <TextareaAutosize
+                      minRows={6}
+                      placeholder="catatan reservasi"
+                      value={reservationNote}
+                      onChange={(e) => setReservationNote(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                        fontSize: "16px",
+                        lineHeight: 1.5,
+                        resize: "vertical",
+                        outline: "none",
+                        color: "black",
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+
+          {/* Modal Untuk memilih layanan */}
+          <Dialog
+            open={openServiceDialog}
+            onClose={handleCloseServiceDialog}
             fullWidth
-            multiline
-            rows={4}
-            id="username"
-          />
-        </Box>
-        {/* tombol Submit */}
-        <Box>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            maxWidth="sm"
           >
-            Konfirmasi
-          </Button>
-        </Box>
+            <Box sx={{ bgcolor: "background.alt", color: "secondary.main" }}>
+              <DialogTitle>Pilih Layanan</DialogTitle>
+              <DialogContent>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="serviceSearch"
+                  label="Cari Layanan Lain"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Button onClick={() => setSearch("")}>Clear</Button>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <div
+                  style={{
+                    maxHeight: "300px",
+                    overflow: "auto",
+                    marginTop: "16px",
+                  }}
+                >
+                  {services
+                    .filter((service) =>
+                      service.name.toLowerCase().includes(search.toLowerCase())
+                    )
+                    .slice(0, 6) //menampilkan hanya 5 layanan utama secara default
+                    .map((service) => (
+                      <Button
+                        key={service._id}
+                        onClick={() => handleServiceSelect(service)}
+                        fullWidth
+                        sx={{
+                          justifyContent: "flex-start",
+                          borderRadius: 0,
+                          bgcolor: selectedServiceIds.includes(service._id)
+                            ? "secondary.main"
+                            : "primary.main",
+
+                          color: "background.alt",
+                          "&:hover": {
+                            bgcolor: "secondary.main",
+                          },
+                        }}
+                      >
+                        {service.name}
+                      </Button>
+                    ))}
+                </div>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={handleCloseServiceDialog}
+                  variant="contained"
+                  sx={{ borderradius: 0 }}
+                >
+                  Keluar
+                </Button>
+              </DialogActions>
+            </Box>
+          </Dialog>
+
+          {/* modal untuk memilih waktu tersedia */}
+          <Dialog
+            open={openTimeDialog}
+            onClose={handleCloseTimeDialog}
+            fullWidth
+            maxWidth="xs"
+          >
+            <Box sx={{ bgcolor: "background.alt", color: "secondary.main" }}>
+              <DialogTitle>Pilih Waktu</DialogTitle>
+              <DialogContent>
+                <div
+                  style={{
+                    maxHeight: "300px",
+                    marginTop: "5px",
+                  }}
+                >
+                  {availableTimes.map((time, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => handleTimeSelect(time)}
+                      fullWidth
+                      sx={{
+                        justifyContent: "flex-start",
+                        mb: 1,
+                        textAlign: "center",
+
+                        bgcolor:
+                          selectedTime === time
+                            ? "secondary.main"
+                            : "primary.main",
+                        color: "background.alt",
+                        "&:hover": {
+                          bgcolor: "secondary.main",
+                        },
+                      }}
+                    >
+                      {time} WIB
+                    </Button>
+                  ))}
+                </div>
+              </DialogContent>
+              <DialogActions>
+                <Button variant="contained" onClick={handleCloseTimeDialog}>
+                  Keluar
+                </Button>
+              </DialogActions>
+            </Box>
+          </Dialog>
+        </Grid>
       </Box>
     </Box>
   );

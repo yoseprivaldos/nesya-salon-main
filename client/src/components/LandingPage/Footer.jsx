@@ -25,37 +25,32 @@ function Footer() {
         sx={{ bgcolor: "black", color: "white", pt: 7, pb: 7 }}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={3} justifyContent="center">
-            <Grid item xs={12} sm={4} align="center">
+          <Grid container spacing={5} justifyContent="center">
+            <Grid item xs={12} sm={4}>
               <Link href="/services" marginBottom="1rem">
-                <Typography color="white" variant="h2" fontWeight="bold">
+                <Typography color="white" variant="h1" fontWeight="bold">
                   Layanan
                 </Typography>
               </Link>
               <Link href="/products">
-                <Typography color="white" variant="h2" fontWeight="bold">
+                <Typography color="white" variant="h1" fontWeight="bold">
                   Katalog
                 </Typography>
               </Link>
               <Link href="/news">
-                <Typography color="white" variant="h2" fontWeight="bold">
+                <Typography color="white" variant="h1" fontWeight="bold">
                   Info
                 </Typography>
               </Link>
               <Link href="/jobs">
-                <Typography color="white" variant="h2" fontWeight="bold">
+                <Typography color="white" variant="h1" fontWeight="bold">
                   Pekerjaan
                 </Typography>
               </Link>
             </Grid>
 
             <Grid item xs={12} sm={4}>
-              <Typography
-                variant="h2"
-                gutterBottom
-                sx={{ fontWeight: "bold" }}
-                align="center"
-              >
+              <Typography variant="h2" gutterBottom sx={{ fontWeight: "bold" }}>
                 Kontak
               </Typography>
               <Typography variant="h4">

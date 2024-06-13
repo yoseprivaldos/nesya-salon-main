@@ -5,7 +5,7 @@ const Header = ({ title, subtitle }) => {
   return (
     <Box>
       <Typography
-        variant="h2"
+        variant="h3"
         color={theme.palette.secondary[100]}
         fontWeight="bold"
         sx={{ mb: "5px" }}

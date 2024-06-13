@@ -49,7 +49,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/employee", employeeRoutes);
-app.use("/api/reservation", reservationRoutes);
+app.use("/api/reservations", reservationRoutes);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

@@ -9,13 +9,21 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["pelanggan", "admin", "pemilik"],
+      enum: ["pelanggan", "admin", "superadmin"],
       default: "pelanggan",
+    },
+    phoneNumber: {
+      type: "String",
+      default: "",
     },
     email: {
       type: String,
       required: [true, "email wajib tertera"],
       unique: [true, "email sudah terdaftar"],
+    },
+    alamat: {
+      type: String,
+      default: "",
     },
     password: {
       type: String,

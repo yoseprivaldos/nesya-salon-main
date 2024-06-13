@@ -10,19 +10,42 @@ import {
 import FlexBetween from "./FlexBetween";
 import { useDispatch } from "react-redux";
 import { setMode } from "../../redux/index";
-// import profileImage from "../../assets/profile.png";
+import { signOut } from "../../redux/user/userSlice";
 import {
   AppBar,
   IconButton,
   InputBase,
+  Menu,
+  MenuItem,
   Toolbar,
   useTheme,
 } from "@mui/material";
-
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState(null);
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/signout");
+      handleMenuClose();
+      dispatch(signOut());
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <AppBar
       sx={{
@@ -58,9 +81,26 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               <LightModeOutlined sx={{ fontSize: "25px" }} />
             )}
           </IconButton>
-          <IconButton>
+          <IconButton onClick={handleMenuOpen}>
             <SettingsOutlined sx={{ fontSize: "25px" }} />
           </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem>
+              <Link
+                to="/login"
+                onClick={() => {
+                  handleLogout();
+                }}
+              >
+                LOG OUT
+              </Link>
+            </MenuItem>
+            {/* Tambahkan pilihan menu lain jika diperlukan */}
+          </Menu>
         </FlexBetween>
       </Toolbar>
     </AppBar>

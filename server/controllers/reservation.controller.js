@@ -9,11 +9,15 @@ export const createReservation = async (req, res) => {
       user,
       reservationName,
       reservationEmail,
+      reservationPhoneNumber,
       note,
       services, //Array of service IDs
+      totalPrice,
       date,
       startTime,
       endTime,
+      status,
+      reservationMessage,
     } = req.body;
 
     // validasi user
@@ -38,11 +42,15 @@ export const createReservation = async (req, res) => {
       user,
       reservationName,
       reservationEmail,
+      reservationPhoneNumber,
       note,
       services,
+      totalPrice,
       date,
       startTime,
       endTime,
+      status,
+      reservationMessage,
     });
     const savedReservation = await newReservation.save();
     res.status(201).json(savedReservation);
@@ -51,8 +59,10 @@ export const createReservation = async (req, res) => {
       const errors = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: "Validasi gagal", errors });
     }
-    console.log(error);
-    res.status(500).json({ message: "Gagal membuat reservasi", error });
+    console.error("detail error", error);
+    res
+      .status(500)
+      .json({ message: "Gagal membuat reservasi", error: error.message });
   }
 };
 
@@ -68,8 +78,10 @@ export const getAllReservation = async (req, res) => {
 
     res.status(200).json(reservations);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "gagal fetching data reservasi", error });
+    console.error("error detaiil: ", error);
+    res
+      .status(500)
+      .json({ message: "gagal fetching data reservasi", error: message.error });
   }
 };
 
@@ -103,7 +115,13 @@ export const updateReservationStatus = async (req, res) => {
     const { status } = req.body;
 
     // validasi status value
-    const validStatuses = ["pending", "confirm", "canceled", "completed"];
+    const validStatuses = [
+      "pending",
+      "confirmed",
+      "canceled",
+      "completed",
+      "absent",
+    ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: "Statuus tidak valid" });
     }
@@ -161,5 +179,97 @@ export const getServiceReservation = async (req, res) => {
   }
 };
 
-//setelah buat review model
-//addReviewToReservation
+export const updateReservation = async (req, res) => {
+  try {
+    const reservationId = req.params.id;
+    const updateData = req.body;
+    const userRole = req.user.role;
+    const userId = req.user.id;
+
+    console.log("ini merupakan data reservationId", reservationId);
+
+    let reservation;
+
+    try {
+      reservation = await Reservation.findById(reservationId);
+    } catch (findError) {
+      console.error("Error finding reservation:", findError);
+      return res.status(500).json({ error: "Error saat mencari reservasi" });
+    }
+
+    if (!reservation) {
+      return res.status(404).json({ error: "Reservasi tidak ditemukan" });
+    }
+
+    console.log("reservasi user id:", reservation.user._id.toString());
+
+    // Validasi umum: Reservasi yang sudah dibatalkan, selesai, atau absen tidak bisa diubah
+    if (["canceled", "completed", "absent"].includes(reservation.status)) {
+      return res
+        .status(400)
+        .json({ error: "Reservasi dengan status tersebut tidak dapat diubah" });
+    }
+
+    // Logika untuk admin
+    if (userRole === "admin") {
+      // Admin dapat mengubah semua data jika reservasi dibuat oleh admin itu sendiri
+      if (reservation.user._id.toString() === userId) {
+        reservation.reservationName =
+          updateData.reservationName || reservation.reservationName;
+        reservation.reservationEmail =
+          updateData.reservationEmail || reservation.reservationEmail;
+        reservation.reservationPhoneNumber =
+          updateData.reservationPhoneNumber ||
+          reservation.reservationPhoneNumber;
+        reservation.note = updateData.note || reservation.note;
+      }
+
+      // Admin dapat mengubah status sesuai aturan
+      if (
+        updateData.status &&
+        ["confirmed", "canceled", "completed"].includes(updateData.status)
+      ) {
+        reservation.status = updateData.status;
+      }
+    }
+
+    // Logika untuk pelanggan
+    if (userRole === "pelanggan") {
+      // Pastikan pelanggan hanya dapat mengubah reservasi miliknya sendiri
+      if (reservation.user._id.toString() !== userId) {
+        return res
+          .status(403)
+          .json({ error: "Anda tidak diizinkan mengubah reservasi ini" });
+      }
+
+      // Pelanggan hanya dapat mengubah status dari confirmed/pending ke canceled dan note
+      if (
+        updateData.status &&
+        updateData.status === "canceled" &&
+        (reservation.status === "confirmed" || reservation.status === "pending")
+      ) {
+        reservation.status = updateData.status;
+      }
+      reservation.note = updateData.note || reservation.note;
+    }
+
+    // Menambahkan reservationMessage jika terjadi perubahan status
+    if (updateData.status && updateData.status !== reservation.status) {
+      reservation.reservationMessage =
+        updateData.reservationMessage || reservation.reservationMessage;
+    }
+
+    // Simpan perubahan reservasi
+    try {
+      await reservation.save();
+    } catch (saveError) {
+      console.error("Error saving reservation:", saveError);
+      return res.status(500).json({ error: "Error saat menyimpan reservasi" });
+    }
+
+    res.status(200).json(reservation);
+  } catch (error) {
+    console.error("Error in updateReservation controller:", error);
+    res.status(500).json({ error: "Terjadi kesalahan pada server" });
+  }
+};

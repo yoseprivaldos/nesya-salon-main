@@ -22,6 +22,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "../../redux/user/userSlice";
 import { Grid, useTheme } from "@mui/material";
 import { FiberManualRecord } from "@mui/icons-material";
+import { useState, useEffect } from "react";
 
 const drawerWidth = "100%";
 const navItems = ["SERVICES", "PRODUCTS", "NEWS"];
@@ -29,13 +30,21 @@ const settings = ["Akun Saya", "Reservasi Saya", "Log Out"];
 
 function Header(props) {
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   // const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const theme = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
+
+  const [profilePicture, setProfilePicture] = useState(
+    currentUser?.profilePicture || null
+  );
+
+  useEffect(() => {
+    setProfilePicture(currentUser?.profilePicture || null);
+  }, [currentUser]);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -94,15 +103,21 @@ function Header(props) {
           sx={{
             backgroundColor: theme.palette.background.alt,
             position: "static",
+            borderBottom: `0.5px solid ${theme.palette.secondary.main}`,
             top: 0,
             left: 0,
             right: 0,
             zIndex: 1100,
-            borderBottom: `0.5px solid ${theme.palette.secondary.main}`,
+            boxSizing: "border-box", // Tambahkan ini untuk memastikan padding dan border tidak mempengaruhi ukuran
           }}
         >
           <Toolbar
-            sx={{ justifyContent: "space-between", mb: "2.5px", mt: "2.5px" }}
+            sx={{
+              justifyContent: "space-between",
+              mb: "2.5px",
+              mt: "2.5px",
+              padding: 0,
+            }}
           >
             <Grid
               container
@@ -141,27 +156,32 @@ function Header(props) {
               </Grid>
               <Grid item>
                 <Box
-                  sx={{ flexGrow: 0 }}
-                  onMouseEnter={handleOpenUserMenu}
-                  onMouseLeave={handleCloseUserMenu}
+                  sx={{ flexGrow: 0, position: "relative" }}
+                  onMouseEnter={currentUser ? handleOpenUserMenu : undefined}
+                  onMouseLeave={currentUser ? handleCloseUserMenu : undefined}
                 >
                   <Tooltip>
                     {currentUser ? (
                       <IconButton sx={{ p: 0 }}>
                         <Avatar
-                          src={currentUser.profilePicture}
+                          src={profilePicture}
                           sx={{
                             m: 1,
                             objectFit: "cover",
                             width: "30px",
                             height: "30px",
+                            border: 1,
+                            borderColor: "secondary.main",
                             backgroundColor: "grey",
                           }}
                         />
                       </IconButton>
                     ) : (
                       <Button onClick={handleLogin}>
-                        <Typography color={theme.palette.secondary.main}>
+                        <Typography
+                          color={theme.palette.secondary.main}
+                          sx={{ textDecoration: "underline" }}
+                        >
                           Login
                         </Typography>
                       </Button>
@@ -188,18 +208,37 @@ function Header(props) {
                       <MenuItem key={setting} onClick={handleCloseUserMenu}>
                         <Typography textAlign="center">
                           {setting === "Akun Saya" ? (
-                            <Link to="/account" onClick={handleCloseUserMenu}>
+                            <Link
+                              to="/account"
+                              onClick={() => {
+                                handleCloseUserMenu();
+                                // Menambahkan sedikit delay sebelum navigasi untuk memastikan menu ditutup
+                                setTimeout(() => {
+                                  navigate("/account");
+                                }, 100);
+                              }}
+                            >
                               {setting}
                             </Link>
                           ) : setting === "Reservasi Saya" ? (
                             <Link
                               to="/reservation"
-                              onClick={handleCloseUserMenu}
+                              onClick={() => {
+                                handleCloseUserMenu();
+                                setTimeout(() => {
+                                  navigate("/reservation");
+                                }, 100);
+                              }}
                             >
                               {setting}
                             </Link>
                           ) : (
-                            <Link to="/login" onClick={handleLogout}>
+                            <Link
+                              to="/login"
+                              onClick={() => {
+                                handleLogout();
+                              }}
+                            >
                               {setting}
                             </Link>
                           )}

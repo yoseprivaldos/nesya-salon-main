@@ -78,9 +78,8 @@ const navItems = [
     icon: <ShoppingCartOutlined />,
     path: "/dashboard/employees",
     subItems: [
-      { text: "Daftar Karyawan", path: "/dashboard/employees" },
-      { text: "Tambah Karyawan", path: "/dashboard/pelanggan/create" },
-      { text: "Atur Karyawan", path: "/dashboard/pelanggan/atur" },
+      { text: "Daftar Staf", path: "/dashboard/employees" },
+      { text: "Daftar Admin", path: "/dashboard/admin" },
     ],
   },
   {

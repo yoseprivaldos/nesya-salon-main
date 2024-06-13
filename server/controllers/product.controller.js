@@ -82,30 +82,37 @@ export const getProducts = async (req, res) => {
   }
 };
 
-//UpdateProduct-only by admin
+// UpdateProduct - only by admin
 export const updateProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-    const updatedData = req.body;
+    console.log("berikut merupakan tipe data dari productId", typeof productId);
+    console.log("log dari productId", productId);
+    console.log("log dari params", req.params);
 
-    // //validasi ID produk
+    // Check if productId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ message: "ID produk tidak valid" });
+      return res.status(400).json({ message: "Invalid product ID" });
     }
+
+    const updatedData = req.body;
 
     // Pastikan kategori adalah array jika ada dalam updatedData
     if (updatedData.category && !Array.isArray(updatedData.category)) {
       return res.status(400).json({ message: "Kategori harus berupa array" });
     }
 
-    // pastikan iamge adalah array jika ada dalam updateData
+    // Pastikan imageProduct adalah array jika ada dalam updatedData
     if (updatedData.imageProduct && !Array.isArray(updatedData.imageProduct)) {
       return res
         .status(400)
         .json({ message: "imageProduct harus berupa array" });
     }
 
-    //Update Produk
+    // Hapus _id dari updatedData jika ada
+    delete updatedData._id;
+
+    // Update Produk
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       updatedData,
@@ -113,11 +120,11 @@ export const updateProduct = async (req, res) => {
     );
 
     if (!updatedProduct) {
-      res.status(404).json({ message: "Produk tidak ditemukan" });
+      return res.status(404).json({ message: "Produk tidak ditemukan" });
     }
     res.status(200).json(updatedProduct);
   } catch (error) {
-    // penanganan Error
+    // Penanganan Error
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: "Data tidak valid", errors });

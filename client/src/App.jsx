@@ -18,6 +18,7 @@ import AddProductsDashboard from "./pages/DashboardPanel/AddProduct.jsx";
 import EditProductDashboard from "./pages/DashboardPanel/EditProduct.jsx";
 import ReservationDashboard from "./pages/DashboardPanel/Reservation.jsx";
 import CreateReservationDashboard from "./pages/DashboardPanel/CreateReservation.jsx";
+import AdminPageDashboard from "./pages/DashboardPanel/AdminPage.jsx";
 
 //import landing page section
 import LayoutLandingPage from "./pages/LandingPage/Layout.jsx";
@@ -66,7 +67,7 @@ export default function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute allowedRoles={["admin"]}>
+              <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
                 <ThemeProvider theme={themeDash}>
                   <CssBaseline />
                   <LayoutDashboard />{" "}
@@ -100,6 +101,7 @@ export default function App() {
               path="reservations/create-reservation"
               element={<CreateReservationDashboard />}
             />
+            <Route path="admin" element={<AdminPageDashboard />}></Route>
           </Route>
 
           {/* testingUI */}

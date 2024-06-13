@@ -16,27 +16,27 @@ import SwiperCore from "swiper";
 SwiperCore.use([Navigation]);
 const tools = [
   {
-    nameTools: "Services",
+    nameTools: "Layanan",
     image: tools1,
     path: "/services",
   },
   {
-    nameTools: "Salons",
-    image: tools2,
-    path: "/salons",
-  },
-  {
-    nameTools: "Catalogs",
+    nameTools: "KATALOG",
     image: tools3,
     path: "/products",
   },
   {
-    nameTools: "Educations",
+    nameTools: "SALON",
+    image: tools2,
+    path: "/salons",
+  },
+  {
+    nameTools: "PENDIDIKAN",
     image: tools4,
     path: "educations",
   },
   {
-    nameTools: "Jobs",
+    nameTools: "PEKERJAAN",
     image: tools5,
     path: "jobs",
   },
@@ -82,7 +82,6 @@ const catalogs = [
 
 export default function Home() {
   const theme = useTheme();
-
   const handleImageClick = (path) => {
     window.location.href = path;
   };
@@ -95,21 +94,22 @@ export default function Home() {
       >
         <Swiper
           slidesPerView={4}
-          spaceBetween={20}
+          spaceBetween={16}
           navigation
           modules={[Navigation]}
           breakpoints={{
-            // Mobile breakpoint (≤ 767px)
-            767: {
-              spaceBetween: 5,
+            0: {
+              // Breakpoint untuk layar xs (0px ke atas)
+              slidesPerView: 3,
             },
-            // Tablet breakpoint (768px - 1023px)
-            1023: {
-              spaceBetween: 15,
+
+            600: {
+              // sm (600px ke atas)
+              slidesPerView: 4,
             },
-            // Desktop breakpoint (≥ 1024px)
-            1024: {
-              spaceBetween: 20,
+            900: {
+              // md (900px ke atas)
+              slidesPerView: 4,
             },
           }}
         >
@@ -150,8 +150,8 @@ export default function Home() {
                       borderRadius: 0,
                       height: "100%",
                       fontSize: {
-                        xs: "0.5rem",
-                        sm: "0.875rem",
+                        xs: "1rem",
+                        sm: "1rem",
                         md: "2rem",
                       },
                       color: theme.palette.secondary.main,
@@ -291,6 +291,20 @@ export default function Home() {
           slidesPerView={4}
           navigation
           modules={[Navigation]}
+          breakpoints={{
+            0: {
+              // Breakpoint untuk layar xs (0px ke atas)
+              slidesPerView: 2,
+            },
+            600: {
+              // sm (600px ke atas)
+              slidesPerView: 4,
+            },
+            900: {
+              // md (900px ke atas)
+              slidesPerView: 5,
+            },
+          }}
         >
           {catalogs.map((catalog, index) => (
             <SwiperSlide key={index}>
@@ -300,8 +314,10 @@ export default function Home() {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    width: "275px",
-                    height: "500px",
+                    // width: { xs: 200, sm: 220, md: 350 },
+                    widht: 350,
+                    // height: { xs: 300, sm: 400, md: 500 },
+                    height: 500,
                     backgroundColor: theme.palette.secondary.main,
                     cursor: "pointer",
                   }}

@@ -36,6 +36,7 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import app from "../../firebase";
 
 const EditProduct = () => {
+  const [proses, setProses] = useState(false);
   const { productId } = useParams();
   const { data: products } = useGetProductsQuery();
   const [updateProduct, { isLoading, isError }] = useUpdateProductMutation();
@@ -83,10 +84,9 @@ const EditProduct = () => {
       const allCategories = products.flatMap((product) => product.category);
       const uniqueCategories = Array.from(new Set(allCategories));
 
-      //ubah format menjadi {name: ..., id: ...}
       const categoriesWithId = uniqueCategories.map((category, index) => ({
         name: category,
-        id: index + 1, // Perbaikan di sini: mengganti "index" dengan "id"
+        id: index + 1,
       }));
       setCategories(categoriesWithId);
     }
@@ -176,7 +176,7 @@ const EditProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setProses(true);
     const storage = getStorage(app);
     const updatedImageUrls = [];
 
@@ -190,11 +190,13 @@ const EditProduct = () => {
 
       // Update product data, replacing temporary URLs with Firebase URLs
       const dataToUpdate = {
-        _id: productId,
         name: formData.name,
         description: formData.description,
         // Filter out temporary URLs and use only Firebase URLs
-        imageProduct: updatedImageUrls,
+        imageProduct:
+          updatedImageUrls.length > 0
+            ? updatedImageUrls
+            : formData.imageProduct,
         ingredients: formData.ingredients,
         price: formData.price,
         stock: formData.stock,
@@ -202,15 +204,21 @@ const EditProduct = () => {
       };
 
       /// Gunakan useUpdateProductMutation
-      await updateProduct(dataToUpdate)
+      await updateProduct({ productId, ...dataToUpdate })
         .unwrap()
         .then((response) => {
           //Handle Successfull response
+          setAlertSeverity("success");
+          setAlertMessage("Berhasil update produk");
           setUpdatedProductData(response);
+          setProses(false);
         })
         .catch((error) => {
           //Handle error response
           console.error("Error updating produk: ", error);
+          setAlertSeverity("error");
+          setAlertMessage("Gagal update produk. coba lagi nanti");
+          setProses(false);
         });
 
       //set UpdateProduct data setelah berhasil update
@@ -218,9 +226,19 @@ const EditProduct = () => {
 
       // Reset newImages and setFormData after successful upload
       setNewImages([]);
-      setFormData(dataToUpdate);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        imageProduct:
+          updatedImageUrls.length > 0
+            ? updatedImageUrls
+            : prevFormData.imageProduct,
+      }));
     } catch (error) {
       console.error("Error updating product:", error);
+      setAlertSeverity("error");
+      setAlertMessage("Gagal update produk. coba lagi nanti");
+    } finally {
+      setShowAlert(true);
     }
   };
   return (
@@ -242,6 +260,7 @@ const EditProduct = () => {
         <Grid container justifyContent="flex-end">
           <Grid item>
             <Button
+              disabled={proses}
               variant="contained"
               color="primary"
               type="submit"
@@ -254,7 +273,7 @@ const EditProduct = () => {
                 fontWeight: "bold",
               }}
             >
-              Simpan Perubahan
+              {proses ? "Memproses..." : "Simpan Perubahan"}
             </Button>
           </Grid>
         </Grid>

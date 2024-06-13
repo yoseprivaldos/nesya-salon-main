@@ -49,7 +49,7 @@ export default function Login() {
         return;
       }
       dispatch(signInSuccess(data));
-      if (data.role === "admin") {
+      if (data.role === "admin" || data.role === "superadmin") {
         navigate("/dashboard");
       } else {
         navigate("/");

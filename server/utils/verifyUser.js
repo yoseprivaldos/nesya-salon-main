@@ -21,12 +21,15 @@ export const verifyToken = (req, res, next) => {
 };
 
 export const requireAdmin = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
-    next();
+  if (
+    req.user &&
+    (req.user.role === "admin" || req.user.role === "superadmin")
+  ) {
+    next(); // Lanjutkan ke middleware atau route berikutnya
   } else {
-    return res
-      .status(403)
-      .json({ message: "hanya admin yang bisa melakukan tindakan ini" });
+    return res.status(403).json({
+      message: "Hanya admin atau superadmin yang bisa melakukan tindakan ini",
+    });
   }
 };
 

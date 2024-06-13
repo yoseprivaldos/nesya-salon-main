@@ -1,6 +1,6 @@
-import { Box } from "@mui/system";
 import Header from "../../components/dashboard/Header";
 import {
+  Box,
   Accordion,
   AccordionDetails,
   AccordionSummary,
@@ -39,6 +39,7 @@ import {
 } from "firebase/storage";
 
 const AddService = () => {
+  const [proses, setProses] = useState(false);
   const { data: categories } = useGetCategoryQuery();
   const [createService, { isLoading, isError }] = useCreateServiceMutation();
   const [name, setName] = useState("");
@@ -103,6 +104,7 @@ const AddService = () => {
   };
 
   const handleSubmit = async () => {
+    setProses(true);
     const storage = getStorage(app);
     const imageUrls = [];
 
@@ -159,7 +161,8 @@ const AddService = () => {
         setCreatedServiceData(data);
         setShowAlert(true);
         setAlertSeverity("success");
-        setAlertMessage("Berhasil update produk");
+        setAlertMessage("Berhasil membuat layanan");
+        setProses(false);
 
         //reset form
         setName("");
@@ -174,13 +177,15 @@ const AddService = () => {
         console.error("Error saat membuat service");
         setShowAlert(true);
         setAlertSeverity("error");
-        setAlertMessage("Gagal membuat Service. Nanti");
+        setAlertMessage("Gagal membuat Service. Coba Lagi Nanti");
+        setProses(false);
       }
     } catch (error) {
       console.error("Error Creating Service", error);
       setShowAlert(true);
       setAlertSeverity("error");
       setAlertMessage("Gagal membuat Service. Coba lagi nanti");
+      setProses(false);
     }
   };
 
@@ -204,7 +209,7 @@ const AddService = () => {
       <Grid container justifyContent="flex-end">
         <Grid item>
           <Button
-            disabled={isLoading}
+            disabled={proses}
             variant="contained"
             color="primary"
             size="large"
@@ -217,7 +222,7 @@ const AddService = () => {
             }}
             onClick={handleSubmit}
           >
-            {isLoading ? "Memproses..." : "TEKAN UNTUK MENAMBAHKAN"}
+            {proses ? "Memproses..." : "TEKAN UNTUK MENAMBAHKAN"}
           </Button>
         </Grid>
       </Grid>
