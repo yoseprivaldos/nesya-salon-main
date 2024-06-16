@@ -103,20 +103,13 @@ function Header(props) {
           sx={{
             backgroundColor: theme.palette.background.alt,
             position: "static",
+            padding: 1,
             borderBottom: `0.5px solid ${theme.palette.secondary.main}`,
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 1100,
-            boxSizing: "border-box", // Tambahkan ini untuk memastikan padding dan border tidak mempengaruhi ukuran
           }}
         >
           <Toolbar
             sx={{
               justifyContent: "space-between",
-              mb: "2.5px",
-              mt: "2.5px",
-              padding: 0,
             }}
           >
             <Grid
@@ -130,10 +123,10 @@ function Header(props) {
                   color="inherit"
                   aria-label="open drawer"
                   edge="start"
+                  margin={0}
                   onClick={handleDrawerToggle}
-                  sx={{ ml: 1 }}
                 >
-                  <MenuIcon sx={{ width: "30px", height: "30px" }} />
+                  <MenuIcon sx={{ width: "40px", height: "40px" }} />
                 </IconButton>
               </Grid>
               <Grid item display="flex">
@@ -166,10 +159,9 @@ function Header(props) {
                         <Avatar
                           src={profilePicture}
                           sx={{
-                            m: 1,
                             objectFit: "cover",
-                            width: "30px",
-                            height: "30px",
+                            width: "42px",
+                            height: "42px",
                             border: 1,
                             borderColor: "secondary.main",
                             backgroundColor: "grey",
@@ -279,10 +271,6 @@ function Header(props) {
 }
 
 Header.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
   window: PropTypes.func,
 };
 

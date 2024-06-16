@@ -44,13 +44,13 @@ const Services = () => {
 
   return (
     <>
-      <Box sx={{ bgcolor: "background.alt", padding: { xs: 2, sm: 4, md: 6 } }}>
+      <Box sx={{ bgcolor: "white", padding: { xs: 2, sm: 4, md: 6 } }}>
         {/* Tittle Utama */}
         <Typography
           variant="h3"
           sx={{
             fontWeight: "bold",
-            bgcolor: "secondary.main",
+            bgcolor: "white",
             color: "background.alt",
             paddingBottom: 2,
           }}
@@ -64,7 +64,7 @@ const Services = () => {
           justifyContent="space-between"
           alignItems="center"
           sx={{
-            bgcolor: "background.alt",
+            bgcolor: "White",
             color: "secondary.main",
             marginBottom: 3,
             paddingBottom: 1,
@@ -78,12 +78,13 @@ const Services = () => {
             >
               {filterMain.map((filter) => (
                 <Button
+                  variant="contained"
                   key={filter.title}
                   component={Link}
                   to={filter.path}
                   sx={{
-                    borderRadius: 0,
-                    borderColor: "secondary.main",
+                    borderRadius: 2,
+                    backgroundColor: "primary.main",
                     color: "secondary.main",
                     fontSize: { xs: "0.6rem", sm: "0.875rem", md: "1rem" },
                   }}
@@ -103,6 +104,7 @@ const Services = () => {
                 fontSize: { xs: "0.65rem", sm: "0.875rem", md: "1rem" },
                 display: "flex",
                 alignItems: "center",
+                borderRadius: 3,
                 border: 1,
               }}
             >
@@ -121,19 +123,20 @@ const Services = () => {
         {isLoading ? (
           <div>Loading</div>
         ) : (
-          <Grid container spacing={{ xs: 2, sm: 4, md: 8 }}>
+          <Grid container spacing={{ xs: 2, sm: 4, md: 2 }}>
             {filteredServices?.map((service) => (
-              <Grid item xs={6} sm={6} md={4} key={service._id}>
+              <Grid item xs={6} sm={6} md={3} key={service._id}>
                 <Link
                   to={`/form-reservation`}
                   style={{ textDecoration: "none" }}
                 >
                   <Paper
                     sx={{
-                      bgcolor: "secondary.main",
-                      height: { xs: "350px", sm: "520px", md: "610px" },
+                      bgcolor: "#fff8f",
+                      height: { xs: "350px", sm: "520px", md: "400px" },
                       display: "flex",
                       flexDirection: "column",
+
                       "&:hover": !isMobile
                         ? {
                             boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
@@ -234,11 +237,11 @@ const Services = () => {
                                 sm: "0.875rem",
                                 md: "1rem",
                               },
-                              color: theme.palette.secondary.main,
+                              color: "white",
                               bgcolor: "primary.main",
                             }}
                           >
-                            Pesan Sekarang
+                            Pesan
                           </Button>
                         </Grid>
                       </Grid>

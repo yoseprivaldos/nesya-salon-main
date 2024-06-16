@@ -19,6 +19,7 @@ import EditProductDashboard from "./pages/DashboardPanel/EditProduct.jsx";
 import ReservationDashboard from "./pages/DashboardPanel/Reservation.jsx";
 import CreateReservationDashboard from "./pages/DashboardPanel/CreateReservation.jsx";
 import AdminPageDashboard from "./pages/DashboardPanel/AdminPage.jsx";
+import ScheduleDashboard from "./pages/DashboardPanel/CalendarPage.jsx";
 
 //import landing page section
 import LayoutLandingPage from "./pages/LandingPage/Layout.jsx";
@@ -30,6 +31,9 @@ import Reservation from "./pages/LandingPage/Reservation.jsx";
 import FormReservation from "./pages/LandingPage/FormReservation.jsx";
 import Services from "./pages/LandingPage/Services.jsx";
 import Product from "./pages/LandingPage/Product.jsx";
+
+//test
+import ReservationCart from "./components/LandingPage/ReservationCart.jsx";
 
 export default function App() {
   const mode = useSelector((state) => state.global.mode);
@@ -102,11 +106,12 @@ export default function App() {
               element={<CreateReservationDashboard />}
             />
             <Route path="admin" element={<AdminPageDashboard />}></Route>
+            <Route path="schedule" element={<ScheduleDashboard />}></Route>
           </Route>
 
           {/* testingUI */}
           <Route>
-            {/* <Route path="/account" element={<Account />} /> */}
+            <Route path="/reservationCard" element={<ReservationCart />} />
             {/* <Route
               path="/account/edit-account/information"
               element={<EditUserInformation />}

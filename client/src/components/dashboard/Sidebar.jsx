@@ -34,11 +34,11 @@ const navItems = [
   },
 
   {
-    text: "Pelanggan",
+    text: "Jadwal",
     icon: <ShoppingCartOutlined />,
     path: "/dashboard/pelanggan",
     subItems: [
-      { text: "Daftar Pelanggan", path: "/dashboard/pelanggan/daftar" },
+      { text: "Kalender", path: "/dashboard/schedule" },
       { text: "Riwayat Layanan", path: "/dashboard/pelanggan/riwayat" },
     ],
   },

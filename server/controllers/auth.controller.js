@@ -34,7 +34,7 @@ export const signin = async (req, res, next) => {
     //memastikan data password tidak dikirim ke client side
     const { password: hashedPassword, ...rest } = validUser._doc;
     //expire date cookie -- 1 jam
-    const expiryDate = new Date(Date.now() + 3600000);
+    const expiryDate = new Date(Date.now() + 7200000);
     res
       .cookie("access_token", token, { httpOnly: true, expires: expiryDate })
       .status(200)

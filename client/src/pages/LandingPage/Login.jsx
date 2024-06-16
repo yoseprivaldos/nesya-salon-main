@@ -40,6 +40,8 @@ export default function Login() {
         body: JSON.stringify(formData),
       });
 
+      console.log(res);
+
       if (!res.ok) {
         throw new Error(`HTTP error ! status : ${res.status}`);
       }

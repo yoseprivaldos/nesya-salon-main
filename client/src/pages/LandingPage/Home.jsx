@@ -260,9 +260,7 @@ export default function Home() {
       </Box>
 
       {/* kisi kisi katalog produk swiper */}
-      <Box
-        sx={{ padding: "50px", backgroundColor: theme.palette.background.alt }}
-      >
+      <Box sx={{ padding: "50px", backgroundColor: "white" }}>
         <Box
           marginBottom="2rem"
           sx={{
@@ -270,13 +268,17 @@ export default function Home() {
             justifyContent: "space-between",
           }}
         >
-          <Typography variant="h2" color="#FFFFFF">
+          <Typography
+            variant="h2"
+            color="primary.main"
+            sx={{ fontWeight: "bold" }}
+          >
             Pilihan Produk
           </Typography>
           <Link to={`/products`}>
             <Typography
               variant="h3"
-              color="#FFFFFF"
+              color="primary.main"
               marginTop="auto"
               marginBottom="auto"
               sx={{ textDecoration: "underline", cursor: "pointer" }}
@@ -318,8 +320,10 @@ export default function Home() {
                     widht: 350,
                     // height: { xs: 300, sm: 400, md: 500 },
                     height: 500,
-                    backgroundColor: theme.palette.secondary.main,
+                    backgroundColor: "#fff8f",
                     cursor: "pointer",
+                    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
+                    transform: "translateY(-2px)",
                   }}
                 >
                   <Grid

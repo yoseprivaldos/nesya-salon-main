@@ -20,8 +20,10 @@ export const createReservation = async (req, res) => {
       reservationMessage,
     } = req.body;
 
+    console.log(req.body);
     // validasi user
     const userExist = await User.findById(user);
+
     if (!userExist) {
       return res.status(404).json({ message: "User tidak ditemukan" });
     }
@@ -36,6 +38,7 @@ export const createReservation = async (req, res) => {
         .status(404)
         .json({ message: "Beberapa layanan tidak ditemukan" });
     }
+    console.log("disini masih jalan");
 
     //Buat objek reservasi baru
     const newReservation = new Reservation({
@@ -91,10 +94,14 @@ export const getMyReservation = async (req, res) => {
     // ambil id pengguna dari token autentikasi
     const userId = req.user.id;
 
+    console.log(userId);
+
     // temukan semua reservasi yang terkait dengan pengguna
     const reservations = await Reservation.find({ user: userId })
       .populate("services", "name price imageService")
       .populate("user", "username");
+
+    console.log("", reservations);
 
     if (!reservations || reservations.length === 0) {
       return res.status(404).json({ message: "Kamu belum membuat reservasi" });
@@ -179,14 +186,13 @@ export const getServiceReservation = async (req, res) => {
   }
 };
 
+//updateReservation
 export const updateReservation = async (req, res) => {
   try {
     const reservationId = req.params.id;
     const updateData = req.body;
     const userRole = req.user.role;
     const userId = req.user.id;
-
-    console.log("ini merupakan data reservationId", reservationId);
 
     let reservation;
 
@@ -201,8 +207,6 @@ export const updateReservation = async (req, res) => {
       return res.status(404).json({ error: "Reservasi tidak ditemukan" });
     }
 
-    console.log("reservasi user id:", reservation.user._id.toString());
-
     // Validasi umum: Reservasi yang sudah dibatalkan, selesai, atau absen tidak bisa diubah
     if (["canceled", "completed", "absent"].includes(reservation.status)) {
       return res
@@ -211,7 +215,7 @@ export const updateReservation = async (req, res) => {
     }
 
     // Logika untuk admin
-    if (userRole === "admin") {
+    if (userRole === "admin" || userRole === "superadmin") {
       // Admin dapat mengubah semua data jika reservasi dibuat oleh admin itu sendiri
       if (reservation.user._id.toString() === userId) {
         reservation.reservationName =
@@ -224,6 +228,8 @@ export const updateReservation = async (req, res) => {
         reservation.note = updateData.note || reservation.note;
       }
 
+      reservation.reservationMessage =
+        updateData.reservationMessage || reservation.reservationMessage;
       // Admin dapat mengubah status sesuai aturan
       if (
         updateData.status &&
@@ -251,9 +257,15 @@ export const updateReservation = async (req, res) => {
         reservation.status = updateData.status;
       }
       reservation.note = updateData.note || reservation.note;
+      reservation.reservationMessage =
+        updateData.reservationMessage || reservation.reservationMessage;
     }
 
     // Menambahkan reservationMessage jika terjadi perubahan status
+    console.log(
+      "Cek kebenaran",
+      updateData.status && updateData.status !== reservation.status
+    );
     if (updateData.status && updateData.status !== reservation.status) {
       reservation.reservationMessage =
         updateData.reservationMessage || reservation.reservationMessage;
@@ -271,5 +283,70 @@ export const updateReservation = async (req, res) => {
   } catch (error) {
     console.error("Error in updateReservation controller:", error);
     res.status(500).json({ error: "Terjadi kesalahan pada server" });
+  }
+};
+
+//mendapatkan jumlah total reservasi
+export const jumlahReservasi = async (req, res) => {
+  try {
+    const count = await Reservation.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    console.error("Error menghitung jumlah reservasi", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Mendapatkan jumlah reservasi berhasil (status confirmed)
+export const jumlahReservasiBerhasil = async (req, res) => {
+  try {
+    const count = await Reservation.countDocuments({ status: "confirmed" });
+    res.json({ count });
+  } catch (error) {
+    console.error("Error menghitung jumlah reservasi berhasil", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Mendapatkan jumlah reservasi menunggu (status pending )
+export const jumlahReservasiMenunggu = async (req, res) => {
+  try {
+    const count = await Reservation.countDocuments({ status: "pending" });
+    res.json({ count });
+  } catch (error) {
+    console.error("Error menghitung jumlah reservasi menunggu", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//Mendapatkan jumlah reservasi absent (status absent)
+export const jumlahReservasiAbsent = async (req, res) => {
+  try {
+    const count = await Reservation.countDocuments({ status: "absent" });
+    res.json({ count });
+  } catch (error) {
+    console.error("Error menghitung jumlah reservasi menunggu", error);
+    res.status(500).json({ error: "internal Server Error" });
+  }
+};
+
+//Mendapatkan jumlahReservasi selesai (status completed)
+export const jumlahReservasiSelesai = async (req, res) => {
+  try {
+    const count = await Reservation.countDocuments({ status: "completed" });
+    res.json({ count });
+  } catch (error) {
+    console.error("Error menghitung jumlah reservasi selesai:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+//Mendapatkan jumlahReservasi selesai (status cancelled)
+export const jumlahReservasiBatal = async (req, res) => {
+  try {
+    const count = await Reservation.countDocuments({ status: "canceled" });
+    res.json({ count });
+  } catch (error) {
+    console.error("Error menghitung jumlah reservasi selesai:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

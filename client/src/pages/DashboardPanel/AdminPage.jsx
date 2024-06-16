@@ -119,22 +119,54 @@ const AdminPage = () => {
 
   return (
     <Box m="1.5rem 2.5rem">
-      <Header title="Halaman Admin" />
+      <Header title="HALAMAN ADMIN" />
       <Box mt={3}>
-        <Typography variant="h6">Daftar Admin</Typography>
+        <Typography
+          variant="h6"
+          backgroundColor="primary.main"
+          padding={3}
+          paddingLeft={1.5}
+          color="secondary.main"
+          fontWeight="bold"
+        >
+          DAFTAR ADMIN
+        </Typography>
         {isLoading ? (
           <CircularProgress />
         ) : error ? (
           <Typography color="error">Failed to load admin data</Typography>
         ) : (
-          <TableContainer component={Paper}>
+          <TableContainer
+            component={Paper}
+            sx={{ backgroundColor: "primary.main" }}
+          >
             <Table aria-label="simple table">
-              <TableHead>
+              <TableHead
+                sx={{ bgcolor: "background.alt", color: "secondary.main" }}
+              >
                 <TableRow>
-                  <TableCell>Nama</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell align="center">Role</TableCell>
-                  <TableCell align="center">Aksi</TableCell>
+                  <TableCell
+                    sx={{ color: "secondary.main", fontWeight: "bold" }}
+                  >
+                    NAMA
+                  </TableCell>
+                  <TableCell
+                    sx={{ color: "secondary.main", fontWeight: "bold" }}
+                  >
+                    EMAIL
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ color: "secondary.main", fontWeight: "bold" }}
+                  >
+                    STATUS
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ color: "secondary.main", fontWeight: "bold" }}
+                  >
+                    AKSI
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -175,8 +207,13 @@ const AdminPage = () => {
         )}
       </Box>
 
-      <Box mt={3}>
-        <Typography variant="h6">Tambah Admin</Typography>
+      <Box mt={3} backgroundColor="primary.main" padding={3} paddingLeft={1.5}>
+        <Typography
+          variant="h6"
+          sx={{ color: "secondary.main", fontWeight: "bold" }}
+        >
+          TAMBAH ADMIN
+        </Typography>
         <Box
           component="form"
           sx={{
@@ -190,12 +227,14 @@ const AdminPage = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
+            sx={{ backgroundColor: "background.alt" }}
           />
           <TextField
             label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
+            sx={{ backgroundColor: "background.alt" }}
           />
           <TextField
             label="Password"
@@ -203,16 +242,32 @@ const AdminPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
+            sx={{ backgroundColor: "background.alt" }}
           />
-          <Button variant="contained" color="primary" onClick={handleAddAdmin}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddAdmin}
+            sx={{ backgroundColor: "background.alt" }}
+          >
             Tambah
           </Button>
         </Box>
       </Box>
 
       {editMode && (
-        <Box mt={3}>
-          <Typography variant="h6">Edit Admin</Typography>
+        <Box
+          mt={3}
+          backgroundColor="primary.main"
+          padding={3}
+          paddingLeft={1.5}
+        >
+          <Typography
+            variant="h6"
+            sx={{ color: "secondary.main", fontWeight: "bold" }}
+          >
+            EDIT ADMIN
+          </Typography>
           <Box
             component="form"
             sx={{
@@ -226,12 +281,14 @@ const AdminPage = () => {
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               fullWidth
+              sx={{ backgroundColor: "background.alt" }}
             />
             <TextField
               label="Email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
               fullWidth
+              sx={{ backgroundColor: "background.alt" }}
             />
             <TextField
               label="Password"
@@ -239,11 +296,13 @@ const AdminPage = () => {
               value={editPassword}
               onChange={(e) => setEditPassword(e.target.value)}
               fullWidth
+              sx={{ backgroundColor: "background.alt" }}
             />
             <Button
               variant="contained"
               color="primary"
               onClick={handleUpdateAdmin}
+              sx={{ backgroundColor: "background.alt" }}
             >
               Update
             </Button>

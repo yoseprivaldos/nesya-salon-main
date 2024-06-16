@@ -70,6 +70,14 @@ function Row(props) {
             backgroundColor: "darkgray",
           },
         };
+      case "pending":
+        return {
+          backgroundColor: "orange",
+          color: "white",
+          "&:hover": {
+            backgroundColor: "darkorange",
+          },
+        };
       default:
         return {
           backgroundColor: "orange",
@@ -119,7 +127,11 @@ function Row(props) {
             variant="outlined"
             size="small"
             onClick={handleModalOpen}
-            disabled={row.status == "completed" || row.status === "absent"}
+            disabled={
+              row.status === "completed" ||
+              row.status === "absent" ||
+              row.status === "canceled"
+            }
             sx={{ ...getStatusButtonStyle(row.status), widht: "170px" }}
           >
             {row.status}
@@ -196,6 +208,7 @@ function Row(props) {
             onChange={(e) => setNewStatus(e.target.value)}
             fullWidth
           >
+            <MenuItem value="pending">Pending</MenuItem>
             <MenuItem value="confirmed">Confirmed</MenuItem>
             <MenuItem value="completed">Completed</MenuItem>
             <MenuItem value="canceled">Canceled</MenuItem>
@@ -280,7 +293,7 @@ export default function BeautySalonReservationTable() {
         status: newStatus,
         reservationMessage: message,
       };
-      console.log(id);
+      console.log(changeStatus);
 
       const { data, error } = await updateReservation({
         reservationId: id,
@@ -408,6 +421,7 @@ export default function BeautySalonReservationTable() {
           <MenuItem value="completed">Completed</MenuItem>
           <MenuItem value="confirmed">Confirmed</MenuItem>
           <MenuItem value="canceled">Canceled</MenuItem>
+          <MenuItem value="absent">absent</MenuItem>
         </Select>
         <TextField
           label="Search"
@@ -426,14 +440,20 @@ export default function BeautySalonReservationTable() {
           <TableHead>
             <TableRow>
               <TableCell />
-              <TableCell>Nama Pelanggan</TableCell>
+              <TableCell sx={{ color: "secondary.main", fontWeight: "bold" }}>
+                NAMA PELANGGAN
+              </TableCell>
               <TableCell align="center">
                 <TableSortLabel
                   active={sortConfig.key === "date"}
                   direction={sortConfig.direction}
                   onClick={() => handleSort("date")}
+                  sx={{
+                    color: "secondary.main",
+                    fontWeight: "bold",
+                  }}
                 >
-                  Tanggal
+                  TANGGAL
                 </TableSortLabel>
               </TableCell>
               <TableCell align="center">
@@ -441,8 +461,12 @@ export default function BeautySalonReservationTable() {
                   active={sortConfig.key === "startTime"}
                   direction={sortConfig.direction}
                   onClick={() => handleSort("startTime")}
+                  sx={{
+                    color: "secondary.main",
+                    fontWeight: "bold",
+                  }}
                 >
-                  Waktu
+                  WAKTU
                 </TableSortLabel>
               </TableCell>
               <TableCell align="center">
@@ -450,11 +474,23 @@ export default function BeautySalonReservationTable() {
                   active={sortConfig.key === "totalPrice"}
                   direction={sortConfig.direction}
                   onClick={() => handleSort("totalPrice")}
+                  sx={{
+                    color: "secondary.main",
+                    fontWeight: "bold",
+                  }}
                 >
-                  Total Harga
+                  TOTAL HARGA
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">Status</TableCell>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "secondary.main",
+                  fontWeight: "bold",
+                }}
+              >
+                STATUS
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

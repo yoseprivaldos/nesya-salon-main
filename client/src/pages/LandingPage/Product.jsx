@@ -26,20 +26,20 @@ const Product = () => {
   const handleCloseModal = () => setOpenModal(false);
 
   return (
-    <Box sx={{ bgcolor: "background.alt", padding: { xs: 2, sm: 4, md: 6 } }}>
+    <Box sx={{ bgcolor: "white", padding: { xs: 2, sm: 4, md: 6 } }}>
       {/* main title */}
       <Box
         sx={{
           paddingTop: { xs: 1, sm: 2, md: 3 },
-          paddingBottom: { xs: 1, sm: 2, md: 3 },
-          bgcolor: "secondary.main",
+          paddingBottom: { xs: 1, sm: 2, md: 2 },
+          bgcolor: "white",
+          borderBottom: 4,
         }}
       >
         <Typography
           variant="h2"
           sx={{
             fontWeight: "bold",
-
             color: "background.alt",
             letterSpacing: 1.5,
             textAlign: "center",
@@ -386,14 +386,14 @@ const Product = () => {
 
       {/* KATALOG CONTENT*/}
       <Box>
-        <Grid container spacing={{ xs: 1.5, sm: 2.5, md: 5 }}>
+        <Grid container paddingTop={5} spacing={{ xs: 1.5, sm: 2.5, md: 5 }}>
           {products?.map((product) => (
             <Grid item xs={4} sm={4} md={3} key={product._id}>
               <Link to="/">
                 <Paper
                   sx={{
                     borderRadius: 0,
-                    bgcolor: "secondary.main",
+                    bgcolor: "#fff8f",
                     height: { xs: "200px", sm: "250px", md: "380px" },
                     display: "flex",
                     flexDirection: "column",
@@ -489,7 +489,7 @@ const Product = () => {
                       </Grid>
                       <Grid item>
                         <Button
-                          variant="contained"
+                          variant="outlined"
                           sx={{
                             size: { xs: "small", sm: "medium", md: "medium" },
                             fontSize: {
@@ -497,13 +497,14 @@ const Product = () => {
                               sm: "0.875rem",
                               md: "1rem",
                             },
-                            color: theme.palette.secondary.main,
-                            bgcolor: "primary.main",
-                            borderRadius: 0,
-                            padding: { xs: 0.6, md: 1 },
+                            width: "90px",
+                            padding: { xs: 0.6, md: 0.7 },
+                            fontWeight: "bold",
+                            color: "primary.main",
+                            borderRadius: 3,
                           }}
                         >
-                          Lihat Detail
+                          Detail
                         </Button>
                       </Grid>
                     </Grid>

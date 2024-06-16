@@ -143,11 +143,9 @@ export const deleteAdmin = async (req, res) => {
 
     //validasi peran superadmin
     if (!currentUser || currentUser.role !== "superadmin") {
-      return res
-        .status(403)
-        .json({
-          message: "Hanya super admin yang diperbolehkan menghapus admin",
-        });
+      return res.status(403).json({
+        message: "Hanya super admin yang diperbolehkan menghapus admin",
+      });
     }
 
     // Cari dan hapus user admin
@@ -163,5 +161,15 @@ export const deleteAdmin = async (req, res) => {
   } catch (error) {
     console.error("Error menghapus user admin:", error);
     res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
+export const jumlahPelanggan = async (req, res) => {
+  try {
+    const count = await User.countDocuments({ role: "pelanggan" });
+    res.json({ count });
+  } catch (error) {
+    console.error("Gagal menapatkan jumlah pelanggan", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

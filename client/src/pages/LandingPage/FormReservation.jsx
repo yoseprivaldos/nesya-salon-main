@@ -182,6 +182,13 @@ const FormReservation = () => {
   const handleSubmit = async () => {
     setProses(true);
 
+    //mengonversi tanggal dari string "DD/MM/YYYY" menjadi objek date
+    const parts = selectedDate.split("/");
+    const day = parseInt(parts[0], 10);
+    const monthIndex = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    const formattedDate = new Date(year, monthIndex, day);
+
     const reservationData = {
       user: currentUser._id,
       reservationName,
@@ -190,7 +197,7 @@ const FormReservation = () => {
       note: reservationNote,
       services: selectedServiceIds,
       totalPrice,
-      date: selectedDate,
+      date: formattedDate,
       startTime: selectedTime,
       endTime: endTimeFormatted,
     };
@@ -214,7 +221,7 @@ const FormReservation = () => {
         setTotalPrice("");
         setEndTimeFormatted("");
       } else if (error) {
-        console.error("Error saat membuat service");
+        console.error("Error saat membuat service ini", error);
         setProses(false);
         setShowAlert(true);
         setAlertSeverity("error");
@@ -273,7 +280,7 @@ const FormReservation = () => {
               }}
               onClick={handleSubmit}
             >
-              {proses ? "Memproses..." : "TEKAN UNTUK MENAMBAHKAN"}
+              {proses ? "Memproses..." : "KONFIRMASI RESERVASI"}
             </Button>
           </Grid>
         </Grid>
@@ -285,14 +292,21 @@ const FormReservation = () => {
             <Paper elevation={3} sx={{ p: 3, bgcolor: "secondary.main" }}>
               <Button
                 variant="outlined"
+                size="large"
+                fullWidth
                 sx={{
                   bgcolor: "primary.main",
                   color: "secondary.main",
+                  fontSize: "14px",
                   borderRadius: 0,
+                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
                 }}
                 onClick={handleOpenServiceDialog}
               >
-                Pilih Layanan
+                Tambah Layanan
               </Button>
               <Box mt={2}>
                 {selectedServiceNames.map((serviceName, index) => (
@@ -320,7 +334,7 @@ const FormReservation = () => {
                   InputProps={{
                     readOnly: true,
                   }}
-                  sx={{ mt: 2 }}
+                  sx={{ mt: 1 }}
                 />
               </Box>
             </Paper>
@@ -331,12 +345,19 @@ const FormReservation = () => {
               sx={{ p: 3, mt: 3, bgcolor: "secondary.main" }}
             >
               <Typography
-                variant="h5"
+                backgroundColor="primary.main"
+                variant="body1"
                 component="h3"
                 gutterBottom
-                sx={{ color: "primary.main" }}
+                sx={{
+                  color: "secondary.main",
+                  padding: 1.3,
+                  paddingLeft: 2.5,
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                }}
               >
-                Pilih Tanggal
+                PILIH TANGGAL RESERVASI
               </Typography>
 
               <LocalizationProvider
@@ -379,22 +400,42 @@ const FormReservation = () => {
             >
               <Button
                 variant="outlined"
+                size="large"
+                fullWidth
                 sx={{
                   bgcolor: "primary.main",
                   color: "secondary.main",
                   borderRadius: 0,
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
                 }}
                 onClick={handleOpenTimeDialog}
               >
-                Pilih Waktu
+                PILIH WAKTU
               </Button>
 
               <Box>
                 {selectedTime && (
-                  <Typography variant="h5" sx={{ mt: 2 }}>
-                    <AccessTimeIcon /> {selectedTime} WIB - {endTimeFormatted}{" "}
-                    WIB
-                  </Typography>
+                  <Box
+                    sx={{
+                      bgcolor: "primary.main",
+                      marginTop: 0.2,
+                      padding: 0.8,
+                      paddingLeft: 2,
+                      color: "white",
+                    }}
+                  >
+                    <Typography sx={{ mt: 1 }} variant="body1">
+                      Estimasi Durasi Layanan:
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                      <AccessTimeIcon /> {selectedTime} WIB - {endTimeFormatted}{" "}
+                      WIB
+                    </Typography>
+                  </Box>
                 )}
               </Box>
             </Paper>
@@ -405,12 +446,19 @@ const FormReservation = () => {
             {/* informasi pelanggan */}
             <Paper elevation={3} sx={{ p: 3, bgcolor: "secondary.main" }}>
               <Typography
-                variant="h5"
+                variant="body1"
                 component="h3"
+                backgroundColor="primary.main"
                 gutterBottom
-                sx={{ color: "primary.main" }}
+                sx={{
+                  color: "secondary.main",
+                  fontSize: "14px",
+                  padding: 1.1,
+                  paddingLeft: 3,
+                  fontWeight: "bold",
+                }}
               >
-                Informasi Pelanggan
+                INFORMASI PELANGGAN
               </Typography>
 
               <Grid container spacing={3}>
@@ -461,9 +509,14 @@ const FormReservation = () => {
                 variant="h5"
                 component="h3"
                 gutterBottom
-                sx={{ color: "primary.main" }}
+                sx={{
+                  color: "secondary.main",
+                  padding: 1.5,
+                  fontWeight: "bold",
+                  backgroundColor: "primary.main",
+                }}
               >
-                Tambahkan Catatan (opsional)
+                TAMBAHKAN CATATAN ( OPSIONAL )
               </Typography>
               <Grid container spacing={3}>
                 <Grid item xs={12}>

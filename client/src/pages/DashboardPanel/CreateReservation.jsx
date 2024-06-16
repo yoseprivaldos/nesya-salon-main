@@ -30,7 +30,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import {
   useGetServicesQuery,
   useCreateReservationMutation,
-} from "../../redux/api/api";
+} from "../../redux/api/api.js";
 import { useSelector } from "react-redux";
 
 dayjs.extend(duration);
@@ -110,7 +110,7 @@ const CreateReservation = () => {
     } else if (isError) {
       setShowAlert(true);
       setAlertSeverity("error");
-      setAlertMessage("Gagal membuat Service. Coba lagi nanti");
+      setAlertMessage("Gagal membuat Reservasi. Coba lagi nanti");
     }
   }, [isLoading, isError]);
 
@@ -176,8 +176,9 @@ const CreateReservation = () => {
 
   const handleDateChange = (date) => {
     //konversi Dayjs ke JavaScript Date
-    const jsDate = date ? date.format("DD/MM/YYYY") : null;
-    setSelectedDate(jsDate);
+    // const jsDate = date ? date.format("DD/MM/YYYY") : null;
+    const isoDate = date ? date.toISOString() : null;
+    setSelectedDate(isoDate);
   };
 
   const handleSubmit = async () => {
@@ -195,7 +196,6 @@ const CreateReservation = () => {
       startTime: selectedTime,
       endTime: endTimeFormatted,
     };
-
     try {
       const { data, error } = await createReservation(reservationData);
       if (data) {
@@ -203,8 +203,6 @@ const CreateReservation = () => {
         setShowAlert(true);
         setAlertSeverity("success");
         setAlertMessage("Berhasil membuat reservasi");
-
-        console.log(data);
         //resetStateForm
         setReservationName("");
         setReservationEmail("");
@@ -215,7 +213,7 @@ const CreateReservation = () => {
         setTotalPrice("");
         setEndTimeFormatted("");
       } else if (error) {
-        console.error("Error saat membuat service");
+        console.error("Error saat membuat reservasi");
         setProses(false);
         setShowAlert(true);
         setAlertSeverity("error");
