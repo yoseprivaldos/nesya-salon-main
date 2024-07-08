@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Container,
   Grid,
   Paper,
   TextField,
@@ -12,28 +11,27 @@ import {
   TableHead,
   TableRow,
   IconButton,
+  Typography,
+  Box,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
+import Header from "../../components/dashboard/Header";
+import {
+  useCreateEmployeeMutation,
+  useGetAllEmployeesQuery,
+  useUpdateEmployeeMutation,
+  useDeleteEmployeeMutation,
+} from "../../redux/api/api.js";
 
 const EmployeePage = () => {
-  const [employees, setEmployees] = useState([
-    {
-      id: "1324w32143251235",
-      name: "John Doe",
-      email: "john@example.com",
-      phoneNumber: "123456789",
-      addresses: "123 Main St",
-      imageProfile: "",
-      startWorking: "2021-01-01",
-      availability: [
-        {
-          day: "Monday",
-          startTime: "09:00",
-          endTime: "17:00",
-        },
-      ],
-    },
-  ]);
+  const { data: employees = [] } = useGetAllEmployeesQuery();
+  const [createEmployeeMutation] = useCreateEmployeeMutation();
+  const [updateEmployeeMutation] = useUpdateEmployeeMutation();
+  const [deleteEmployeeMutation] = useDeleteEmployeeMutation();
 
   const [form, setForm] = useState({
     name: "",
@@ -53,166 +51,162 @@ const EmployeePage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const nameParts = name.split(".");
+    if (nameParts.length === 1) {
+      setForm({ ...form, [name]: value });
+    } else {
+      const index = parseInt(nameParts[1]);
+      const key = nameParts[2];
+      const newAvailability = [...form.availability];
+      newAvailability[index][key] = value;
+      setForm({ ...form, availability: newAvailability });
+    }
   };
 
-  const handleAddEmployee = () => {
-    setEmployees([...employees, { ...form, id: uuidv4() }]);
+  const handleAddAvailability = () => {
     setForm({
-      name: "",
-      email: "",
-      phoneNumber: "",
-      addresses: "",
-      imageProfile: "",
-      startWorking: "",
+      ...form,
       availability: [
-        {
-          day: "",
-          startTime: "",
-          endTime: "",
-        },
+        ...form.availability,
+        { day: "", startTime: "", endTime: "" },
       ],
     });
   };
 
-  const handleEditEmployee = (id) => {
-    const employee = employees.find((emp) => emp.id === id);
+  const handleRemoveAvailability = (index) => {
+    const newAvailability = form.availability.filter((_, i) => i !== index);
+    setForm({ ...form, availability: newAvailability });
+  };
+
+  const handleAddEmployee = async () => {
+    try {
+      await createEmployeeMutation(form);
+      setForm({
+        name: "",
+        email: "",
+        phoneNumber: "",
+        addresses: "",
+        imageProfile: "",
+
+        availability: [
+          {
+            day: "",
+            startTime: "",
+            endTime: "",
+          },
+        ],
+      });
+    } catch (error) {
+      console.error("Failed to add employee:", error);
+    }
+  };
+
+  const handleEditEmployee = (employee) => {
     setForm(employee);
   };
 
-  const handleDeleteEmployee = (id) => {
-    setEmployees(employees.filter((emp) => emp.id !== id));
+  const handleDeleteEmployee = async (employeeId) => {
+    try {
+      await deleteEmployeeMutation(employeeId);
+    } catch (error) {
+      console.error("Failed to delete employee:", error);
+    }
   };
 
-  const handleUpdateEmployee = () => {
-    setEmployees(employees.map((emp) => (emp.id === form.id ? form : emp)));
-    setForm({
-      name: "",
-      email: "",
-      phoneNumber: "",
-      addresses: "",
-      imageProfile: "",
-      startWorking: "",
-      availability: [
-        {
-          day: "",
-          startTime: "",
-          endTime: "",
-        },
-      ],
-    });
+  const handleUpdateEmployee = async () => {
+    try {
+      await updateEmployeeMutation({ employeeId: form._id, ...form });
+      setForm({
+        name: "",
+        email: "",
+        phoneNumber: "",
+        addresses: "",
+        imageProfile: "",
+        availability: [
+          {
+            day: "",
+            startTime: "",
+            endTime: "",
+          },
+        ],
+      });
+    } catch (error) {
+      console.error("Failed to update employee:", error);
+    }
   };
+
+  const daysOfWeek = [
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu",
+    "Minggu",
+  ];
+  const timeOptions = [];
+  for (let hour = 9; hour <= 18; hour++) {
+    const timeString = `${hour < 10 ? `0${hour}` : hour}:00`;
+    timeOptions.push(timeString);
+  }
 
   return (
-    <Container>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Paper style={{ padding: 16 }}>
-            <h2>Employee Management</h2>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Name"
-                  name="name"
-                  value={form.name}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Phone Number"
-                  name="phoneNumber"
-                  value={form.phoneNumber}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Addresses"
-                  name="addresses"
-                  value={form.addresses}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Start Working"
-                  name="startWorking"
-                  type="date"
-                  value={form.startWorking}
-                  onChange={handleInputChange}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Day of Availability"
-                  name="availability[0].day"
-                  value={form.availability[0].day}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  fullWidth
-                  label="Start Time"
-                  name="availability[0].startTime"
-                  value={form.availability[0].startTime}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  fullWidth
-                  label="End Time"
-                  name="availability[0].endTime"
-                  value={form.availability[0].endTime}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={form.id ? handleUpdateEmployee : handleAddEmployee}
-                >
-                  {form.id ? "Update Employee" : "Add Employee"}
-                </Button>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
+    <Box m="1.5rem 2.5rem">
+      <Header title="HALAMAN STAFF" />
+      <Grid container spacing={3} mt={0.5}>
+        {/* bagian daftar karyawan */}
+        <Grid item xs={12} backgroundColor="primary.main" ml={3} pr={3} pb={2}>
+          <Typography variant="h4" mb={3} mt={1}>
+            Daftar Staff
+          </Typography>
           <TableContainer component={Paper}>
             <Table>
-              <TableHead>
+              <TableHead
+                sx={{
+                  backgroundColor: "background.alt",
+                }}
+              >
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Phone Number</TableCell>
-                  <TableCell>Addresses</TableCell>
-                  <TableCell>Start Working</TableCell>
-                  <TableCell>Availability</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell
+                    sx={{ fontWeight: "bold", color: "secondary.main" }}
+                  >
+                    Nama
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: "bold", color: "secondary.main" }}
+                  >
+                    Email
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: "bold", color: "secondary.main" }}
+                  >
+                    Nomor Hp
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: "bold", color: "secondary.main" }}
+                  >
+                    Alamat
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: "bold", color: "secondary.main" }}
+                  >
+                    Mulai Bekerja
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: "bold", color: "secondary.main" }}
+                  >
+                    Jadwal Mingguan
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: "bold", color: "secondary.main" }}
+                  >
+                    Aksi
+                  </TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody sx={{ backgroundColor: "primary.main" }}>
                 {employees.map((employee) => (
-                  <TableRow key={employee.id}>
+                  <TableRow key={employee._id}>
                     <TableCell>{employee.name}</TableCell>
                     <TableCell>{employee.email}</TableCell>
                     <TableCell>{employee.phoneNumber}</TableCell>
@@ -228,13 +222,13 @@ const EmployeePage = () => {
                     <TableCell>
                       <IconButton
                         color="primary"
-                        onClick={() => handleEditEmployee(employee.id)}
+                        onClick={() => handleEditEmployee(employee)}
                       >
                         <Edit />
                       </IconButton>
                       <IconButton
                         color="secondary"
-                        onClick={() => handleDeleteEmployee(employee.id)}
+                        onClick={() => handleDeleteEmployee(employee._id)}
                       >
                         <Delete />
                       </IconButton>
@@ -245,8 +239,178 @@ const EmployeePage = () => {
             </Table>
           </TableContainer>
         </Grid>
+
+        {/* bagian input field add atau tambah karyawan */}
+        <Grid item xs={12}>
+          <Paper
+            sx={{
+              padding: 2,
+              paddingLeft: 3,
+              paddingRight: 3,
+              backgroundColor: "primary.main",
+            }}
+          >
+            <Typography variant="h4" mb={3} mt={1}>
+              Manajemen Staff
+            </Typography>
+            <Grid container spacing={2}>
+              {/* name */}
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Nama"
+                  name="name"
+                  value={form.name}
+                  onChange={handleInputChange}
+                  sx={{ backgroundColor: "background.alt" }}
+                />
+              </Grid>
+              {/* alamat */}
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Alamat"
+                  name="addresses"
+                  value={form.addresses}
+                  onChange={handleInputChange}
+                  sx={{ backgroundColor: "background.alt" }}
+                />
+              </Grid>
+              {/* phone number */}
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Nomor HP"
+                  name="phoneNumber"
+                  value={form.phoneNumber}
+                  onChange={handleInputChange}
+                  sx={{ backgroundColor: "background.alt" }}
+                />
+              </Grid>
+              {/* email */}
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleInputChange}
+                  sx={{ backgroundColor: "background.alt" }}
+                />
+              </Grid>
+              {/* Button tambah jadwal karyawan */}
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    backgroundColor: "secondary.main",
+                    color: "background.alt",
+                  }}
+                  onClick={handleAddAvailability}
+                >
+                  Tambah Jadwal Staff
+                </Button>
+              </Grid>
+              {/* availability */}
+              {form.availability.map((avail, index) => (
+                <Grid
+                  container
+                  spacing={2}
+                  key={index}
+                  pl={2}
+                  mt={1}
+                  alignItems="center"
+                >
+                  <Grid item xs={12} md={3.6}>
+                    <FormControl
+                      fullWidth
+                      sx={{ backgroundColor: "background.alt" }}
+                    >
+                      <InputLabel>Pilih Hari</InputLabel>
+                      <Select
+                        name={`availability.${index}.day`}
+                        value={avail.day}
+                        onChange={handleInputChange}
+                      >
+                        {daysOfWeek.map((day) => (
+                          <MenuItem key={day} value={day}>
+                            {day}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} md={3.6}>
+                    <FormControl
+                      fullWidth
+                      sx={{ backgroundColor: "background.alt" }}
+                    >
+                      <InputLabel>Jam Mulai Kerja</InputLabel>
+                      <Select
+                        name={`availability.${index}.startTime`}
+                        value={avail.startTime}
+                        onChange={handleInputChange}
+                      >
+                        {timeOptions.map((time) => (
+                          <MenuItem key={time} value={time}>
+                            {time}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} md={3.6}>
+                    <FormControl
+                      fullWidth
+                      sx={{ backgroundColor: "background.alt" }}
+                    >
+                      <InputLabel>Jam Pulang Kerja</InputLabel>
+                      <Select
+                        name={`availability.${index}.endTime`}
+                        value={avail.endTime}
+                        onChange={handleInputChange}
+                      >
+                        {timeOptions.map((time) => (
+                          <MenuItem key={time} value={time}>
+                            {time}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} md={1.2}>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      fullWidth
+                      height="100%"
+                      onClick={() => handleRemoveAvailability(index)}
+                    >
+                      Hapus
+                    </Button>
+                  </Grid>
+                </Grid>
+              ))}
+
+              {/* submit button */}
+              <Grid item xs={12} mb={1}>
+                <Button
+                  variant="contained"
+                  onClick={form._id ? handleUpdateEmployee : handleAddEmployee}
+                  sx={{
+                    backgroundColor: "secondary.main",
+                    color: "background.alt",
+                  }}
+                >
+                  {form._id ? "Update Staff" : "Tambah Staff"}
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
       </Grid>
-    </Container>
+    </Box>
   );
 };
 

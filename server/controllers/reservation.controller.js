@@ -121,6 +121,8 @@ export const updateReservationStatus = async (req, res) => {
     const { reservationId } = req.params;
     const { status } = req.body;
 
+    console.log("status yang didapatkan", status);
+
     // validasi status value
     const validStatuses = [
       "pending",
@@ -194,6 +196,8 @@ export const updateReservation = async (req, res) => {
     const userRole = req.user.role;
     const userId = req.user.id;
 
+    console.log(updateData);
+
     let reservation;
 
     try {
@@ -233,7 +237,9 @@ export const updateReservation = async (req, res) => {
       // Admin dapat mengubah status sesuai aturan
       if (
         updateData.status &&
-        ["confirmed", "canceled", "completed"].includes(updateData.status)
+        ["confirmed", "canceled", "completed", "absent"].includes(
+          updateData.status
+        )
       ) {
         reservation.status = updateData.status;
       }
@@ -262,10 +268,6 @@ export const updateReservation = async (req, res) => {
     }
 
     // Menambahkan reservationMessage jika terjadi perubahan status
-    console.log(
-      "Cek kebenaran",
-      updateData.status && updateData.status !== reservation.status
-    );
     if (updateData.status && updateData.status !== reservation.status) {
       reservation.reservationMessage =
         updateData.reservationMessage || reservation.reservationMessage;

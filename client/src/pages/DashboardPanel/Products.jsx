@@ -110,7 +110,7 @@ const Product = ({
         height="90"
         image={imageUrl}
         alt={name}
-        sx={{ objectFit: "contain" }} // Atur bagaimana gambar akan disesuaikan
+        sx={{ objectFit: "contain" }}
       />
       <CardContent>
         <Typography

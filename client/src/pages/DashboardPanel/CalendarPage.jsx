@@ -55,13 +55,8 @@ const CalendarPage = () => {
   const [todayDate, setTodayDate] = useState(new Date()); // State to hold today's date
 
   useEffect(() => {
-    refetch();
-  }, [refetch, location.pathname]);
-
-  useEffect(() => {
     if (schedules) {
       // data kalender (semua event)
-
       const events = schedules.map((schedule) => {
         let title = "";
         if (schedule.type === "reservation" && schedule.reservation) {
@@ -84,7 +79,6 @@ const CalendarPage = () => {
         };
       });
       setCurrentEvents(events);
-
       // Data untuk list "Jadwal Hari Ini" (hanya event hari ini)
       const today = new Date();
       const options = {

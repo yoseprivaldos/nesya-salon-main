@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
@@ -20,6 +21,10 @@ import TextField from "@mui/material/TextField";
 import {
   useGetReservationsQuery,
   useUpdateReservationMutation,
+  useCreateScheduleMutation,
+  useDeleteScheduleByReservationMutation,
+  useCreateEmailMutation,
+  useUpdateServiceViewsMutation,
 } from "../../redux/api/api";
 import { useLocation } from "react-router-dom";
 import TableSortLabel from "@mui/material/TableSortLabel";
@@ -28,11 +33,14 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import SendIcon from "@mui/icons-material/Send";
+import { Tooltip } from "@mui/material";
 
 function Row(props) {
   const { row, handleStatusChange } = props;
   const [open, setOpen] = React.useState(false);
   const [modalOpen, setModalOpen] = React.useState(false);
+  const [emailModalOpen, setEmailModalOpen] = React.useState(false);
   const [newStatus, setNewStatus] = React.useState(row.status);
   const [message, setMessage] = React.useState("");
 
@@ -97,8 +105,26 @@ function Row(props) {
     setModalOpen(false);
   };
 
+  const handleEmailModalOpen = () => {
+    setEmailModalOpen(true);
+  };
+
+  const handleEmailModalClose = () => {
+    setEmailModalOpen(false);
+  };
+
   const handleStatusUpdate = () => {
-    handleStatusChange(row._id, newStatus, message);
+    handleStatusChange(
+      row._id,
+      newStatus,
+      message,
+      row.date,
+      row.startTime,
+      row.endTime,
+      row.note,
+      row.services,
+      row.reservationName
+    );
     setModalOpen(false);
   };
 
@@ -132,15 +158,47 @@ function Row(props) {
               row.status === "absent" ||
               row.status === "canceled"
             }
-            sx={{ ...getStatusButtonStyle(row.status), widht: "170px" }}
+            sx={{ ...getStatusButtonStyle(row.status), width: "170px" }}
           >
             {row.status}
           </Button>
         </TableCell>
+        <TableCell align="center">
+          {row.status === "confirmed" && (
+            <Tooltip title="Kirim email notifikasi">
+              <span>
+                <IconButton
+                  color="primary"
+                  onClick={handleEmailModalOpen}
+                  disabled={row.status !== "confirmed"}
+                >
+                  <SendIcon
+                    sx={{
+                      color: row.status !== "confirmed" ? "grey" : "blue",
+                    }}
+                  />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
+          {row.status !== "confirmed" && ( // Hanya IconButton yang ditampilkan jika row.status bukan "confirmed"
+            <IconButton
+              color="primary"
+              onClick={handleEmailModalOpen}
+              disabled={row.status !== "confirmed"}
+            >
+              <SendIcon
+                sx={{
+                  color: row.status !== "confirmed" ? "grey" : "blue",
+                }}
+              />
+            </IconButton>
+          )}
+        </TableCell>
       </TableRow>
 
       <TableRow sx={{ "& > *": { borderBottom: "unset" }, mb: 2 }}>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
@@ -191,6 +249,7 @@ function Row(props) {
         </TableCell>
       </TableRow>
 
+      {/* Dialog untuk status           */}
       <Dialog open={modalOpen} onClose={handleModalClose}>
         <DialogTitle>Update Status Reservasi</DialogTitle>
         <DialogContent>
@@ -208,17 +267,33 @@ function Row(props) {
             onChange={(e) => setNewStatus(e.target.value)}
             fullWidth
           >
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="confirmed">Confirmed</MenuItem>
-            <MenuItem value="completed">Completed</MenuItem>
-            <MenuItem value="canceled">Canceled</MenuItem>
-            <MenuItem value="absent">Absent</MenuItem>
+            <MenuItem value="pending">Menunggu</MenuItem>
+            <MenuItem value="confirmed">Setujui</MenuItem>
+            <MenuItem value="completed">Selesaikan</MenuItem>
+            <MenuItem value="canceled">Batalkan</MenuItem>
+            <MenuItem value="absent">Tidak Hadir</MenuItem>
           </Select>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleModalClose}>Cancel</Button>
           <Button onClick={handleStatusUpdate} color="primary">
             Update
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* dialog untuk email icon */}
+      <Dialog open={emailModalOpen} onClose={handleEmailModalClose}>
+        <DialogTitle>Konfirmasi Pengiriman Email</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Anda akan mengirimkan notifikasi email ke: {row.reservationEmail}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEmailModalClose}>Cancel</Button>
+          <Button onClick={props.handleSendEmail} color="primary">
+            Konfirmasi
           </Button>
         </DialogActions>
       </Dialog>
@@ -239,6 +314,7 @@ Row.propTypes = {
         name: PropTypes.string.isRequired,
         duration: PropTypes.number.isRequired,
         price: PropTypes.number.isRequired,
+        // numberOfViews: PropTypes.number.isRequired,
       })
     ).isRequired,
     totalPrice: PropTypes.number.isRequired,
@@ -263,20 +339,23 @@ export default function BeautySalonReservationTable() {
     isLoading,
     refetch,
   } = useGetReservationsQuery();
-
+  const [createSchedule] = useCreateScheduleMutation();
   const [updateReservation] = useUpdateReservationMutation();
-
+  const [updateServiceViews] = useUpdateServiceViewsMutation();
+  const [deleteScheduleByReservationId] =
+    useDeleteScheduleByReservationMutation();
+  const location = useLocation();
   const [filterStatus, setFilterStatus] = React.useState("All");
   const [updatedReservations, setUpdatedReservations] = React.useState([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(6);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortConfig, setSortConfig] = React.useState({
-    key: "",
-    direction: "",
+    key: "date",
+    direction: "desc",
   });
-  const location = useLocation();
 
+  const [createEmail] = useCreateEmailMutation();
   React.useEffect(() => {
     refetch();
   }, [refetch, location.pathname]);
@@ -287,65 +366,101 @@ export default function BeautySalonReservationTable() {
     }
   }, [reservations]);
 
-  const handleChangeStatus = async (id, newStatus, message) => {
+  const handleStatusChange = async (
+    reservationId,
+    newStatus,
+    message,
+    date,
+    startTime,
+    endTime,
+    note,
+    services
+  ) => {
+    console.log(services);
+    const serviceIds = services.map((service) => service._id);
+    console.log(serviceIds);
+    const newEvent = {
+      date: date,
+      startTime: startTime,
+      endTime: endTime,
+      type: "reservation",
+      reservation: reservationId,
+      notes: note,
+    };
     try {
-      const changeStatus = {
-        status: newStatus,
-        reservationMessage: message,
-      };
-      console.log(changeStatus);
-
-      const { data, error } = await updateReservation({
-        reservationId: id,
-        ...changeStatus,
-      });
-
-      if (data) {
-        console.log(data);
+      if (newStatus === "canceled") {
+        // jika mengubah ke cancelled ya melakukan perubahan status dan mengurangi jadwal
+        await deleteScheduleByReservationId({
+          reservationId,
+          message,
+          status: newStatus,
+        }).unwrap();
+      } else if (newStatus === "confirmed") {
+        // jika mengubah ke confirmed ya melakukan perubahan status dan menambah jadwal
+        await updateReservation({
+          reservationId,
+          status: newStatus,
+          message,
+        }).unwrap();
+        await createSchedule(newEvent).unwrap();
+      } else if (newStatus === "completed") {
+        // jika ada perubahan ke selesai
+        await updateReservation({
+          reservationId,
+          status: newStatus,
+          message,
+        }).unwrap();
+        // menambahkan jumlah number of views terhadap semua service yang ada di reservasi
+        await updateServiceViews(serviceIds).unwrap();
+      } else {
+        // jika ada perubahan status absent
+        await updateReservation({
+          reservationId,
+          status: newStatus,
+          message,
+        }).unwrap();
       }
 
-      if (error) {
-        console.error(error);
-      }
+      refetch();
+      // Setelah refetch selesai, update state lokal
+      setUpdatedReservations((prevReservations) =>
+        prevReservations.map((reservation) =>
+          reservation._id === reservationId
+            ? { ...reservation, status: newStatus }
+            : reservation
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update reservation status: ", error);
+    }
+  };
+
+  const handleSendEmail = async (reservationData) => {
+    try {
+      await createEmail(reservationData).unwrap();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleStatusChange = (id, newStatus, message) => {
-    handleChangeStatus(id, newStatus, message);
-
-    const updatedData = updatedReservations.map((reservation) => {
-      if (reservation._id === id) {
-        // Lakukan sesuatu dengan message jika diperlukan
-        console.log(`Pesan Pemberitahuan: ${message}`);
-        return { ...reservation, status: newStatus };
-      }
-      return reservation;
-    });
-    setUpdatedReservations(updatedData);
-  };
-
-  const handleFilterChange = (event) => {
+  const handleFilterStatusChange = (event) => {
     setFilterStatus(event.target.value);
-    setPage(0);
   };
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-    setPage(0);
   };
 
-  const handleChangePage = (event, newPage) => {
+  const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleSort = (key) => {
+  const handleSortRequest = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
@@ -353,166 +468,155 @@ export default function BeautySalonReservationTable() {
     setSortConfig({ key, direction });
   };
 
-  const sortedReservations = React.useMemo(() => {
-    const sortedData = [...updatedReservations];
-    if (sortConfig.key !== "") {
-      sortedData.sort((a, b) => {
-        if (sortConfig.key === "totalPrice") {
-          return sortConfig.direction === "asc"
-            ? a.totalPrice - b.totalPrice
-            : b.totalPrice - a.totalPrice;
-        } else {
-          return sortConfig.direction === "asc"
-            ? new Date(a.date + " " + a.startTime) -
-                new Date(b.date + " " + b.startTime)
-            : new Date(b.date + " " + b.startTime) -
-                new Date(a.date + " " + a.startTime);
-        }
-      });
+  const filteredReservations = updatedReservations.filter((reservation) => {
+    if (filterStatus === "All") {
+      return true;
     }
-    return sortedData;
-  }, [updatedReservations, sortConfig]);
+    return reservation.status === filterStatus;
+  });
 
-  const filteredRows = sortedReservations
-    .filter((row) => filterStatus === "All" || row.status === filterStatus)
-    .filter((row) => {
-      const searchTerm = searchQuery.toLowerCase();
-      const reservationDate = new Date(row.date);
-      const month = reservationDate
-        .toLocaleString("default", { month: "long" })
-        .toLowerCase();
-      const year = reservationDate.getFullYear().toString();
-
-      return (
-        row.reservationName.toLowerCase().includes(searchTerm) ||
-        row.reservationEmail.toLowerCase().includes(searchTerm) ||
-        row.services.some((service) =>
-          service.name.toLowerCase().includes(searchTerm)
-        ) ||
-        month.includes(searchTerm) ||
-        year.includes(searchTerm)
-      );
-    });
-
-  const paginatedRows = filteredRows.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+  const searchedReservations = filteredReservations.filter((reservation) =>
+    reservation.reservationName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
   );
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading reservations</div>;
+  const sortedReservations = searchedReservations.sort((a, b) => {
+    if (sortConfig.key === "date") {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      if (sortConfig.direction === "asc") {
+        return dateA - dateB;
+      } else {
+        return dateB - dateA;
+      }
+    } else if (sortConfig.key === "totalPrice") {
+      if (sortConfig.direction === "asc") {
+        return a.totalPrice - b.totalPrice;
+      } else {
+        return b.totalPrice - a.totalPrice;
+      }
+    }
+    return 0;
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading reservations.</div>;
+  }
 
   return (
-    <Box sx={{ backgroundColor: "background.alt" }}>
-      <Box sx={{ marginBottom: 1, padding: 1 }}>
-        <Typography variant="h5">Filter Status:</Typography>
+    <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      <Typography
+        variant="h5"
+        component="div"
+        sx={{ padding: 2, backgroundColor: "background.alt" }}
+      >
+        Manajemen Reservasi
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: 2,
+          backgroundColor: "background.alt",
+        }}
+      >
         <Select
           value={filterStatus}
-          onChange={handleFilterChange}
-          sx={{
-            fontSize: 12,
-            borderRadius: 0,
-            border: 1,
-            color: "primary",
-          }}
+          onChange={handleFilterStatusChange}
+          displayEmpty
+          inputProps={{ "aria-label": "Filter by status" }}
         >
-          <MenuItem value="All">All</MenuItem>
-          <MenuItem value="pending">Pending</MenuItem>
-          <MenuItem value="completed">Completed</MenuItem>
-          <MenuItem value="confirmed">Confirmed</MenuItem>
-          <MenuItem value="canceled">Canceled</MenuItem>
-          <MenuItem value="absent">absent</MenuItem>
+          <MenuItem value="All">Semua</MenuItem>
+          <MenuItem value="pending">Proses</MenuItem>
+          <MenuItem value="confirmed">Disetujui</MenuItem>
+          <MenuItem value="completed">Selesai</MenuItem>
+          <MenuItem value="canceled">Dibatalkan</MenuItem>
+          <MenuItem value="absent">Absent</MenuItem>
         </Select>
         <TextField
-          label="Search"
+          label="Search by Name"
           value={searchQuery}
           onChange={handleSearchChange}
-          variant="outlined"
-          size="small"
-          sx={{ marginLeft: 2 }}
         />
       </Box>
-      <TableContainer
-        component={Paper}
-        sx={{ backgroundColor: "background.alt", borderRadius: 0 }}
-      >
-        <Table aria-label="beauty salon reservation table">
+      <TableContainer>
+        <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
               <TableCell />
-              <TableCell sx={{ color: "secondary.main", fontWeight: "bold" }}>
-                NAMA PELANGGAN
-              </TableCell>
-              <TableCell align="center">
-                <TableSortLabel
-                  active={sortConfig.key === "date"}
-                  direction={sortConfig.direction}
-                  onClick={() => handleSort("date")}
-                  sx={{
-                    color: "secondary.main",
-                    fontWeight: "bold",
-                  }}
-                >
-                  TANGGAL
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align="center">
-                <TableSortLabel
-                  active={sortConfig.key === "startTime"}
-                  direction={sortConfig.direction}
-                  onClick={() => handleSort("startTime")}
-                  sx={{
-                    color: "secondary.main",
-                    fontWeight: "bold",
-                  }}
-                >
-                  WAKTU
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align="center">
-                <TableSortLabel
-                  active={sortConfig.key === "totalPrice"}
-                  direction={sortConfig.direction}
-                  onClick={() => handleSort("totalPrice")}
-                  sx={{
-                    color: "secondary.main",
-                    fontWeight: "bold",
-                  }}
-                >
-                  TOTAL HARGA
-                </TableSortLabel>
-              </TableCell>
+              <TableCell>Nama Pelanggan</TableCell>
               <TableCell
                 align="center"
-                sx={{
-                  color: "secondary.main",
-                  fontWeight: "bold",
-                }}
+                sortDirection={
+                  sortConfig.key === "date" ? sortConfig.direction : false
+                }
               >
-                STATUS
+                <TableSortLabel
+                  active={sortConfig.key === "date"}
+                  direction={sortConfig.direction || "asc"}
+                  onClick={() => handleSortRequest("date")}
+                >
+                  Tanggal
+                </TableSortLabel>
               </TableCell>
+              <TableCell align="center">Waktu</TableCell>
+              <TableCell
+                align="center"
+                sortDirection={
+                  sortConfig.key === "totalPrice" ? sortConfig.direction : false
+                }
+              >
+                <TableSortLabel
+                  active={sortConfig.key === "totalPrice"}
+                  direction={sortConfig.direction || "asc"}
+                  onClick={() => handleSortRequest("totalPrice")}
+                >
+                  Total Harga
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="center">Status</TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
-          <TableBody>
-            {paginatedRows.map((row) => (
-              <Row
-                key={row._id}
-                row={row}
-                handleStatusChange={handleStatusChange}
-              />
-            ))}
+          <TableBody sx={{ backgroundColor: "background.alt" }}>
+            {sortedReservations
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((reservation) => (
+                <Row
+                  key={reservation._id}
+                  row={reservation}
+                  handleStatusChange={handleStatusChange}
+                  handleSendEmail={() =>
+                    handleSendEmail({
+                      email: reservation.reservationEmail,
+                      reservationName: reservation.reservationName,
+                      reservationDate: reservation.date,
+                      startTime: reservation.startTime,
+                      endTime: reservation.endTime,
+                      services: reservation.services,
+                      note: reservation.note,
+                    })
+                  }
+                />
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
+        sx={{ backgroundColor: "background.alt" }}
+        rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={filteredRows.length}
-        page={page}
-        onPageChange={handleChangePage}
+        count={sortedReservations.length}
         rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        rowsPerPageOptions={[6, 12, 24]}
+        page={page}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
       />
-    </Box>
+    </Paper>
   );
 }

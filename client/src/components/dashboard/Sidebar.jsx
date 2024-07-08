@@ -17,33 +17,31 @@ import {
   ShoppingCartOutlined,
   Groups2Outlined,
   ReceiptLongOutlined,
-  PointOfSaleOutlined,
-  TodayOutlined,
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import MoveToInboxIcon from "@mui/icons-material/MoveToInbox";
+import BadgeIcon from "@mui/icons-material/Badge";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
 import PropTypes from "prop-types";
 const navItems = [
   {
-    text: "Dashboard",
+    text: "DASHBOARD",
     icon: <HomeOutlined />,
     path: "/dashboard",
   },
 
   {
-    text: "Jadwal",
-    icon: <ShoppingCartOutlined />,
+    text: "JADWAL",
+    icon: <CalendarMonthIcon />,
     path: "/dashboard/pelanggan",
-    subItems: [
-      { text: "Kalender", path: "/dashboard/schedule" },
-      { text: "Riwayat Layanan", path: "/dashboard/pelanggan/riwayat" },
-    ],
+    subItems: [{ text: "Kalender", path: "/dashboard/schedule" }],
   },
   {
-    text: "Reservasi",
+    text: "RESERVASI",
     icon: <Groups2Outlined />,
     path: "/dashboard/janjitemu",
     subItems: [
@@ -56,7 +54,7 @@ const navItems = [
   },
 
   {
-    text: "Layanan",
+    text: "LAYANAN",
     icon: <ReceiptLongOutlined />,
     path: "/dashboard/services",
     subItems: [
@@ -65,8 +63,8 @@ const navItems = [
     ],
   },
   {
-    text: "Produk",
-    icon: <PointOfSaleOutlined />,
+    text: "PRODUK",
+    icon: <ShoppingCartOutlined />,
     path: "/dashboard/products",
     subItems: [
       { text: "Daftar Produk", path: "/dashboard/products" },
@@ -74,8 +72,8 @@ const navItems = [
     ],
   },
   {
-    text: "Karyawan",
-    icon: <ShoppingCartOutlined />,
+    text: "KARYAWAN",
+    icon: <BadgeIcon />,
     path: "/dashboard/employees",
     subItems: [
       { text: "Daftar Staf", path: "/dashboard/employees" },
@@ -83,13 +81,9 @@ const navItems = [
     ],
   },
   {
-    text: "Laporan",
-    icon: <TodayOutlined />,
+    text: "LAPORAN",
+    icon: <MoveToInboxIcon />,
     path: "/dashboard/report",
-    subItems: [
-      { text: "Laporan Reservasi", path: "/dashboard/report" },
-      { text: "Unduh Laporan", path: "/dashboard/report/download" },
-    ],
   },
 ];
 

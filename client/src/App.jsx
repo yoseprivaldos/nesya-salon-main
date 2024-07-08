@@ -5,6 +5,8 @@ import { themeDashboard } from "./utils/dashboard.theme.js";
 import themePublic from "./utils/public.theme.js";
 import { useSelector } from "react-redux";
 import { useMemo } from "react";
+import SessionTimer from "./pages/Authentication/SessionTimer.jsx";
+
 //import Dashboard section
 import LayoutDashboard from "./pages/DashboardPanel/Layout.jsx";
 import Dashboard from "./pages/DashboardPanel/Dashboard.jsx";
@@ -20,6 +22,7 @@ import ReservationDashboard from "./pages/DashboardPanel/Reservation.jsx";
 import CreateReservationDashboard from "./pages/DashboardPanel/CreateReservation.jsx";
 import AdminPageDashboard from "./pages/DashboardPanel/AdminPage.jsx";
 import ScheduleDashboard from "./pages/DashboardPanel/CalendarPage.jsx";
+import ReportDashboard from "./pages/DashboardPanel/Report.jsx";
 
 //import landing page section
 import LayoutLandingPage from "./pages/LandingPage/Layout.jsx";
@@ -31,9 +34,13 @@ import Reservation from "./pages/LandingPage/Reservation.jsx";
 import FormReservation from "./pages/LandingPage/FormReservation.jsx";
 import Services from "./pages/LandingPage/Services.jsx";
 import Product from "./pages/LandingPage/Product.jsx";
+import ReservationSuccess from "./pages/LandingPage/SuccessNotification.jsx";
 
 //test
 import ReservationCart from "./components/LandingPage/ReservationCart.jsx";
+
+//protected route public
+import ProtectedRoutePublic from "./pages/LandingPage/ProtectedRoutePublic.jsx";
 
 export default function App() {
   const mode = useSelector((state) => state.global.mode);
@@ -42,6 +49,7 @@ export default function App() {
   return (
     <div className="app">
       <BrowserRouter>
+        <SessionTimer />
         <Routes>
           {/* Public Route */}
           <Route
@@ -55,13 +63,35 @@ export default function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/services" element={<Services />} />
-                    <Route path="/reservation" element={<Reservation />} />
+                    <Route
+                      path="/reservation"
+                      element={
+                        <ProtectedRoutePublic>
+                          <Reservation />
+                        </ProtectedRoutePublic>
+                      }
+                    />
                     <Route
                       path="/form-reservation"
-                      element={<FormReservation />}
+                      element={
+                        <ProtectedRoutePublic>
+                          <FormReservation />
+                        </ProtectedRoutePublic>
+                      }
                     />
-                    <Route path="/account" element={<Account />} />
+                    <Route
+                      path="/account"
+                      element={
+                        <ProtectedRoutePublic>
+                          <Account />
+                        </ProtectedRoutePublic>
+                      }
+                    />
                     <Route path="/products" element={<Product />} />
+                    <Route
+                      path="/reservation-success"
+                      element={<ReservationSuccess />}
+                    />
                   </Route>
                 </Routes>
               </ThemeProvider>
@@ -107,6 +137,7 @@ export default function App() {
             />
             <Route path="admin" element={<AdminPageDashboard />}></Route>
             <Route path="schedule" element={<ScheduleDashboard />}></Route>
+            <Route path="report" element={<ReportDashboard />}></Route>
           </Route>
 
           {/* testingUI */}

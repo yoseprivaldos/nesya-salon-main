@@ -16,7 +16,11 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { useDeleteScheduleByReservationMutation } from "../../redux/api/api";
+import {
+  useDeleteScheduleByReservationMutation,
+  useCreateRatingMutation,
+} from "../../redux/api/api";
+import { useSelector } from "react-redux";
 
 const ReservationItem = ({
   id,
@@ -31,6 +35,7 @@ const ReservationItem = ({
   message,
   onCancelReservation,
 }) => {
+  const { currentUser } = useSelector((state) => state.user);
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [openReasonDialog, setOpenReasonDialog] = useState(false);
@@ -38,6 +43,7 @@ const ReservationItem = ({
   const [otherReason, setOtherReason] = useState("");
   const [deleteScheduleByReservationId] =
     useDeleteScheduleByReservationMutation();
+  const [createRating] = useCreateRatingMutation();
 
   // State untuk rating
   const [serviceRatings, setServiceRatings] = useState(
@@ -141,29 +147,20 @@ const ReservationItem = ({
   const handleSubmitRating = async () => {
     const ratingData = {
       reservation_id: id,
-      user_id: "user-id-saat-ini", // Ganti dengan user id yang sesuai
+      user_id: currentUser._id,
       serviceRatings,
       overallRatings,
       additionalComment,
     };
-    console.log(ratingData);
-
     try {
-      const response = await fetch("/api/rating", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(ratingData),
-      });
+      const { data, error } = await createRating(ratingData);
 
-      if (!response.ok) {
-        throw new Error("Gagal menyimpan rating.");
+      if (data) {
+        console.log("Berhasil Rating berhasil ");
+        console.log(data);
+      } else if (error) {
+        console.error("Rating gagal dibuat", error.message);
       }
-
-      const result = await response.json();
-      console.log("Rating berhasil disimpan:", result);
-
       // Reset state dan tutup dialog
       setServiceRatings(
         services.map((service) => ({
@@ -358,18 +355,12 @@ const ReservationItem = ({
           <DialogContentText>
             Berikan penilaian untuk reservasi ini.
           </DialogContentText>
-          {/* Form atau input untuk memberikan nilai */}
-          <FormControl fullWidth>
-            <InputLabel id="service-rating-label">Penilaian Layanan</InputLabel>
-            {serviceRatings.map((serviceRating, index) => (
-              <Box key={serviceRating.service_id} sx={{ mt: 2 }}>
-                <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                  {
-                    services.find(
-                      (service) => service._id === serviceRating.service_id
-                    ).name
-                  }
-                </Typography>
+          {serviceRatings.map((serviceRating, index) => (
+            <Box key={serviceRating.service_id} sx={{ mt: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel id={`service-rating-label-${index}`}>
+                  Penilaian Layanan
+                </InputLabel>
                 <Select
                   labelId={`service-rating-label-${index}`}
                   value={serviceRating.rating}
@@ -385,12 +376,14 @@ const ReservationItem = ({
                   <MenuItem value={4}>4 - Baik</MenuItem>
                   <MenuItem value={5}>5 - Sangat Baik</MenuItem>
                 </Select>
-              </Box>
-            ))}
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+              </FormControl>
+            </Box>
+          ))}
+          <Box sx={{ mt: 2 }}>
+            <FormControl fullWidth>
+              <InputLabel id="overall-rating-label">
                 Penilaian Keseluruhan
-              </Typography>
+              </InputLabel>
               <Select
                 labelId="overall-rating-label"
                 value={overallRatings}
@@ -404,18 +397,18 @@ const ReservationItem = ({
                 <MenuItem value={4}>4 - Baik</MenuItem>
                 <MenuItem value={5}>5 - Sangat Baik</MenuItem>
               </Select>
-            </Box>
-            <TextField
-              sx={{ mt: 2 }}
-              multiline
-              rows={4}
-              fullWidth
-              variant="outlined"
-              label="Komentar Tambahan (opsional)"
-              value={additionalComment}
-              onChange={handleAdditionalCommentChange}
-            />
-          </FormControl>
+            </FormControl>
+          </Box>
+          <TextField
+            sx={{ mt: 2 }}
+            multiline
+            rows={4}
+            fullWidth
+            variant="outlined"
+            label="Komentar Tambahan (opsional)"
+            value={additionalComment}
+            onChange={handleAdditionalCommentChange}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseReviewDialog} color="primary">

@@ -15,6 +15,8 @@ export const api = createApi({
     "Auth",
     "Schedule",
     "Stats",
+    "Rating",
+    "Employee",
   ],
   endpoints: (build) => ({
     getUser: build.query({
@@ -48,10 +50,12 @@ export const api = createApi({
       }),
       invalidatesTags: ["Products"],
     }),
+    //category
     getCategory: build.query({
       query: () => "api/category",
       providesTags: ["Category"],
     }),
+    //service
     createService: build.mutation({
       query: (newService) => ({
         url: "api/services",
@@ -83,6 +87,15 @@ export const api = createApi({
       }),
       invalidatesTags: ["Services"],
     }),
+    updateServiceViews: build.mutation({
+      query: (serviceIds) => ({
+        url: `api/services/updateNumberOfViews`,
+        method: "POST",
+        body: serviceIds,
+      }),
+      invalidatesTags: ["Service"],
+    }),
+    //reservation
     createReservation: build.mutation({
       query: (newReservation) => ({
         url: "api/reservations",
@@ -172,6 +185,31 @@ export const api = createApi({
       providesTags: ["Schedule"],
     }),
 
+    //ratings
+    createRating: build.mutation({
+      query: (newRating) => ({
+        url: "api/ratings",
+        method: "POST",
+        body: newRating,
+      }),
+      invalidatesTags: ["Rating"],
+    }),
+    getRatingsByUser: build.query({
+      query: (user_id) => `api/ratings/user/${user_id}`,
+      providesTags: ["Rating"],
+    }),
+    getRatingsByReservation: build.query({
+      query: (reservation_id) => `api/ratings/reservation/${reservation_id}`,
+      providesTags: ["Rating"],
+    }),
+    getRatingsByService: build.query({
+      query: (service_id) => `api/ratings/service/${service_id}`,
+      providesTags: ["Rating"],
+    }),
+    getAverageRatingForService: build.query({
+      query: (service_id) => `api/ratings/service/${service_id}/average`,
+      providesTags: ["Rating"],
+    }),
     //stats
     getJumlahReservasi: build.query({
       query: () => "api/stats/reservations/all",
@@ -201,6 +239,70 @@ export const api = createApi({
       query: () => "api/stats/user/all",
       providesTags: ["User"],
     }),
+    getJumlahService: build.query({
+      query: () => "api/stats/service/all",
+      providesTags: ["Service"],
+    }),
+    //email
+    createEmail: build.mutation({
+      query: (emailData) => ({
+        url: "/api/email/send",
+        method: "POST",
+        body: emailData,
+      }),
+    }),
+    //report
+    generateExcelReport: build.query({
+      query: ({ startDate, endDate }) => ({
+        url: `api/reports/excel?startDate=${startDate}&endDate=${endDate}`,
+      }),
+    }),
+    // PDF Report
+    generatePdfReport: build.query({
+      query: ({ startDate, endDate }) => ({
+        url: `api/reports/pdf?startDate=${startDate}&endDate=${endDate}`,
+      }),
+    }),
+    // Employee
+    createEmployee: build.mutation({
+      query: (newEmployee) => ({
+        url: "api/employees",
+        method: "POST",
+        body: newEmployee,
+      }),
+      invalidatesTags: ["Employee"],
+    }),
+    getAllEmployees: build.query({
+      query: () => "api/employees",
+      providesTags: ["Employee"],
+    }),
+    getEmployeeById: build.query({
+      query: (employeeId) => `api/employees/${employeeId}`,
+      providesTags: ["Employee"],
+    }),
+    updateEmployee: build.mutation({
+      query: ({ employeeId, ...data }) => ({
+        url: `api/employees/${employeeId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Employee"],
+    }),
+    deleteEmployee: build.mutation({
+      query: (employeeId) => ({
+        url: `api/employees/${employeeId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Employee"],
+    }),
+    addAvailability: build.mutation({
+      query: ({ employeeId, ...availabilityData }) => ({
+        url: `api/employees/${employeeId}/availability`,
+        method: "PATCH",
+        body: availabilityData,
+      }),
+      invalidatesTags: ["Employee"],
+    }),
   }),
 });
 
@@ -219,6 +321,7 @@ export const {
   useGetServiceByIdQuery,
   useUpdateServiceMutation,
   useDeleteServiceMutation,
+  useUpdateServiceViewsMutation,
   //reservation
   useCreateReservationMutation,
   useGetReservationsQuery,
@@ -243,4 +346,19 @@ export const {
   useGetJumlahReservasiAbsentQuery,
   useGetJumlahReservasiSelesaiQuery,
   useGetJumlahPelangganQuery,
+  useGetJumlahServiceQuery,
+  //rating
+  useCreateRatingMutation,
+  //email
+  useCreateEmailMutation,
+  // Excel and PDF report hooks
+  useGenerateExcelReportQuery,
+  useGeneratePdfReportQuery,
+  //employee
+  useCreateEmployeeMutation,
+  useGetAllEmployeesQuery,
+  useGetEmployeeByIdQuery,
+  useUpdateEmployeeMutation,
+  useDeleteEmployeeMutation,
+  useAddAvailabilityMutation,
 } = api;

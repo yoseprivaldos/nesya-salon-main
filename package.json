@@ -16,13 +16,21 @@
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
     "express": "^4.19.2",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "mongoose": "^8.3.2",
     "morgan": "^1.10.0",
+    "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
-    "redux-persist": "^6.0.0"
+    "pdfmake": "^0.2.10",
+    "redux-persist": "^6.0.0",
+    "xlsx": "^0.18.5",
+    "xlsx-style": "^0.8.13"
   }
 }

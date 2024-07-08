@@ -23,11 +23,12 @@ const ratingSchema = new mongoose.Schema({
     },
   ],
   overallRatings: {
-    pelayanan: { type: Number, required: true, min: 1, max: 5 },
-    kebersihan: { type: Number, required: true, min: 1, max: 5 },
-    hasil: { type: Number, required: true, min: 1, max: 5 },
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5,
   },
-  additionalComment: String, // Komentar tambahan secara keseluruhan
+  additionalComment: String,
   created_at: { type: Date, default: Date.now },
 });
 

@@ -11,6 +11,7 @@ import {
   useGetJumlahReservasiAbsentQuery,
   useGetJumlahReservasiSelesaiQuery,
   useGetJumlahPelangganQuery,
+  useGetJumlahServiceQuery,
 } from "../../redux/api/api.js";
 import StatBox from "../../components/dashboard/StatBox";
 import TrafficIcon from "@mui/icons-material/Traffic";
@@ -33,6 +34,7 @@ const Dashboard = () => {
     useGetJumlahReservasiBerhasilQuery();
   const { data: jumlahReservasiBatal } = useGetJumlahReservasiBatalQuery();
   const { data: jumlahReservasiGagal } = useGetJumlahReservasiAbsentQuery();
+  const { data: jumlahService } = useGetJumlahServiceQuery();
   return (
     <Box m={"0.5rem 2.5rem"}>
       <Box>
@@ -160,7 +162,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="39"
+            title={jumlahService?.count}
             subtitle="Total Layanan"
             icon={
               <ProductionQuantityLimitsIcon

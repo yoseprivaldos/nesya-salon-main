@@ -11,18 +11,40 @@ import {
   signInStart,
   signInSuccess,
   signInFailure,
+  clearNotification,
 } from "../../redux/user/userSlice";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "@emotion/react";
+import { Alert, Snackbar } from "@mui/material";
 
 export default function Login() {
   const [formData, setFormData] = useState({});
   const { loading, error } = useSelector((state) => state.user);
+  const notification = useSelector((state) => state.user.notification);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (notification) {
+      setOpen(true);
+      // Clear notification after displaying it
+      setTimeout(() => {
+        dispatch(clearNotification());
+        setOpen(false);
+      }, 5000); // Hapus pesan setelah 5 detik
+    }
+  }, [notification, dispatch]);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -39,8 +61,6 @@ export default function Login() {
         },
         body: JSON.stringify(formData),
       });
-
-      console.log(res);
 
       if (!res.ok) {
         throw new Error(`HTTP error ! status : ${res.status}`);
@@ -62,117 +82,132 @@ export default function Login() {
   };
 
   return (
-    <Grid
-      className="login"
-      container
-      component="main"
-      sx={{
-        backgroundColor: theme.palette.background.alt,
-      }}
-    >
-      <CssBaseline />
-      <Grid
-        item
-        xs={false}
-        sm={4}
-        md={7}
-        sx={{
-          backgroundImage: "url(https://source.unsplash.com/random?wallpapers)",
-          backgroundRepeat: "no-repeat",
-          backgroundColor: (t) =>
-            t.palette.mode === "primary"
-              ? t.palette.grey[50]
-              : t.palette.grey[900],
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <Grid
-        item
-        xs={12}
-        sm={8}
-        md={5}
-        component={Paper}
-        elevation={6}
-        square
-        fontWeight="bold"
-        backgroundColor={theme.palette.secondary.main}
+    <>
+      {/* notifikasi jika ada */}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={5000}
+        onClose={handleClose}
       >
-        <Box
+        <Alert onClose={handleClose} severity="warning" sx={{ width: "100%" }}>
+          {notification}
+        </Alert>
+      </Snackbar>
+
+      <Grid
+        className="login"
+        container
+        component="main"
+        sx={{
+          backgroundColor: theme.palette.background.alt,
+        }}
+      >
+        <CssBaseline />
+        <Grid
+          item
+          xs={false}
+          sm={4}
+          md={7}
           sx={{
-            boxShadow: "none",
-            my: 14,
-            mx: 7,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            backgroundImage:
+              "url(https://source.unsplash.com/random?wallpapers)",
+            backgroundRepeat: "no-repeat",
+            backgroundColor: (t) =>
+              t.palette.mode === "primary"
+                ? t.palette.grey[50]
+                : t.palette.grey[900],
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
+        />
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={5}
+          component={Paper}
+          elevation={6}
+          square
+          fontWeight="bold"
+          backgroundColor={theme.palette.secondary.main}
         >
-          <Typography component="h1" variant="h2" fontWeight="bold">
-            Halaman Login
-          </Typography>
           <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 1 }}
+            sx={{
+              boxShadow: "none",
+              my: 14,
+              mx: 7,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              onChange={handleChange}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              onChange={handleChange}
-            />
-
-            <Button
-              disabled={loading}
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Login
-            </Button>
-            <Typography variant="h6" sx={{ textAlign: "center" }}>
-              | atau |
+            <Typography component="h1" variant="h2" fontWeight="bold">
+              Halaman Login
             </Typography>
-            <OAuth />
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Lupa Password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="/register" variant="body2">
-                  {"Belum punya akun? Daftar"}
-                </Link>
-              </Grid>
+            <Box
+              component="form"
+              noValidate
+              onSubmit={handleSubmit}
+              sx={{ mt: 1 }}
+            >
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                onChange={handleChange}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                onChange={handleChange}
+              />
 
-              <Typography variant="h6">
-                {error ? error.message || "Something went wrong!" : ""}
+              <Button
+                disabled={loading}
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Login
+              </Button>
+              <Typography variant="h6" sx={{ textAlign: "center" }}>
+                | atau |
               </Typography>
-            </Grid>
+              <OAuth />
+              <Grid container>
+                <Grid item xs>
+                  <Link href="#" variant="body2">
+                    Lupa Password?
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link href="/register" variant="body2">
+                    {"Belum punya akun? Daftar"}
+                  </Link>
+                </Grid>
+
+                <Typography variant="h6">
+                  {error ? error.message || "Something went wrong!" : ""}
+                </Typography>
+              </Grid>
+            </Box>
           </Box>
-        </Box>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 }

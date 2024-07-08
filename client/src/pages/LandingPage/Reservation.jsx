@@ -100,7 +100,7 @@ const Reservation = () => {
           variant="h3"
           gutterBottom
           fontWeight="bold"
-          color="primary.main"
+          color={theme.palette.primary.main}
         >
           Reservasi Saya
         </Typography>
@@ -130,8 +130,8 @@ const Reservation = () => {
                   border: "none",
                 }}
               />
-              <Typography variant="h6" color="secondary">
-                {currentUser.username}
+              <Typography variant="h6" color="secondary.main">
+                Halo, {currentUser.username}
               </Typography>
             </Box>
 
@@ -186,33 +186,6 @@ const Reservation = () => {
                       variant="h6"
                     >
                       RESERVASI
-                    </Typography>
-                  </Link>
-                </ListItem>
-                <ListItem>
-                  <Link
-                    to="/wishlist"
-                    style={{
-                      textDecoration: "none",
-                      display: "block",
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        backgroundColor: "primary.main",
-                        color: "secondary.main",
-                        textAlign: "center",
-
-                        padding: 1,
-                        "&:hover": {
-                          backgroundColor: "secondary.main",
-                          color: "primary.main",
-                        },
-                      }}
-                      variant="h6"
-                    >
-                      WHISHLIST
                     </Typography>
                   </Link>
                 </ListItem>
@@ -380,15 +353,16 @@ const Reservation = () => {
                 <Box
                   sx={{
                     width: "100%",
-                    height: "100%",
-                    margin: "auto",
+                    height: { xs: "100%", md: "300px" },
+                    display: "flex",
+                    flexDirection: "column",
                     padding: 2,
-                    textAlign: "center",
-                    border: `1px solid ${theme.palette.secondary.main}`,
+                    justifyContent: "space-around",
+                    alignItems: "center",
                   }}
                 >
-                  <Typography variant="h6">
-                    Kamu belum membuat reservasi.
+                  <Typography variant="h5" color="primary.main">
+                    Belum Ada Reservasi yang Sesuai
                   </Typography>
                   <Button
                     variant="contained"
@@ -397,7 +371,7 @@ const Reservation = () => {
                     to="/services"
                     sx={{ marginTop: 2 }}
                   >
-                    Buat Reservasi
+                    Buat Reservasi Baru
                   </Button>
                 </Box>
               ) : (

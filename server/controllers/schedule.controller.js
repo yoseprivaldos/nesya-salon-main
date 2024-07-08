@@ -32,8 +32,6 @@ export const getSchedule = async (req, res) => {
 
 export const createSchedule = async (req, res) => {
   const { date, startTime, endTime, type, reservation, notes } = req.body;
-
-  console.log("ini data yang didapatkan dari body", req.body);
   try {
     // Validasi data (opsional, tambahkan validasi lebih lanjut jika perlu)
     if (!date || !startTime || !endTime || !type) {
@@ -99,10 +97,7 @@ export const deleteSchedule = async (req, res) => {
 export const deleteScheduleByReservationId = async (req, res) => {
   const reservationId = req.params.id;
   const { status, reservationMessage } = req.body;
-  console.log(reservationId);
-  console.log("ini adalah hasil ari:", req.params);
 
-  console.log(req.body);
   try {
     // 1. Cari reservasi berdasarkan ID
     const reservation = await Reservation.findById(reservationId);
@@ -116,9 +111,9 @@ export const deleteScheduleByReservationId = async (req, res) => {
       type: "reservation",
     });
 
-    // // 3. Hapus jadwal jika ada
+    // 3. Hapus jadwal jika ada
     if (schedule) {
-      await schedule.remove();
+      await Schedule.deleteOne({ _id: schedule._id });
     }
 
     // // 4. Perbarui status reservasi menjadi "canceled" (opsional)

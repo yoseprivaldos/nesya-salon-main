@@ -1,0 +1,61 @@
+<!-- emailTemplate.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .email-container {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+      }
+      .email-header {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        text-align: center;
+      }
+      .email-content {
+        margin: 20px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .email-footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 12px;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <h1>Nesya Salon</h1>
+      </div>
+  
+      <div class="email-content">
+        <p>Yth. Bapak/Ibu {reservationName},</p>
+  
+        <p>Terima kasih telah melakukan reservasi di Nesya Salon. Kami dengan senang hati mengonfirmasi bahwa reservasi Anda pada hari {reservationDate} pukul {startTime} - {endTime} WIB telah disetujui.</p>
+  
+        <h3>Detail Reservasi:</h3>
+        <ul>
+          <li><strong>Nama:</strong> {reservationName}</li>
+          <li><strong>Layanan:</strong> {services}</li>
+          {note} 
+        </ul>
+  
+        <p>Tim kami akan siap menyambut Anda dan memberikan pelayanan terbaik. Jika ada pertanyaan atau perubahan, jangan ragu untuk menghubungi kami di [0812-2927-6602] atau membalas email ini.</p>
+  
+        <p>Kami tunggu kedatangan Anda!</p>
+      </div>
+  
+      <div class="email-footer">
+        <p>&copy; 2024 Nesya Salon</p>
+      </div>
+    </div>
+  </body>
+  </html>
+</html>

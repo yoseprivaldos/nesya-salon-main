@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Typography, Box, useTheme } from "@mui/material";
 
 const Header = ({ title, subtitle }) => {

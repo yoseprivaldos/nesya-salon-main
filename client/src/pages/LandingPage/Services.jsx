@@ -9,7 +9,6 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { Sort } from "@mui/icons-material";
 import { useGetServicesQuery } from "../../redux/api/api";
 
 const filterMain = [
@@ -46,31 +45,34 @@ const Services = () => {
     <>
       <Box sx={{ bgcolor: "white", padding: { xs: 2, sm: 4, md: 6 } }}>
         {/* Tittle Utama */}
-        <Typography
-          variant="h3"
-          sx={{
-            fontWeight: "bold",
-            bgcolor: "white",
-            color: "background.alt",
-            paddingBottom: 2,
-          }}
-        >
-          DAFTAR LAYANAN
-        </Typography>
+        <Box sx={{ borderBottom: 4 }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: "bold",
+              bgcolor: "white",
+              color: "background.alt",
+              letterSpacing: 1.5,
+              paddingBottom: 2,
+              textAlign: "center",
+            }}
+          >
+            Daftar Layanan
+          </Typography>
+        </Box>
 
         {/* Filter Section */}
         <Box
           display="flex"
-          justifyContent="space-between"
-          alignItems="center"
+          alignContent="center"
           sx={{
-            bgcolor: "White",
+            bgcolor: "white",
             color: "secondary.main",
+            marginTop: 1,
             marginBottom: 3,
-            paddingBottom: 1,
           }}
         >
-          <Grid width="68%">
+          <Grid width="100%">
             <ButtonGroup
               variant="outlined"
               aria-label="filter buttons"
@@ -94,36 +96,13 @@ const Services = () => {
               ))}
             </ButtonGroup>
           </Grid>
-
-          <Box sx={{ width: { xs: "20%", sm: "20%", md: "10%" } }}>
-            <Typography
-              bgcolor="background.alt"
-              color="secondary.main"
-              padding={1}
-              sx={{
-                fontSize: { xs: "0.65rem", sm: "0.875rem", md: "1rem" },
-                display: "flex",
-                alignItems: "center",
-                borderRadius: 3,
-                border: 1,
-              }}
-            >
-              <Sort
-                sx={{
-                  fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
-                  marginRight: 0.5,
-                }}
-              />
-              FILTER
-            </Typography>
-          </Box>
         </Box>
 
         {/* SERVICE CONTENT */}
         {isLoading ? (
           <div>Loading</div>
         ) : (
-          <Grid container spacing={{ xs: 2, sm: 4, md: 2 }}>
+          <Grid container spacing={{ xs: 2, sm: 4, md: 2 }} mb={4}>
             {filteredServices?.map((service) => (
               <Grid item xs={6} sm={6} md={3} key={service._id}>
                 <Link
@@ -201,50 +180,51 @@ const Services = () => {
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             display: "-webkit-box",
-                            WebkitLineClamp: 3,
                             WebkitBoxOrient: "vertical",
                           }}
                         >
                           {service.description}
                         </Typography>
                       </Box>
-                      <Grid
-                        container
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Grid item>
-                          <Typography
-                            variant="h6"
-                            fontWeight="bold"
-                            sx={{
-                              fontSize: {
-                                xs: "0.875rem",
-                                sm: "1rem",
-                                md: "1.25rem",
-                              },
-                            }}
-                          >
-                            Rp {service.price.toLocaleString("id-ID")}
-                          </Typography>
+                      <Box>
+                        <Grid
+                          container
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Grid item>
+                            <Typography
+                              variant="h6"
+                              fontWeight="bold"
+                              sx={{
+                                fontSize: {
+                                  xs: "0.875rem",
+                                  sm: "1rem",
+                                  md: "1.25rem",
+                                },
+                              }}
+                            >
+                              Rp {service.price.toLocaleString("id-ID")}
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <Button
+                              variant="contained"
+                              sx={{
+                                fontSize: {
+                                  xs: "0.4rem",
+                                  sm: "0.875rem",
+                                  md: "1rem",
+                                },
+                                color: "white",
+                                bgcolor: "primary.main",
+                              }}
+                            >
+                              Pesan
+                            </Button>
+                          </Grid>
                         </Grid>
-                        <Grid item>
-                          <Button
-                            variant="contained"
-                            sx={{
-                              fontSize: {
-                                xs: "0.4rem",
-                                sm: "0.875rem",
-                                md: "1rem",
-                              },
-                              color: "white",
-                              bgcolor: "primary.main",
-                            }}
-                          >
-                            Pesan
-                          </Button>
-                        </Grid>
-                      </Grid>
+                      </Box>
                     </Box>
                   </Paper>
                 </Link>

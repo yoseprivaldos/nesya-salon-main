@@ -1,9 +1,9 @@
 import Employee from "../models/employee.model.js";
 
-//createEmployee
+// createEmployee
 export const createEmployee = async (req, res) => {
   try {
-    const { name, email, phoneNumber, addresses, imageProfile, availability } =
+    const { name, email, phoneNumber, address, imageProfile, availability } =
       req.body;
 
     // validasi input dari body request
@@ -36,7 +36,7 @@ export const createEmployee = async (req, res) => {
       name,
       email,
       phoneNumber,
-      addresses,
+      address,
       imageProfile,
       availability,
     });
@@ -46,40 +46,41 @@ export const createEmployee = async (req, res) => {
     res.status(201).json(savedEmployee);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "gagal fetching employee" });
+    res.status(500).json({ message: "Gagal menambahkan employee", error });
   }
 };
 
-//getAllEmployees
+// getAllEmployees
 export const getAllEmployees = async (req, res) => {
   try {
     const employees = await Employee.find();
     res.status(200).json(employees);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Gagal Fetching Employee", error });
+    return res
+      .status(500)
+      .json({ message: "Gagal mengambil data employee", error });
   }
 };
 
-//getEmployeeById
+// getEmployeeById
 export const getEmployeeById = async (req, res) => {
   try {
     const { employeeId } = req.params;
-    console.log(req.params);
     const employee = await Employee.findById(employeeId);
 
     if (!employee) {
-      return res.status(404).json({ message: "staff tidak ditemukan" });
+      return res.status(404).json({ message: "Pegawai tidak ditemukan" });
     }
 
     res.status(200).json(employee);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Gagal Fetching Employee", error });
+    res.status(500).json({ message: "Gagal mengambil data employee", error });
   }
 };
 
-//updateEmployee
+// updateEmployee
 export const updateEmployee = async (req, res) => {
   try {
     const { employeeId } = req.params;
@@ -92,50 +93,51 @@ export const updateEmployee = async (req, res) => {
     );
 
     if (!updatedEmployee) {
-      return res.status(404).json({ message: "Staff tidak ditemukan" });
+      return res.status(404).json({ message: "Pegawai tidak ditemukan" });
     }
     res.status(200).json(updatedEmployee);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error fetching employee", error });
+    res.status(500).json({ message: "Gagal mengupdate employee", error });
   }
 };
 
-//addAvailability
+// addAvailability
 export const addAvailability = async (req, res) => {
   try {
     const { employeeId } = req.params;
-    console.log(req.params);
     const { day, startTime, endTime } = req.body;
 
-    //validasi input dari body request
+    // validasi input dari body request
     if (!day || !startTime || !endTime) {
       return res
         .status(400)
-        .json({ message: "Hari, waktu mulai, dan waktu selsai harus diisi" });
+        .json({ message: "Hari, waktu mulai, dan waktu selesai harus diisi" });
     }
 
     // mencari pegawai berdasarkan ID
     const employee = await Employee.findById(employeeId);
 
     if (!employee) {
-      return res.status(404).json({ message: "pegawai tidak ditemukan" });
+      return res.status(404).json({ message: "Pegawai tidak ditemukan" });
     }
 
-    //menambahkan data availibility baru ke array abailibility yang sudah ada
+    // menambahkan data availability baru ke array availability yang sudah ada
     employee.availability.push({ day, startTime, endTime });
 
-    //menyimpan perubahan pada pegawai
+    // menyimpan perubahan pada pegawai
     const updatedEmployee = await employee.save();
 
     res.status(200).json(updatedEmployee);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "error fetching employee" });
+    res
+      .status(500)
+      .json({ message: "Gagal menambahkan ketersediaan pegawai", error });
   }
 };
 
-//deleteEmployee
+// deleteEmployee
 export const deleteEmployee = async (req, res) => {
   try {
     const { employeeId } = req.params;
@@ -143,12 +145,12 @@ export const deleteEmployee = async (req, res) => {
     const deletedEmployee = await Employee.findByIdAndDelete(employeeId);
 
     if (!deletedEmployee) {
-      return res.status(404).json({ message: "Staff tidak ditemukan" });
+      return res.status(404).json({ message: "Pegawai tidak ditemukan" });
     }
 
-    res.status(200).json({ message: "Staff berhasil dihapus" });
+    res.status(200).json({ message: "Pegawai berhasil dihapus" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Gagal fetching Employee" });
+    res.status(500).json({ message: "Gagal menghapus employee", error });
   }
 };

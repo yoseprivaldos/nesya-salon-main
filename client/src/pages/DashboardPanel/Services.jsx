@@ -85,6 +85,7 @@ const Service = ({
   imageService,
   // isActive,
   // categories,
+  numberOfViews,
   price,
   onDelete,
 }) => {
@@ -235,7 +236,7 @@ const Service = ({
                   mb: 0.4,
                 }}
               >
-                30
+                {numberOfViews}
               </Card>
               <Typography variant="body2" align="center">
                 Total Reservasi

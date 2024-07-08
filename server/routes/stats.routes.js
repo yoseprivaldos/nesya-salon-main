@@ -10,6 +10,7 @@ import {
   jumlahReservasiSelesai,
   jumlahReservasiBatal,
 } from "../controllers/reservation.controller.js";
+import { jumlahService } from "../controllers/services.controller.js";
 const router = express.Router();
 
 router.get("/reservations/all", jumlahReservasi);
@@ -18,6 +19,7 @@ router.get("/reservations/pending", jumlahReservasiMenunggu);
 router.get("/reservations/confirmed", jumlahReservasiBerhasil);
 router.get("/reservations/canceled", jumlahReservasiBatal);
 router.get("/reservations/absent", jumlahReservasiAbsent);
+router.get("/service/all", jumlahService);
 router.get("/user/all", jumlahPelanggan);
 
 export default router;

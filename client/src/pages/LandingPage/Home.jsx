@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // import ToolsSection from "../../components/LandingPage/ToolsSection";
 import { Box, Button, Grid, Paper, Typography, useTheme } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -5,12 +6,15 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Link } from "react-router-dom";
+
+import { useGetProductsQuery } from "../../redux/api/api";
+
 import tools1 from "../../assets/tools/tools1.png";
 import tools2 from "../../assets/tools/tools2.png";
 import tools3 from "../../assets/tools/tools3.png";
 import tools4 from "../../assets/tools/tools4.png";
-import tools5 from "../../assets/tools/tools5.png";
 import SwiperCore from "swiper";
+import { useEffect, useState } from "react";
 
 // Initialize Swiper core components
 SwiperCore.use([Navigation]);
@@ -31,60 +35,25 @@ const tools = [
     path: "/salons",
   },
   {
-    nameTools: "PENDIDIKAN",
+    nameTools: "GALERI",
     image: tools4,
-    path: "educations",
-  },
-  {
-    nameTools: "PEKERJAAN",
-    image: tools5,
-    path: "jobs",
-  },
-];
-
-const catalogs = [
-  {
-    id: "12345678",
-    name: "Shampo",
-    deskripsi: "Shampo ini dapat membuat rambut anda sehat",
-    price: 75000,
-    image: tools3,
-  },
-  {
-    id: "12345678",
-    name: "Shampo",
-    deskripsi: "Shampo ini dapat membuat rambut anda sehat",
-    price: 75000,
-    image: tools3,
-  },
-  {
-    id: "12345678",
-    name: "Shampo",
-    deskripsi: "Shampo ini dapat membuat rambut anda sehat",
-    price: 75000,
-    image: tools3,
-  },
-  {
-    id: "12345678",
-    name: "Shampo",
-    deskripsi: "Shampo ini dapat membuat rambut anda sehat",
-    price: 75000,
-    image: tools3,
-  },
-  {
-    id: "12345678",
-    name: "Shampo",
-    deskripsi: "Shampo ini dapat membuat rambut anda sehat",
-    price: 75000,
-    image: tools3,
+    path: "Galeri",
   },
 ];
 
 export default function Home() {
+  const { data: dataProduct } = useGetProductsQuery();
+  const [bestProduct, setBestProduct] = useState([]);
   const theme = useTheme();
   const handleImageClick = (path) => {
     window.location.href = path;
   };
+
+  useEffect(() => {
+    if (dataProduct && dataProduct.length > 0) {
+      setBestProduct(dataProduct.slice(0, 6));
+    }
+  }, [dataProduct]);
 
   return (
     <>
@@ -210,6 +179,7 @@ export default function Home() {
                     fontWeight="bold"
                     sx={{
                       fontSize: { xs: "1.6rem", sm: "1.25rem", md: "4rem" },
+                      fontFamily: "cursive",
                     }}
                   >
                     Waktu Berharga,
@@ -218,6 +188,7 @@ export default function Home() {
                     variant="h1"
                     sx={{
                       fontSize: { xs: "1.5rem", sm: "1.25rem", md: "3rem" },
+                      fontFamily: "cursive",
                     }}
                   >
                     Booking Salon Lebih Cepat dan Mudah.
@@ -235,6 +206,7 @@ export default function Home() {
                     sx={{
                       marginTop: { xs: "0.8rem", sm: "1.25rem", md: "2.5rem" },
                       fontSize: { xs: "1.2rem", sm: "1.25rem", md: "2rem" },
+                      fontFamily: "revert",
                     }}
                   >
                     Langkah awal menuju transformasai diri yang menabjubkan.
@@ -262,10 +234,10 @@ export default function Home() {
       {/* kisi kisi katalog produk swiper */}
       <Box sx={{ padding: "50px", backgroundColor: "white" }}>
         <Box
-          marginBottom="2rem"
+          marginBottom="3rem"
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
           }}
         >
           <Typography
@@ -275,6 +247,15 @@ export default function Home() {
           >
             Pilihan Produk
           </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 1,
+          }}
+        >
           <Link to={`/products`}>
             <Typography
               variant="h3"
@@ -295,69 +276,72 @@ export default function Home() {
           modules={[Navigation]}
           breakpoints={{
             0: {
-              // Breakpoint untuk layar xs (0px ke atas)
               slidesPerView: 2,
             },
             600: {
-              // sm (600px ke atas)
               slidesPerView: 4,
             },
             900: {
-              // md (900px ke atas)
               slidesPerView: 5,
             },
           }}
         >
-          {catalogs.map((catalog, index) => (
+          {bestProduct.map((product, index) => (
             <SwiperSlide key={index}>
-              <Link to={`/products/${catalog.id}`}>
+              <Link to={`/products/${product._id}`}>
                 <Grid
                   sx={{
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: "center",
                     // width: { xs: 200, sm: 220, md: 350 },
                     widht: 350,
-                    // height: { xs: 300, sm: 400, md: 500 },
-                    height: 500,
-                    backgroundColor: "#fff8f",
+                    height: { xs: 450, sm: 450, md: 500 },
+                    backgroundColor: "#ffffff",
                     cursor: "pointer",
                     boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
                     transform: "translateY(-2px)",
                   }}
                 >
                   <Grid
+                    padding={2}
                     component="img"
-                    src={catalog.image}
-                    alt={catalog.name}
+                    src={product.imageProduct[0]}
+                    alt={product.name}
                     sx={{
                       width: "100%",
-                      height: "100%",
+                      height: "70%",
                       objectFit: "cover",
                     }}
                   />
-                  <Box marginLeft="0.5rem">
-                    <Grid
-                      width="100%"
-                      marginBottom="0.5rem"
-                      marginTop="0.25rem"
-                    >
+                  <Box
+                    sx={{
+                      height: "30%",
+                      widht: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      margin: "1rem 0.5rem 1rem 0.5rem",
+                    }}
+                  >
+                    <Box marginBottom="0.5rem" marginTop="0.25rem">
                       <Typography
                         variant="h3"
                         fontWeight="bold"
                         sx={{ letterSpacing: "0.18px" }}
                       >
-                        {catalog.name}
+                        {product.name}
                       </Typography>
-                    </Grid>
-                    <Grid width="100%" marginBottom="0.5rem">
-                      <Typography variant="h5">{catalog.deskripsi}</Typography>
-                    </Grid>
-                    <Grid width="100%" marginBottom="0.5rem">
-                      <Typography variant="h5" fontWeight="bold">
-                        RP.{catalog.price}
+                    </Box>
+                    <Box marginBottom="0.5rem">
+                      <Typography variant="h4">
+                        {product.description}
                       </Typography>
-                    </Grid>
+                    </Box>
+                    <Box marginBottom="0.5rem">
+                      <Typography variant="h4" fontWeight="bold">
+                        Rp.{product.price}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Grid>
               </Link>

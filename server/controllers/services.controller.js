@@ -234,3 +234,55 @@ export const deactivateService = async (req, res) => {
     res.status(500).json({ message: "Gagal menonaktifkan layanan", error });
   }
 };
+
+//mendapatkan jumlah item service
+export const jumlahService = async (req, res) => {
+  try {
+    const count = await Service.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    console.error("Error menghitung jumlah layanan", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// mendapatkan nilai numberOfViews dari suatu layanan berdasarkan id
+export const getNumberOfViewsById = async (req, res) => {
+  try {
+    const serviceId = req.params.id;
+    const service = await Service.findById(serviceId).select("numberOfViews"); // Hanya ambil numberOfViews
+
+    if (!service) {
+      return res.status(404).json({ error: "Layanan tidak ditemukan" });
+    }
+
+    res.json({ numberOfViews: service.numberOfViews });
+  } catch (error) {
+    res.status(500).json({ error: "Gagal mengambil data layanan" });
+  }
+};
+
+export const updateNumberOfViewsService = async (req, res) => {
+  try {
+    const serviceIds = req.body;
+
+    // Meningkatkan numberOfViews untuk setiap serviceId
+    const updatePromises = serviceIds.map(async (serviceId) => {
+      return Service.findByIdAndUpdate(
+        serviceId,
+        { $inc: { numberOfViews: 1 } },
+        { new: true, useFindAndModify: false }
+      );
+    });
+    const updatedServices = await Promise.all(updatePromises);
+    res.status(200).json({
+      message: "Berhasil memperbarui numberOfViews.",
+      updatedServices,
+    });
+  } catch (error) {
+    console.error("Error updating numberOfViews:", error);
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan saat memperbarui numberOfViews." });
+  }
+};

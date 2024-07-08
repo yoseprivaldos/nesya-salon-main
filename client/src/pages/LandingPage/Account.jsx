@@ -6,7 +6,6 @@ import {
   List,
   ListItem,
   Typography,
-  Divider,
   Avatar,
   TextField,
 } from "@mui/material";
@@ -137,20 +136,20 @@ const Account = () => {
   };
 
   return (
-    <Box sx={{ padding: 4, bgcolor: "background.alt", color: "white" }}>
+    <Box sx={{ padding: 4, bgcolor: "white", color: "white" }}>
       <Box>
         <Typography
-          variant="h4"
+          variant="h3"
           gutterBottom
           fontWeight="bold"
-          color="secondary.main"
+          color="primary.main"
         >
           Akun Saya
         </Typography>
       </Box>
       <Box>
-        <Grid container>
-          <Grid item xs={12} sm={2} gap="5rem">
+        <Grid container backgroundColor="white">
+          <Grid item xs={12} sm={2} gap="5rem" backgroundColor="background.alt">
             <Box
               gap="0.5rem"
               sx={{
@@ -169,22 +168,13 @@ const Account = () => {
                   width: "80px",
                   height: "80px",
                   backgroundColor: "grey",
-                  objectFit: "cover",
-                  border: 2,
-                  borderColor: "secondary.main",
+                  border: "none",
                 }}
                 onClick={() => fileRef.current.click()}
               />
               <Typography variant="h6" color="secondary.main">
                 Halo, {formData.username}
               </Typography>
-              <input
-                type="file"
-                ref={fileRef}
-                hidden
-                accept="image/*"
-                onChange={(e) => setImage(e.target.files[0])}
-              />
             </Box>
             <Box>
               <List>
@@ -240,62 +230,46 @@ const Account = () => {
                     </Typography>
                   </Link>
                 </ListItem>
-                <ListItem>
-                  <Link
-                    to="/wishlist"
-                    style={{
-                      textDecoration: "none",
-                      display: "block",
-                      width: "100%",
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        backgroundColor: "primary.main",
-                        color: "secondary.main",
-                        textAlign: "center",
-                        padding: 1,
-                        "&:hover": {
-                          backgroundColor: "secondary.main",
-                          color: "primary.main",
-                        },
-                      }}
-                      variant="h6"
-                    >
-                      WISHLIST
-                    </Typography>
-                  </Link>
-                </ListItem>
               </List>
             </Box>
           </Grid>
-          <Grid item xs={12} sm={10}>
+
+          <Grid
+            item
+            xs={12}
+            sm={10}
+            sx={{ paddingLeft: { xs: 0, md: 2 }, paddingTop: { xs: 2, md: 0 } }}
+          >
             <Box
               sx={{
-                bgcolor: "secondary.main",
-                color: "primary.main",
+                bgcolor: "primary.main",
+                color: "secondary.main",
                 margin: "2px 2px 0px 2px",
                 padding: 2,
+                boxShadow: 3,
               }}
             >
               <Typography variant="h3" fontWeight="bold">
                 Profil Saya
               </Typography>
-              <Typography variant="subtitle1" mb={3}>
+              <Typography variant="subtitle1" mb={2}>
                 Kelola informasi profil Anda untuk mengontrol, melindungi, dan
                 mengamankan akun
               </Typography>
-              <Divider
-                sx={{
-                  marginTop: "1rem",
-                  borderBottomWidth: 5,
-                  borderColor: "primary.main",
-                }}
-              />
+            </Box>
+            <Box
+              sx={{
+                bgcolor: "white",
+                color: "primary.main",
+                margin: "2px 2px 0px 2px",
+                padding: 2,
+                boxShadow: 3,
+              }}
+            >
               <Box component="form" onSubmit={handleSubmit} noValidate>
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={8}>
-                    <Box marginTop="2rem">
+                    <Box>
                       <Typography fontWeight="bold">Ubah Username</Typography>
                       <TextField
                         margin="dense"
