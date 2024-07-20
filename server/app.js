@@ -5,6 +5,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
+import path from "path";
+import cookieParser from "cookie-parser";
+
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
 import categoryRoutes from "./routes/category.route.js";
@@ -18,11 +21,14 @@ import ratingRoutes from "./routes/rating.route.js";
 import emailRoutes from "./routes/email.routes.js";
 import reportRoutes from "./routes/report.route.js";
 
-import cookieParser from "cookie-parser";
-
 /*CONFIGURATION */
 dotenv.config();
+
+const __dirname = path.resolve();
 const app = express();
+const PORT = process.env.PORT || 9000;
+
+// MIDDLEWARE SETUP
 app.use(cookieParser());
 app.use(express.json());
 app.use(helmet());
@@ -32,23 +38,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
 
-const PORT = process.env.PORT || 9000;
-/**MONGOOSE SETUP */
-mongoose
-  .connect(process.env.MONGO)
-  .then(() => {
-    console.log("berhasil terhubung dengan mongodb");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+//STATIC FILES
+app.use(express.static(path.join(__dirname, "/client/dist")));
 
-//routes
+//ROUTES
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
@@ -62,6 +60,12 @@ app.use("/api/ratings", ratingRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/report", reportRoutes);
 
+//CATCH-ALL ROUTE
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
+
+//ERROR HANDLING
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
@@ -71,6 +75,16 @@ app.use((err, req, res, next) => {
     statusCode,
   });
 });
+
+/**MONGOOSE SETUP */
+mongoose
+  .connect(process.env.MONGO)
+  .then(() => {
+    console.log("berhasil terhubung dengan mongodb");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 app.listen(PORT, () => {
   console.log(`APP LISTENING ON http://localhost:${PORT}`);
