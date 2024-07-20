@@ -9,14 +9,14 @@ import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OAuth from "../../components/LandingPage/OAuth";
-import { useTheme } from "@mui/material";
+import bannerImg from "../../assets/Banner.jpg";
 
 export default function Register() {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const theme = useTheme();
   const navigate = useNavigate();
+  const [showError, setShowError] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -34,17 +34,20 @@ export default function Register() {
         },
         body: JSON.stringify(formData),
       });
+
       const data = await res.json();
-      console.log(data);
       setLoading(false);
+
       if (data.success === false) {
         setError(true);
+        setShowError(true);
         return;
       }
       navigate("/login");
     } catch (error) {
       setLoading(false);
       setError(true);
+      setShowError(true);
     }
   };
 
@@ -53,7 +56,7 @@ export default function Register() {
       className="register"
       container
       component="main"
-      sx={{ backgroundColor: theme.palette.secondary.main }}
+      sx={{ backgroundColor: "#fffff0" }}
     >
       <CssBaseline />
       <Grid
@@ -62,7 +65,7 @@ export default function Register() {
         sm={4}
         md={7}
         sx={{
-          backgroundImage: "url(https://source.unsplash.com/random?wallpapers)",
+          backgroundImage: `url(${bannerImg})`,
           backgroundRepeat: "no-repeat",
           backgroundColor: (t) =>
             t.palette.mode === "light"
@@ -80,7 +83,7 @@ export default function Register() {
         component={Paper}
         elevation={6}
         square
-        backgroundColor={theme.palette.secondary.main}
+        backgroundColor="#fffff0"
       >
         <Box
           sx={{
@@ -92,7 +95,7 @@ export default function Register() {
           }}
         >
           <Typography component="h1" variant="h2" fontWeight="bold">
-            Daftar
+            Halaman Register
           </Typography>
           <Box
             component="form"
@@ -105,7 +108,7 @@ export default function Register() {
               required
               fullWidth
               id="username"
-              label="Username"
+              label="Nama"
               name="username"
               autoComplete="username"
               autoFocus
@@ -116,7 +119,7 @@ export default function Register() {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="Alamat Email"
               name="email"
               autoComplete="email"
               autoFocus
@@ -148,17 +151,22 @@ export default function Register() {
               | atau |
             </Typography>
             <OAuth />
-            <Grid container>
+
+            <Grid container justifyContent="space-between">
               <Grid item xs>
                 <Link href="/login" variant="body2">
                   {"Sudah punya akun? Login"}
                 </Link>
               </Grid>
-              <Grid item>
-                <Typography variant="h7">
-                  {error ? error.message || "Something went wrong!" : ""}
-                </Typography>
-              </Grid>
+              {showError && (
+                <Grid item>
+                  <Typography variant="body2" color="red">
+                    {error
+                      ? error.message || "Terjadi kesalahan di sisi server!"
+                      : ""}
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
           </Box>
         </Box>

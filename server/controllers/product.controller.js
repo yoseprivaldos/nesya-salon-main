@@ -160,3 +160,14 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Error deleting produk" });
   }
 };
+
+//mendapatkan jumlah item produk
+export const jumlahProduk = async (req, res) => {
+  try {
+    const count = await Product.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    console.error("Error menghitung jumlah produk", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

@@ -8,15 +8,17 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Pagination,
 } from "@mui/material";
+import { useState } from "react";
 import { useGetServicesQuery } from "../../redux/api/api";
 
 const filterMain = [
   { title: "Semua", path: "/services" },
   { title: "Wanita", path: "/services?category=wanita" },
   { title: "Pria", path: "/services?category=pria" },
-  { title: "Anak-anak", path: "/services?category=anak-anak" },
-  { title: "Paket Acara", path: "/services?category=paket-acara" },
+  { title: "Anak-anak", path: "/services?category=anak" },
+  { title: "Paket Acara", path: "/services?category=paket acara" },
 ];
 
 const Services = () => {
@@ -25,25 +27,36 @@ const Services = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { data: services, isLoading } = useGetServicesQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  const servicesPerPage = 8; // Jumlah layanan per halaman
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
   const filteredServices =
     services?.filter((service) => {
       const selectedCategory = queryParams.get("category");
-      // 1. Check if a category filter is applied
       if (!selectedCategory) {
-        return true; // No filter, show all services
+        return true; // Tidak ada filter, tampilkan semua layanan
       }
 
-      // 2. Check if the service has the selected category
-      const hasSelectedCategory = service.categories.some(
+      return service.categories.some(
         (cat) => cat.name.toLowerCase() === selectedCategory.toLowerCase()
       );
-      return hasSelectedCategory;
     }) || [];
+
+  // Menghitung index awal dan akhir layanan yang akan ditampilkan
+  const indexOfLastService = currentPage * servicesPerPage;
+  const indexOfFirstService = indexOfLastService - servicesPerPage;
+  const currentServices = filteredServices.slice(
+    indexOfFirstService,
+    indexOfLastService
+  );
 
   return (
     <>
-      <Box sx={{ bgcolor: "white", padding: { xs: 2, sm: 4, md: 6 } }}>
+      <Box sx={{ bgcolor: "white", padding: { xs: 2, sm: 4, md: 4 } }}>
         {/* Tittle Utama */}
         <Box sx={{ borderBottom: 4 }}>
           <Typography
@@ -103,16 +116,16 @@ const Services = () => {
           <div>Loading</div>
         ) : (
           <Grid container spacing={{ xs: 2, sm: 4, md: 2 }} mb={4}>
-            {filteredServices?.map((service) => (
+            {currentServices.map((service) => (
               <Grid item xs={6} sm={6} md={3} key={service._id}>
                 <Link
-                  to={`/form-reservation`}
+                  to={`/service/${service._id}`}
                   style={{ textDecoration: "none" }}
                 >
                   <Paper
                     sx={{
                       bgcolor: "#fff8f",
-                      height: { xs: "350px", sm: "520px", md: "400px" },
+                      height: { xs: "350px", sm: "520px", md: "450px" },
                       display: "flex",
                       flexDirection: "column",
 
@@ -125,21 +138,21 @@ const Services = () => {
                       transition: "all 0.3s ease",
                     }}
                   >
-                    <Box sx={{ flexBasis: "65%", overflow: "hidden" }}>
+                    <Box sx={{ flexBasis: "70%", overflow: "hidden" }}>
                       <img
                         src={service.imageService}
                         alt={service.name}
                         style={{
                           width: "100%",
                           height: "100%",
-                          objectFit: "cover",
                         }}
                       />
                     </Box>
                     <Box
                       sx={{
                         padding: { xs: 1, sm: 1.7, md: 2 },
-                        flexBasis: "35%",
+                        paddingBottom: { xs: 1, sm: 1.7, md: 0.5 },
+                        flexBasis: "30%",
                         overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
@@ -154,7 +167,7 @@ const Services = () => {
                           overflow: "hidden",
                         }}
                       >
-                        <Typography
+                        {/* <Typography
                           variant="h6"
                           fontWeight="bold"
                           component="h3"
@@ -168,7 +181,7 @@ const Services = () => {
                           }}
                         >
                           {service.name}
-                        </Typography>
+                        </Typography> */}
                         <Typography
                           variant="body2"
                           sx={{
@@ -191,6 +204,7 @@ const Services = () => {
                           container
                           justifyContent="space-between"
                           alignItems="center"
+                          mt={1}
                         >
                           <Grid item>
                             <Typography
@@ -220,7 +234,7 @@ const Services = () => {
                                 bgcolor: "primary.main",
                               }}
                             >
-                              Pesan
+                              Detail
                             </Button>
                           </Grid>
                         </Grid>
@@ -232,6 +246,21 @@ const Services = () => {
             ))}
           </Grid>
         )}
+
+        {/* Pagination */}
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          sx={{ marginTop: 4 }}
+        >
+          <Pagination
+            count={Math.ceil(filteredServices.length / servicesPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
       </Box>
     </>
   );

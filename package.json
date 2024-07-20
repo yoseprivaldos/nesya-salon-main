@@ -9,7 +9,7 @@
     "start": "node server/app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Yosep R Silaban",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",

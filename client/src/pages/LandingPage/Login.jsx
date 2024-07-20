@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "@emotion/react";
 import { Alert, Snackbar } from "@mui/material";
+import bannerImg from "../../assets/Banner.jpg";
 
 export default function Login() {
   const [formData, setFormData] = useState({});
@@ -27,6 +28,7 @@ export default function Login() {
   const dispatch = useDispatch();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     if (notification) {
@@ -63,7 +65,13 @@ export default function Login() {
       });
 
       if (!res.ok) {
-        throw new Error(`HTTP error ! status : ${res.status}`);
+        if (res.status === 404) {
+          throw new Error(`Akun belum terdaftar`);
+        } else if (res.status === 401) {
+          throw new Error("Password Salah");
+        } else {
+          throw new Error(`HTTP error ! status : ${res.status}`);
+        }
       }
       const data = await res.json();
       if (data.success === false) {
@@ -78,6 +86,7 @@ export default function Login() {
       }
     } catch (error) {
       dispatch(signInFailure(error));
+      setShowError(true);
     }
   };
 
@@ -110,8 +119,7 @@ export default function Login() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage:
-              "url(https://source.unsplash.com/random?wallpapers)",
+            backgroundImage: `url(${bannerImg})`,
             backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
               t.palette.mode === "primary"
@@ -130,7 +138,7 @@ export default function Login() {
           elevation={6}
           square
           fontWeight="bold"
-          backgroundColor={theme.palette.secondary.main}
+          backgroundColor="#fffff0"
         >
           <Box
             sx={{
@@ -157,7 +165,7 @@ export default function Login() {
                 required
                 fullWidth
                 id="email"
-                label="Email Address"
+                label="Alamat Email "
                 name="email"
                 autoComplete="email"
                 autoFocus
@@ -188,21 +196,20 @@ export default function Login() {
                 | atau |
               </Typography>
               <OAuth />
-              <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Lupa Password?
-                  </Link>
-                </Grid>
+
+              <Grid container justifyContent="space-between">
                 <Grid item>
                   <Link href="/register" variant="body2">
                     {"Belum punya akun? Daftar"}
                   </Link>
                 </Grid>
-
-                <Typography variant="h6">
-                  {error ? error.message || "Something went wrong!" : ""}
-                </Typography>
+                {showError && (
+                  <Grid item>
+                    <Typography variant="body2" color="red">
+                      {error.message || "Terjadi kesalahan di sisi server!"}
+                    </Typography>
+                  </Grid>
+                )}
               </Grid>
             </Box>
           </Box>

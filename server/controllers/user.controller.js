@@ -38,20 +38,17 @@ export const updateUser = async (req, res, next) => {
     );
   }
   try {
-    if (req.body.password) {
+    if (req.body.password && req.body.password.trim() !== "") {
+      // Tambahan pengecekan trim untuk mengatasi spasi
       req.body.password = bcryptjs.hashSync(req.body.password, 10);
+    } else {
+      // Jika password tidak diubah, hapus dari data yang akan diupdate
+      delete req.body.password;
     }
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      {
-        $set: {
-          username: req.body.username,
-          email: req.body.email,
-          password: req.body.password,
-          profilePicture: req.body.profilePicture,
-        },
-      },
+      { $set: req.body }, // Cukup kirim req.body, sudah difilter
       { new: true }
     );
     const { password, ...rest } = updatedUser._doc;

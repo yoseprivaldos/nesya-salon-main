@@ -4,8 +4,10 @@ import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
 export const signup = async (req, res, next) => {
+  const { username, email, password } = req.body;
   try {
-    const { username, email, password } = req.body;
+    const existUser = await User.findOne({ email });
+    if (existUser) return next(errorHandler(409, "Email sudah terdaftar"));
     const hashedPassword = bcryptjs.hashSync(password, 10);
     const newUser = new User({
       username,

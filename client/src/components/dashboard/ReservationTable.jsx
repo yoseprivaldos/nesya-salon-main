@@ -291,7 +291,7 @@ function Row(props) {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEmailModalClose}>Cancel</Button>
+          <Button onClick={handleEmailModalClose}>Tutup</Button>
           <Button onClick={props.handleSendEmail} color="primary">
             Konfirmasi
           </Button>
@@ -376,9 +376,7 @@ export default function BeautySalonReservationTable() {
     note,
     services
   ) => {
-    console.log(services);
     const serviceIds = services.map((service) => service._id);
-    console.log(serviceIds);
     const newEvent = {
       date: date,
       startTime: startTime,
@@ -438,8 +436,9 @@ export default function BeautySalonReservationTable() {
   const handleSendEmail = async (reservationData) => {
     try {
       await createEmail(reservationData).unwrap();
+      alert("Email berhasil dikirim")
     } catch (error) {
-      console.error(error);
+      alert("Terjadi kesalahan saat mengirim email")
     }
   };
 

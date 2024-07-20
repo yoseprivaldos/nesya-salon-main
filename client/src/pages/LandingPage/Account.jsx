@@ -34,6 +34,7 @@ const Account = () => {
   const [image, setImage] = useState(null);
   const [imagePercent, setImagePercent] = useState(0);
   const [imageError, setImageError] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
 
   const userId = currentUser._id;
 
@@ -67,7 +68,6 @@ const Account = () => {
       navigate("/login");
       dispatch(deleteUserSuccess(data));
     } catch (error) {
-      console.log(error);
       dispatch(deleteUserFailure(error));
     }
   };
@@ -107,18 +107,29 @@ const Account = () => {
   }, [image, handleFileUpload]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    if (e.target.id === "password") {
+      setNewPassword(e.target.value); // Update newPassword state only
+    } else {
+      setFormData({ ...formData, [e.target.id]: e.target.value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const dataToUpdate = { ...formData };
+
+    // Include new password only if it has been changed
+    if (newPassword !== "") {
+      dataToUpdate.password = newPassword;
+    }
     try {
       const response = await fetch(`/api/user/update/${userId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToUpdate),
       });
       if (response.ok) {
         const updatedData = await response.json();
@@ -309,7 +320,7 @@ const Account = () => {
                         fullWidth
                         id="password"
                         name="password"
-                        value={formData.password || ""}
+                        value={newPassword}
                         onChange={handleChange}
                         autoComplete="current-password"
                         type="password"

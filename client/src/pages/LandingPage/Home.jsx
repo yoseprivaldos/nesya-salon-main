@@ -1,43 +1,47 @@
 /* eslint-disable no-unused-vars */
-// import ToolsSection from "../../components/LandingPage/ToolsSection";
 import { Box, Button, Grid, Paper, Typography, useTheme } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Link } from "react-router-dom";
-
 import { useGetProductsQuery } from "../../redux/api/api";
-
-import tools1 from "../../assets/tools/tools1.png";
-import tools2 from "../../assets/tools/tools2.png";
-import tools3 from "../../assets/tools/tools3.png";
-import tools4 from "../../assets/tools/tools4.png";
 import SwiperCore from "swiper";
 import { useEffect, useState } from "react";
+import { Collections, ContentCut, PinDrop, Sell } from "@mui/icons-material";
+import tools1 from "../../assets/tools/services.jpeg";
+import tools2 from "../../assets/tools/produkTool.jpg";
+import tools3 from "../../assets/tools/Galeri.png";
+import tools4 from "../../assets/tools/map.png";
+import tools5 from "../../assets/tools/serviceTool.jpeg";
 
 // Initialize Swiper core components
 SwiperCore.use([Navigation]);
+
 const tools = [
   {
     nameTools: "Layanan",
-    image: tools1,
+    image: tools5,
+    icon: ContentCut,
     path: "/services",
   },
   {
     nameTools: "KATALOG",
-    image: tools3,
+    image: tools2,
+    icon: Sell,
     path: "/products",
   },
   {
     nameTools: "SALON",
-    image: tools2,
-    path: "/salons",
+    image: tools4,
+    icon: PinDrop,
+    path: "https://www.google.com/maps/place/NESYA+SALON/@3.1896567,98.509291,15z/data=!4m6!3m5!1s0x303103dccbebe145:0x926ce357f397bab8!8m2!3d3.1896567!4d98.509291!16s%2Fg%2F11fs_k1x7c?hl=id&entry=ttu",
   },
   {
     nameTools: "GALERI",
-    image: tools4,
-    path: "Galeri",
+    image: tools3,
+    icon: Collections,
+    path: "https://www.instagram.com/nesya_beauty_salon/",
   },
 ];
 
@@ -67,19 +71,9 @@ export default function Home() {
           navigation
           modules={[Navigation]}
           breakpoints={{
-            0: {
-              // Breakpoint untuk layar xs (0px ke atas)
-              slidesPerView: 3,
-            },
-
-            600: {
-              // sm (600px ke atas)
-              slidesPerView: 4,
-            },
-            900: {
-              // md (900px ke atas)
-              slidesPerView: 4,
-            },
+            0: { slidesPerView: 3 },
+            600: { slidesPerView: 4 },
+            900: { slidesPerView: 4 },
           }}
         >
           {tools.map((tool, index) => (
@@ -90,24 +84,58 @@ export default function Home() {
                   height: { xs: "150px", sm: "250px", md: "300px" },
                   display: "flex",
                   flexDirection: "column",
-                  "&:hover img ": {
+                  overflow: "hidden",
+                  position: "relative",
+                  "&:hover .icon": { opacity: 0 },
+                  "&:hover .blurred-bg": {
+                    filter: "blur(0)",
                     transform: "scale(1.05)",
                   },
-                  "&:hover Button ": {
-                    transform: "scale(1.05)",
-                  },
+                  "&:hover .clear-bg": { opacity: 1, transform: "scale(1.05)" },
                   transition: "transform 0.3s ease-in-out",
                   cursor: "pointer",
                 }}
               >
-                <Box sx={{ flexBasis: "70%", overflow: "hidden" }}>
-                  <img
-                    src={tool.image}
-                    alt={tool.nameTools}
+                <Box
+                  className="blurred-bg"
+                  sx={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "70%",
+                    background: `url(${tool.image}) no-repeat center center/cover`,
+                    filter: "blur(5px)",
+                    transition: "all 0.3s ease-in-out",
+                    zIndex: 1,
+                  }}
+                />
+                <Box
+                  className="clear-bg"
+                  sx={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "70%",
+                    background: `url(${tool.image}) no-repeat center center/cover`,
+                    opacity: 0,
+                    transition: "all 0.3s ease-in-out",
+                    zIndex: 2,
+                  }}
+                />
+                <Box
+                  className="icon"
+                  sx={{
+                    position: "relative",
+                    zIndex: 3,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                    height: "70%",
+                  }}
+                >
+                  <tool.icon
                     style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
+                      fontSize: "80px",
+                      color: theme.palette.background.alt,
                     }}
                   />
                 </Box>
@@ -118,11 +146,7 @@ export default function Home() {
                     sx={{
                       borderRadius: 0,
                       height: "100%",
-                      fontSize: {
-                        xs: "1rem",
-                        sm: "1rem",
-                        md: "2rem",
-                      },
+                      fontSize: { xs: "1rem", sm: "1rem", md: "2rem" },
                       color: theme.palette.secondary.main,
                       bgcolor: "primary.main",
                     }}
@@ -136,11 +160,10 @@ export default function Home() {
         </Swiper>
       </Box>
 
-      {/* tagline 1 */}
-      <Box sx={{ backgroundColor: theme.palette.secondary.main, padding: 0 }}>
+      {/* Tagline 1 */}
+      <Box sx={{ backgroundColor: "#FFFFF0", padding: 0 }}>
         <Grid container spacing={0} alignContent="center">
           <Grid item sm={5} xs={12}>
-            {/* Gambar */}
             <Box
               component="img"
               src={tools1}
@@ -152,12 +175,7 @@ export default function Home() {
             />
           </Grid>
           <Grid item sm={7} xs={12}>
-            <Box
-              backgroundColor={theme.palette.secondary.main}
-              sx={{
-                height: "100%",
-              }}
-            >
+            <Box backgroundColor="#FFFFF0" sx={{ height: "100%" }}>
               <Box
                 padding={4}
                 sx={{
@@ -179,7 +197,7 @@ export default function Home() {
                     fontWeight="bold"
                     sx={{
                       fontSize: { xs: "1.6rem", sm: "1.25rem", md: "4rem" },
-                      fontFamily: "cursive",
+                      fontFamily: "revert",
                     }}
                   >
                     Waktu Berharga,
@@ -188,7 +206,7 @@ export default function Home() {
                     variant="h1"
                     sx={{
                       fontSize: { xs: "1.5rem", sm: "1.25rem", md: "3rem" },
-                      fontFamily: "cursive",
+                      fontFamily: "monospace",
                     }}
                   >
                     Booking Salon Lebih Cepat dan Mudah.
@@ -209,8 +227,8 @@ export default function Home() {
                       fontFamily: "revert",
                     }}
                   >
-                    Langkah awal menuju transformasai diri yang menabjubkan.
-                    Jadilah versi terbaikmu!
+                    Kami berusaha menyesuaikan layanan dengan kebutuhan
+                    masyarakat Berastagi dan Sekitarnya.
                   </Typography>
                   <Button
                     variant="contained"
@@ -222,7 +240,7 @@ export default function Home() {
                       borderRadius: 0,
                     }}
                   >
-                    Booking Sekarang
+                    Buat Pesanan
                   </Button>
                 </Box>
               </Box>
@@ -231,13 +249,18 @@ export default function Home() {
         </Grid>
       </Box>
 
-      {/* kisi kisi katalog produk swiper */}
-      <Box sx={{ padding: "50px", backgroundColor: "white" }}>
+      {/* Katalog produk swiper */}
+      <Box
+        sx={{ padding: "25px", marginBottom: "50px", backgroundColor: "white" }}
+      >
         <Box
           marginBottom="3rem"
           sx={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
+            paddingTop: "25px",
+            mb: "15px",
+            backgroundColor: "white",
           }}
         >
           <Typography
@@ -245,28 +268,19 @@ export default function Home() {
             color="primary.main"
             sx={{ fontWeight: "bold" }}
           >
-            Pilihan Produk
+            PILIHAN PRODUK
           </Typography>
-        </Box>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: 1,
-          }}
-        >
-          <Link to={`/products`}>
-            <Typography
-              variant="h3"
-              color="primary.main"
-              marginTop="auto"
-              marginBottom="auto"
-              sx={{ textDecoration: "underline", cursor: "pointer" }}
-            >
-              Lihat lebih
-            </Typography>
-          </Link>
+          <Button
+            component={Link}
+            to="/products"
+            sx={{
+              color: theme.palette.secondary.main,
+              backgroundColor: theme.palette.primary.main,
+              borderRadius: 0,
+            }}
+          >
+            Lihat Semua
+          </Button>
         </Box>
 
         <Swiper
@@ -293,17 +307,15 @@ export default function Home() {
                   sx={{
                     display: "flex",
                     flexDirection: "column",
-                    // width: { xs: 200, sm: 220, md: 350 },
                     widht: 350,
                     height: { xs: 450, sm: 450, md: 500 },
                     backgroundColor: "#ffffff",
                     cursor: "pointer",
-                    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
+                    boxShadow: "-3px 0px 10px rgba(0, 0, 0, 0.2)",
                     transform: "translateY(-2px)",
                   }}
                 >
                   <Grid
-                    padding={2}
                     component="img"
                     src={product.imageProduct[0]}
                     alt={product.name}

@@ -33,7 +33,9 @@ import Account from "./pages/LandingPage/Account.jsx";
 import Reservation from "./pages/LandingPage/Reservation.jsx";
 import FormReservation from "./pages/LandingPage/FormReservation.jsx";
 import Services from "./pages/LandingPage/Services.jsx";
+import ServiceDetail from "./pages/LandingPage/DetailService.jsx";
 import Product from "./pages/LandingPage/Product.jsx";
+import DetailProduct from "./pages/LandingPage/DetailProduct.jsx";
 import ReservationSuccess from "./pages/LandingPage/SuccessNotification.jsx";
 
 //test
@@ -63,6 +65,7 @@ export default function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/services" element={<Services />} />
+                    <Route path="/service/:id" element={<ServiceDetail />} />
                     <Route
                       path="/reservation"
                       element={
@@ -88,6 +91,10 @@ export default function App() {
                       }
                     />
                     <Route path="/products" element={<Product />} />
+                    <Route
+                      path="/product/:productId"
+                      element={<DetailProduct />}
+                    />
                     <Route
                       path="/reservation-success"
                       element={<ReservationSuccess />}

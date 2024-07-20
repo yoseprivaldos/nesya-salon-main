@@ -6,7 +6,11 @@ import {
   Typography,
   useMediaQuery,
   Box,
+  Pagination,
+  Menu,
+  MenuItem,
   Modal,
+  FormControl,
   FormGroup,
   FormControlLabel,
   Checkbox,
@@ -20,17 +24,82 @@ const Product = () => {
   const { data: products } = useGetProductsQuery();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [openModal, setOpenModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8; // jumlah produk per halaman
+  const [sortAnchorEl, setSortAnchorEl] = useState(null);
+  const [sortType, setSortType] = useState("name"); // Default sorting by name
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
+  // Open and close menu handlers
+  const handleSortMenuOpen = (event) => {
+    setSortAnchorEl(event.currentTarget);
+  };
+
+  const handleSortMenuClose = () => {
+    setSortAnchorEl(null);
+  };
+
+  const handleSortChange = (type) => {
+    setSortType(type);
+    setSortAnchorEl(null);
+  };
+
+  const handleFilterModalOpen = () => {
+    setFilterModalOpen(true);
+  };
+
+  const handleFilterModalClose = () => {
+    setFilterModalOpen(false);
+  };
+
+  const handleCategoryChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedCategories((prev) =>
+      checked ? [...prev, value] : prev.filter((category) => category !== value)
+    );
+  };
+
+  // Menghitung produk yang akan ditampilkan pada halaman saat ini
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+
+  // Sorting products
+  const sortedProducts = products?.slice().sort((a, b) => {
+    if (sortType === "name") {
+      return a.name.localeCompare(b.name);
+    } else if (sortType === "price") {
+      return a.price - b.price;
+    }
+    return 0;
+  });
+
+  // Filtering products by selected categories
+  const filteredProducts = selectedCategories.length
+    ? sortedProducts?.filter((product) =>
+        selectedCategories.includes(product.category)
+      )
+    : sortedProducts;
+
+  const currentProducts = filteredProducts?.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const handleChangePage = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  // Get unique categories
+  const uniqueCategories = [
+    ...new Set(products?.map((product) => product.category)),
+  ];
 
   return (
-    <Box sx={{ bgcolor: "white", padding: { xs: 2, sm: 4, md: 6 } }}>
+    <Box sx={{ bgcolor: "white", padding: { xs: 2, sm: 4, md: 4 } }}>
       {/* main title */}
       <Box
         sx={{
-          paddingTop: { xs: 1, sm: 2, md: 3 },
           paddingBottom: { xs: 1, sm: 2, md: 2 },
           bgcolor: "white",
           borderBottom: 4,
@@ -67,7 +136,7 @@ const Product = () => {
             borderRadius: 0,
             gap: 1,
           }}
-          onClick={handleOpenModal}
+          onClick={handleFilterModalOpen}
         >
           <FilterList />
           FILTER
@@ -80,316 +149,31 @@ const Product = () => {
             borderRadius: 0,
             gap: 1,
           }}
+          onClick={handleSortMenuOpen}
         >
           <SwapVert />
           URUTKAN
         </Button>
-      </Box>
-
-      {/* Modal Filter */}
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 800,
-            bgcolor: "background.alt",
-            color: "secondary.main",
-            boxShadow: 24,
-            p: 4,
-          }}
+        <Menu
+          anchorEl={sortAnchorEl}
+          open={Boolean(sortAnchorEl)}
+          onClose={handleSortMenuClose}
         >
-          {/* <ThemeProvider theme={themeModal}> */}
-          <Grid container spacing={2}>
-            <Grid className="Make Up" item xs={12} sm={6} md={6}>
-              <Box>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  sx={{
-                    mb: 1,
-                    textDecoration: "underline",
-                    textDecorationColor: "white",
-                  }}
-                >
-                  Make Up
-                </Typography>
-                <FormGroup>
-                  <Grid container alignItems="flex-start">
-                    <Grid item md={6}>
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Foundation"
-                      />
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Lipstik"
-                      />
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Concealer"
-                      />
-
-                      <FormControlLabel control={<Checkbox />} label="Bedak" />
-
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Hightlighter"
-                      />
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Blush on "
-                      />
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Eyeshadow"
-                      />
-                    </Grid>
-                    <Grid item md={6}>
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Eyeliner"
-                      />
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Maskara"
-                      />
-
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Lip gloss"
-                      />
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Pensil alis"
-                      />
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Setting spray"
-                      />
-                      <FormControlLabel
-                        control={<Checkbox />}
-                        label="Bronzer"
-                      />
-                    </Grid>
-                  </Grid>
-                </FormGroup>
-              </Box>
-            </Grid>
-            <Grid className="Perawatan Rambut" item xs={6} sm={3} md={3}>
-              <Box>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  sx={{
-                    mb: 1,
-                    textDecoration: "underline",
-                    textDecorationColor: "white",
-                  }}
-                >
-                  Perawatan Rambut
-                </Typography>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Shampo" />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Conditioner"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Masker Rambut"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Minyak Rambut"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Spray Rambut"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Pewarna Rambut"
-                  />
-                </FormGroup>
-              </Box>
-            </Grid>
-            <Grid className="Perawatan Kulit" item xs={6} sm={3} md={3}>
-              <Box>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  sx={{
-                    mb: 1,
-                    textDecoration: "underline",
-                    textDecorationColor: "white",
-                  }}
-                >
-                  Perawatan Kulit
-                </Typography>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Pembersih Wajah"
-                  />
-                  <FormControlLabel control={<Checkbox />} label="Toner" />
-                  <FormControlLabel control={<Checkbox />} label="Serum" />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Masker Wajah"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Scrub Wajah"
-                  />
-                  <FormControlLabel control={<Checkbox />} label="Pelembab" />
-                </FormGroup>
-              </Box>
-            </Grid>
-
-            <Grid className="Perawatan Tubuh" item xs={6} sm={3} md={3}>
-              <Box>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  sx={{
-                    mb: 1,
-                    textDecoration: "underline",
-                    textDecorationColor: "white",
-                  }}
-                >
-                  Perawatan Tubuh
-                </Typography>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Sabun Mandi"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Lulur Tubuh"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Body Lotion"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Body Butter"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Minyak Tubuh"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Minyak Pijat"
-                  />
-                </FormGroup>
-              </Box>
-            </Grid>
-            <Grid className="Alat dan Aksesoris" item xs={6} sm={3} md={3}>
-              <Box>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  sx={{
-                    mb: 1,
-                    textDecoration: "underline",
-                    textDecorationColor: "white",
-                  }}
-                >
-                  Alat dan Aksesori
-                </Typography>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Kuas makeup"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Spons makeup"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Sisir dan sikat"
-                  />
-                  <FormControlLabel control={<Checkbox />} label="Alat cukur" />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Minyak kutikula"
-                  />
-                </FormGroup>
-              </Box>
-            </Grid>
-            <Grid className="Perawatan Kuku" item xs={6} sm={3} md={3}>
-              <Box>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  sx={{
-                    mb: 1,
-                    textDecoration: "underline",
-                    textDecorationColor: "white",
-                  }}
-                >
-                  Perawatan Kuku
-                </Typography>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Kuteks" />
-                  <FormControlLabel control={<Checkbox />} label="Base coat" />
-                  <FormControlLabel control={<Checkbox />} label="Top coat" />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Penghapus kuteks"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="Minyak kutikula"
-                  />
-                </FormGroup>
-              </Box>
-            </Grid>
-            <Grid className="Kategori Tambahan" item xs={6} sm={3} md={3}>
-              <Box>
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  sx={{
-                    mb: 1,
-                    textDecoration: "underline",
-                    textDecorationColor: "white",
-                  }}
-                >
-                  Kategori Tambahan
-                </Typography>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Pria" />
-                  <FormControlLabel control={<Checkbox />} label="Wanita" />
-                </FormGroup>
-              </Box>
-            </Grid>
-          </Grid>
-          {/* </ThemeProvider> */}
-
-          <Button
-            variant="contained"
-            onClick={handleCloseModal}
-            sx={{ borderRadius: 0, color: "secondary.main" }}
-          >
-            Terapkan Filter
-          </Button>
-        </Box>
-      </Modal>
+          <MenuItem onClick={() => handleSortChange("name")}>
+            Nama Produk
+          </MenuItem>
+          <MenuItem onClick={() => handleSortChange("price")}>
+            Harga Produk
+          </MenuItem>
+        </Menu>
+      </Box>
 
       {/* KATALOG CONTENT*/}
       <Box>
         <Grid container paddingTop={5} spacing={{ xs: 1.5, sm: 2.5, md: 5 }}>
-          {products?.map((product) => (
+          {currentProducts?.map((product) => (
             <Grid item xs={4} sm={4} md={3} key={product._id}>
-              <Link to="/">
+              <Link to={`/product/${product._id}`}>
                 <Paper
                   sx={{
                     borderRadius: 0,
@@ -515,6 +299,68 @@ const Product = () => {
           ))}
         </Grid>
       </Box>
+
+      {/* Pagination */}
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+        <Pagination
+          count={Math.ceil(filteredProducts?.length / productsPerPage)}
+          page={currentPage}
+          onChange={handleChangePage}
+          color="primary"
+        />
+      </Box>
+
+      {/* Filter Modal */}
+      <Modal
+        open={filterModalOpen}
+        onClose={handleFilterModalClose}
+        aria-labelledby="filter-modal-title"
+        aria-describedby="filter-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            outline: 0,
+            borderRadius: 1,
+          }}
+        >
+          <Typography id="filter-modal-title" variant="h6" component="h2">
+            Filter Kategori Produk
+          </Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+              {uniqueCategories.map((category) => (
+                <FormControlLabel
+                  key={category}
+                  control={
+                    <Checkbox
+                      checked={selectedCategories.includes(category)}
+                      onChange={handleCategoryChange}
+                      value={category}
+                    />
+                  }
+                  label={category}
+                />
+              ))}
+            </FormGroup>
+          </FormControl>
+          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleFilterModalClose}
+            >
+              Terapkan
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 };

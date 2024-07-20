@@ -12,6 +12,7 @@ import {
   useGetJumlahReservasiSelesaiQuery,
   useGetJumlahPelangganQuery,
   useGetJumlahServiceQuery,
+  useGetJumlahProdukQuery,
 } from "../../redux/api/api.js";
 import StatBox from "../../components/dashboard/StatBox";
 import TrafficIcon from "@mui/icons-material/Traffic";
@@ -23,6 +24,7 @@ import CachedIcon from "@mui/icons-material/Cached";
 import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
+import { Inventory } from "@mui/icons-material";
 
 const Dashboard = () => {
   const { data: jumlahPelanggan } = useGetJumlahPelangganQuery();
@@ -35,14 +37,16 @@ const Dashboard = () => {
   const { data: jumlahReservasiBatal } = useGetJumlahReservasiBatalQuery();
   const { data: jumlahReservasiGagal } = useGetJumlahReservasiAbsentQuery();
   const { data: jumlahService } = useGetJumlahServiceQuery();
+  const { data: jumlahProduk } = useGetJumlahProdukQuery();
   return (
     <Box m={"0.5rem 2.5rem"}>
       <Box>
-        <Header title="DASHBOARD"></Header>
+        <Header title="HALAMAN DASHBOARD"></Header>
       </Box>
 
       {/* Grid Charts */}
       <Box
+        mt={4}
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
         gridAutoRows="110px"
@@ -50,7 +54,7 @@ const Dashboard = () => {
       >
         {/* row satu */}
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor="primary.main"
           display="flex"
           alignItems="center"
@@ -66,7 +70,7 @@ const Dashboard = () => {
         </Box>
 
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor="primary.main"
           display="flex"
           alignItems="center"
@@ -80,7 +84,7 @@ const Dashboard = () => {
         </Box>
 
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor="primary.main"
           display="flex"
           alignItems="center"
@@ -98,7 +102,7 @@ const Dashboard = () => {
         </Box>
 
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor="primary.main"
           display="flex"
           alignItems="center"
@@ -112,7 +116,7 @@ const Dashboard = () => {
         </Box>
 
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor="primary.main"
           display="flex"
           alignItems="center"
@@ -129,7 +133,7 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor="primary.main"
           display="flex"
           alignItems="center"
@@ -142,7 +146,7 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor="primary.main"
           display="flex"
           alignItems="center"
@@ -155,7 +159,7 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 3"
+          gridColumn="span 4"
           backgroundColor="primary.main"
           display="flex"
           alignItems="center"
@@ -168,6 +172,21 @@ const Dashboard = () => {
               <ProductionQuantityLimitsIcon
                 sx={{ color: "secondary.main", fontSize: "50px" }}
               />
+            }
+          />
+        </Box>
+        <Box
+          gridColumn="span 4"
+          backgroundColor="primary.main"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title={jumlahProduk?.count}
+            subtitle="Total Produk"
+            icon={
+              <Inventory sx={{ color: "secondary.main", fontSize: "45px" }} />
             }
           />
         </Box>

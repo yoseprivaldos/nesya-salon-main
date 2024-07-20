@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
@@ -26,6 +25,10 @@ export const api = createApi({
     getProducts: build.query({
       query: () => "api/products",
       providesTags: ["Products"],
+    }),
+    getProductById: build.query({
+      query: (productId) => `api/products/${productId}`,
+      provideTags: ["Products"],
     }),
     createProduct: build.mutation({
       query: (newProduct) => ({
@@ -243,6 +246,10 @@ export const api = createApi({
       query: () => "api/stats/service/all",
       providesTags: ["Service"],
     }),
+    getJumlahProduk: build.query({
+      query: () => "api/stats/product/all",
+      providesTags: ["Product"],
+    }),
     //email
     createEmail: build.mutation({
       query: (emailData) => ({
@@ -311,6 +318,7 @@ export const {
   useGetUserQuery,
   //product
   useGetProductsQuery,
+  useGetProductByIdQuery,
   useCreateProductMutation,
   useDeleteProductMutation,
   useUpdateProductMutation,
@@ -347,6 +355,7 @@ export const {
   useGetJumlahReservasiSelesaiQuery,
   useGetJumlahPelangganQuery,
   useGetJumlahServiceQuery,
+  useGetJumlahProdukQuery,
   //rating
   useCreateRatingMutation,
   //email

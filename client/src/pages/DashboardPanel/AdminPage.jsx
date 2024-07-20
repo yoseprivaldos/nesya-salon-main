@@ -25,7 +25,6 @@ import { useSelector } from "react-redux";
 
 const AdminPage = () => {
   const { currentUser } = useSelector((state) => state.user);
-  console.log(currentUser);
 
   const [createAdmin] = useCreateAdminMutation();
   const [updateAdmin] = useUpdateAdminMutation();
@@ -85,7 +84,6 @@ const AdminPage = () => {
       setEditMode(true);
       setEditName(adminToEdit.username);
       setEditEmail(adminToEdit.email);
-      // ... set nilai lainnya jika diperlukan
     }
   };
 
