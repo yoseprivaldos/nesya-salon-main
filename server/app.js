@@ -65,10 +65,6 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/build", "index.html"));
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
-});
-
 //ERROR HANDLING
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
