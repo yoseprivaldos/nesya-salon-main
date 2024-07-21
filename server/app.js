@@ -43,8 +43,15 @@ app.use(
   })
 );
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, "../client/build")));
+if (process.env.NODE_ENV === "production") {
+  // Serve static files from the React app
+  app.use(express.static(path.join(__dirname, "../client/build")));
+
+  //CATCH-ALL ROUTE to serve React app
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+  });
+}
 
 //ROUTES
 app.use("/api/user", userRoutes);
@@ -59,11 +66,6 @@ app.use("/api/stats", statsRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/report", reportRoutes);
-
-//CATCH-ALL ROUTE to serve React app
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
-});
 
 //ERROR HANDLING
 app.use((err, req, res, next) => {
