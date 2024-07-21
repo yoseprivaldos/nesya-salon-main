@@ -31,8 +31,7 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, "build"),
     rollupOptions: {
-      // Hapus external atau pastikan array ini kosong
-      external: [],
+      external: ["react", "react-dom"], // Tambahkan entri ini
     },
   },
 });

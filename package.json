@@ -33,5 +33,9 @@
     "redux-persist": "^6.0.0",
     "xlsx": "^0.18.5",
     "xlsx-style": "^0.8.13"
+  },
+  "engines": {
+    "node": "18.17.1",
+    "npm": "10.8.1"
   }
 }
