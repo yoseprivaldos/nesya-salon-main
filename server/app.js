@@ -44,9 +44,7 @@ app.use(
 );
 
 // Serve static files from the React app
-// app.use(express.static(path.join(__dirname, "..", "client", "build")));
-// app.use(express.static(path.join(__dirname, "client", "build")));
-app.use(express.static(path.join(__dirname, "..", "client", "build")));
+app.use(express.static(path.join(__dirname, "../client/build")));
 
 //ROUTES
 app.use("/api/user", userRoutes);
@@ -62,14 +60,10 @@ app.use("/api/ratings", ratingRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/report", reportRoutes);
 
-//CATCH-ALL ROUTE
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
-// });
-
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-// });
+//CATCH-ALL ROUTE to serve React app
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+});
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
