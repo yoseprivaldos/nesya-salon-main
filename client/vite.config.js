@@ -31,7 +31,8 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, "build"),
     rollupOptions: {
-      external: [], // Kosongkan array ini jika ada entri di sini
+      // Hapus external atau pastikan array ini kosong
+      external: [],
     },
   },
 });
