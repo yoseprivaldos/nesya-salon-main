@@ -1,5 +1,5 @@
 {
-  "name": "nova-salon",
+  "name": "nesya-salon",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon server/app.js",
     "start": "node server/app.js",
-    "build": "npm install && npm install --prefix client && npm run build --prefix client"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "keywords": [],
   "author": "Yosep R Silaban",

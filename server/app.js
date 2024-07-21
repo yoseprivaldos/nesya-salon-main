@@ -43,8 +43,8 @@ app.use(
   })
 );
 
-//STATIC FILES
-app.use(express.static(path.join(__dirname, "/client/dist")));
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, "..", "client", "build")));
 
 //ROUTES
 app.use("/api/user", userRoutes);
@@ -62,7 +62,7 @@ app.use("/api/report", reportRoutes);
 
 //CATCH-ALL ROUTE
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
 });
 
 //ERROR HANDLING
