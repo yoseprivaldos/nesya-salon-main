@@ -1,4 +1,6 @@
+/* eslint-disable no-unused-vars */
 // SessionTimer.jsx
+import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "../../redux/user/userSlice.js";

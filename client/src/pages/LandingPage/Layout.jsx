@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
+import React from "react";
 import { Outlet } from "react-router-dom";
-
 import { Box } from "@mui/material";
 import Header from "../../components/LandingPage/Header";
 import Footer from "../../components/LandingPage/Footer";

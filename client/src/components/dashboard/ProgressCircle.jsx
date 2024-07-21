@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
+import React from "react";
 import { Box, useTheme } from "@mui/material";
 
 const ProgressCircle = ({ progress = "0.75", size = "40" }) => {

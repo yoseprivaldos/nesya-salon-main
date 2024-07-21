@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+import React from "react";
 import { Box, Typography, Grid, Button, Paper } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
 import { useGetProductByIdQuery } from "../../redux/api/api";

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+import React from "react";
 import Button from "@mui/material/Button";
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
 import app from "../../firebase";
