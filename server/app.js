@@ -43,13 +43,28 @@ app.use(
   })
 );
 
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("Path to build:", path.join(__dirname, "../client/build"));
+
 if (process.env.NODE_ENV === "production") {
   // Serve static files from the React app
   app.use(express.static(path.join(__dirname, "../client/build")));
+  console.log(
+    "Serving static files from",
+    path.join(__dirname, "../client/build")
+  );
 
   //CATCH-ALL ROUTE to serve React app
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+    res.sendFile(
+      path.join(__dirname, "../client/build", "index.html"),
+      (err) => {
+        if (err) {
+          console.error("Error serving index.html:", err);
+          res.status(500).send(err);
+        }
+      }
+    );
   });
 }
 
