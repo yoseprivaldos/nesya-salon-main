@@ -29,7 +29,7 @@ export default defineConfig({
     include: ["@emotion/react", "@emotion/styled", "@mui/material/Tooltip"],
   },
   build: {
-    outDir: resolve(__dirname, "build"),
+    outDir: resolve(__dirname, "../server/public"),
     rollupOptions: {
       external: [],
     },

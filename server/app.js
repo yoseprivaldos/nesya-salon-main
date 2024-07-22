@@ -21,7 +21,7 @@ import ratingRoutes from "./routes/rating.route.js";
 import emailRoutes from "./routes/email.routes.js";
 import reportRoutes from "./routes/report.route.js";
 
-/*CONFIGURATION */
+/* CONFIGURATION */
 dotenv.config();
 
 const __dirname = path.resolve();
@@ -43,28 +43,11 @@ app.use(
   })
 );
 
+// Log environment and paths
 console.log("NODE_ENV:", process.env.NODE_ENV);
-console.log("Path to build:", path.join(__dirname, "../client/build"));
+console.log("Path to build:", path.join(__dirname, "public"));
 
-if (process.env.NODE_ENV === "production") {
-  // Serve static files from the React app
-  app.use(express.static(path.join(__dirname, "..", "client", "build")));
-
-  // Catch-all handler to serve React app
-  app.get("*", (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "..", "client", "build", "index.html"),
-      (err) => {
-        if (err) {
-          console.error("Error serving index.html:", err);
-          res.status(500).send(err);
-        }
-      }
-    );
-  });
-}
-
-//ROUTES
+// ROUTES
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
@@ -78,7 +61,22 @@ app.use("/api/ratings", ratingRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/report", reportRoutes);
 
-//ERROR HANDLING
+if (process.env.NODE_ENV === "production") {
+  // Serve static files from the React app
+  app.use(express.static(path.join(__dirname, "public")));
+
+  // Catch-all handler to serve React app
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"), (err) => {
+      if (err) {
+        console.error("Error serving index.html:", err);
+        res.status(500).send(err);
+      }
+    });
+  });
+}
+
+// ERROR HANDLING
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
@@ -89,16 +87,18 @@ app.use((err, req, res, next) => {
   });
 });
 
-/**MONGOOSE SETUP */
+/** MONGOOSE SETUP */
 mongoose
-  .connect(process.env.MONGO)
+  .connect(process.env.MONGO, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log("berhasil terhubung dengan mongodb");
+    app.listen(PORT, () => {
+      console.log(`APP LISTENING ON http://localhost:${PORT}`);
+    });
   })
   .catch((err) => {
-    console.log(err);
+    console.error("MongoDB connection error:", err);
   });
-
-app.listen(PORT, () => {
-  console.log(`APP LISTENING ON http://localhost:${PORT}`);
-});
