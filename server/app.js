@@ -7,6 +7,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 import cookieParser from "cookie-parser";
+import { fileURLToPath } from "url";
 
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
@@ -24,7 +25,10 @@ import reportRoutes from "./routes/report.route.js";
 /* CONFIGURATION */
 dotenv.config();
 
-const __dirname = path.resolve();
+// Resolve __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 9000;
 
@@ -38,8 +42,25 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
+  })
+);
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: [
+        "'self'",
+        "https://firebasestorage.googleapis.com",
+        "https://*.firebaseapp.com",
+        "https://*.googleusercontent.com",
+        "data:", // Jika menggunakan gambar base64
+      ],
+      connectSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+    },
   })
 );
 
@@ -89,10 +110,7 @@ app.use((err, req, res, next) => {
 
 /** MONGOOSE SETUP */
 mongoose
-  .connect(process.env.MONGO, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO, {})
   .then(() => {
     console.log("berhasil terhubung dengan mongodb");
     app.listen(PORT, () => {
