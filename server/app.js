@@ -46,6 +46,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -64,7 +65,7 @@ app.use(
         "https://*.firebaseapp.com", // Domain untuk Firebase API
         "https://*.googleusercontent.com", // Domain untuk Google API
         "https://www.googleapis.com", // Domain tambahan untuk API Google
-        "wss://*",
+        "wss://*", // Untuk WebSocket Secure connections
       ],
       scriptSrc: [
         "'self'",
@@ -79,6 +80,7 @@ app.use(
       fontSrc: [
         "'self'",
         "https://fonts.gstatic.com", // Domain untuk font Google
+        "data:", // Mengizinkan font dari data URI
       ],
       frameSrc: [
         "'self'",

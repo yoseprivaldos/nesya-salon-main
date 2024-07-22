@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
@@ -19,20 +20,20 @@ export const api = createApi({
   ],
   endpoints: (build) => ({
     getUser: build.query({
-      query: (id) => `api/user/${id}`,
+      query: (id) => `/api/user/${id}`,
       providesTags: ["User"],
     }),
     getProducts: build.query({
-      query: () => "api/products",
+      query: () => "/api/products",
       providesTags: ["Products"],
     }),
     getProductById: build.query({
-      query: (productId) => `api/products/${productId}`,
+      query: (productId) => `/api/products/${productId}`,
       provideTags: ["Products"],
     }),
     createProduct: build.mutation({
       query: (newProduct) => ({
-        url: "api/products",
+        url: "/api/products",
         method: "POST",
         body: newProduct,
       }),
@@ -40,14 +41,14 @@ export const api = createApi({
     }),
     deleteProduct: build.mutation({
       query: (productId) => ({
-        url: `api/products/${productId}`,
+        url: `/api/products/${productId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Products"],
     }),
     updateProduct: build.mutation({
       query: ({ productId, ...data }) => ({
-        url: `api/products/${productId}`,
+        url: `/api/products/${productId}`,
         method: "PATCH",
         body: data,
       }),
@@ -55,29 +56,29 @@ export const api = createApi({
     }),
     //category
     getCategory: build.query({
-      query: () => "api/category",
+      query: () => "/api/category",
       providesTags: ["Category"],
     }),
     //service
     createService: build.mutation({
       query: (newService) => ({
-        url: "api/services",
+        url: "/api/services",
         method: "POST",
         body: newService,
       }),
       invalidatesTags: ["Services"],
     }),
     getServices: build.query({
-      query: () => "api/services",
+      query: () => "/api/services",
       providesTags: ["Services"],
     }),
     getServiceById: build.query({
-      query: (serviceId) => `api/services/${serviceId}`,
+      query: (serviceId) => `/api/services/${serviceId}`,
       providesTags: ["Services"],
     }),
     updateService: build.mutation({
       query: ({ serviceId, ...data }) => ({
-        url: `api/services/${serviceId}`,
+        url: `/api/services/${serviceId}`,
         method: "PATCH",
         body: data,
       }),
@@ -85,14 +86,14 @@ export const api = createApi({
     }),
     deleteService: build.mutation({
       query: (serviceId) => ({
-        url: `api/services/${serviceId}`,
+        url: `/api/services/${serviceId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Services"],
     }),
     updateServiceViews: build.mutation({
       query: (serviceIds) => ({
-        url: `api/services/updateNumberOfViews`,
+        url: `/api/services/updateNumberOfViews`,
         method: "POST",
         body: serviceIds,
       }),
@@ -101,23 +102,23 @@ export const api = createApi({
     //reservation
     createReservation: build.mutation({
       query: (newReservation) => ({
-        url: "api/reservations",
+        url: "/api/reservations",
         method: "POST",
         body: newReservation,
       }),
       invalidatesTags: "Reservations",
     }),
     getReservations: build.query({
-      query: () => "api/reservations",
+      query: () => "/api/reservations",
       providesTags: ["Reservations"],
     }),
     getMyReservations: build.query({
-      query: () => "api/reservations/my-reservation",
+      query: () => "/api/reservations/my-reservation",
       providesTags: ["Reservations"],
     }),
     updateReservation: build.mutation({
       query: ({ reservationId, ...data }) => ({
-        url: `api/reservations/${reservationId}`,
+        url: `/api/reservations/${reservationId}`,
         method: "PATCH",
         body: data,
       }),
@@ -125,19 +126,19 @@ export const api = createApi({
     }),
     createAdmin: build.mutation({
       query: (newAdmin) => ({
-        url: "api/auth/create-admin",
+        url: "/api/auth/create-admin",
         method: "POST",
         body: newAdmin,
       }),
       invalidatesTags: "Auth",
     }),
     getAllAdmin: build.query({
-      query: () => "api/user/admins/show",
+      query: () => "/api/user/admins/show",
       providesTags: ["Users"],
     }),
     updateAdmin: build.mutation({
       query: ({ currentId, ...data }) => ({
-        url: `api/user/admins/update/${currentId}`,
+        url: `/api/user/admins/update/${currentId}`,
         method: "PATCH",
         body: data,
       }),
@@ -145,7 +146,7 @@ export const api = createApi({
     }),
     deleteAdmin: build.mutation({
       query: (adminId) => ({
-        url: `api/user/admins/delete/${adminId}`,
+        url: `/api/user/admins/delete/${adminId}`,
         method: "DELETE",
       }),
       providesTags: ["User"],
@@ -153,19 +154,19 @@ export const api = createApi({
 
     //schedule
     getAllSchedule: build.query({
-      query: () => "api/schedules/all",
+      query: () => "/api/schedules/all",
       providesTags: ["Schedule"],
     }),
     deleteSchedule: build.mutation({
       query: (scheduleId) => ({
-        url: `api/schedules/${scheduleId}`,
+        url: `/api/schedules/${scheduleId}`,
         method: "DELETE",
       }),
       providesTags: ["Schedule"],
     }),
     createSchedule: build.mutation({
       query: (newSchedule) => ({
-        url: "api/schedules/create-schedule",
+        url: "/api/schedules/create-schedule",
         method: "POST",
         body: newSchedule,
       }),
@@ -173,7 +174,7 @@ export const api = createApi({
     }),
     updateSchedule: build.mutation({
       query: ({ scheduleId, ...data }) => ({
-        url: `api/schedules/${scheduleId}`,
+        url: `/api/schedules/${scheduleId}`,
         method: "PATCH",
         body: data,
       }),
@@ -181,7 +182,7 @@ export const api = createApi({
     }),
     deleteScheduleByReservation: build.mutation({
       query: ({ reservationId, ...data }) => ({
-        url: `api/schedules/delete-schedule-reservation/${reservationId}`,
+        url: `/api/schedules/delete-schedule-reservation/${reservationId}`,
         method: "DELETE",
         body: data,
       }),
@@ -191,35 +192,35 @@ export const api = createApi({
     //ratings
     createRating: build.mutation({
       query: (newRating) => ({
-        url: "api/ratings",
+        url: "/api/ratings",
         method: "POST",
         body: newRating,
       }),
       invalidatesTags: ["Rating"],
     }),
     getRatingsByUser: build.query({
-      query: (user_id) => `api/ratings/user/${user_id}`,
+      query: (user_id) => `/api/ratings/user/${user_id}`,
       providesTags: ["Rating"],
     }),
     getRatingsByReservation: build.query({
-      query: (reservation_id) => `api/ratings/reservation/${reservation_id}`,
+      query: (reservation_id) => `/api/ratings/reservation/${reservation_id}`,
       providesTags: ["Rating"],
     }),
     getRatingsByService: build.query({
-      query: (service_id) => `api/ratings/service/${service_id}`,
+      query: (service_id) => `/api/ratings/service/${service_id}`,
       providesTags: ["Rating"],
     }),
     getAverageRatingForService: build.query({
-      query: (service_id) => `api/ratings/service/${service_id}/average`,
+      query: (service_id) => `/api/ratings/service/${service_id}/average`,
       providesTags: ["Rating"],
     }),
     //stats
     getJumlahReservasi: build.query({
-      query: () => "api/stats/reservations/all",
+      query: () => "/api/stats/reservations/all",
       providesTags: ["Reservations"],
     }),
     getJumlahReservasiBerhasil: build.query({
-      query: () => "api/stats/reservations/confirmed",
+      query: () => "/api/stats/reservations/confirmed",
       providesTags: ["Reservations"],
     }),
     getJumlahReservasiBatal: build.query({
@@ -227,27 +228,27 @@ export const api = createApi({
       providesTags: ["Reservations"],
     }),
     getJumlahReservasiMenunggu: build.query({
-      query: () => "api/stats/reservations/pending",
+      query: () => "/api/stats/reservations/pending",
       providesTags: ["Reservations"],
     }),
     getJumlahReservasiAbsent: build.query({
-      query: () => "api/stats/reservations/absent",
+      query: () => "/api/stats/reservations/absent",
       providesTags: ["Reservations"],
     }),
     getJumlahReservasiSelesai: build.query({
-      query: () => "api/stats/reservations/completed",
+      query: () => "/api/stats/reservations/completed",
       providesTags: ["Reservations"],
     }),
     getJumlahPelanggan: build.query({
-      query: () => "api/stats/user/all",
+      query: () => "/api/stats/user/all",
       providesTags: ["User"],
     }),
     getJumlahService: build.query({
-      query: () => "api/stats/service/all",
+      query: () => "/api/stats/service/all",
       providesTags: ["Service"],
     }),
     getJumlahProduk: build.query({
-      query: () => "api/stats/product/all",
+      query: () => "/api/stats/product/all",
       providesTags: ["Product"],
     }),
     //email
@@ -261,35 +262,35 @@ export const api = createApi({
     //report
     generateExcelReport: build.query({
       query: ({ startDate, endDate }) => ({
-        url: `api/reports/excel?startDate=${startDate}&endDate=${endDate}`,
+        url: `/api/reports/excel?startDate=${startDate}&endDate=${endDate}`,
       }),
     }),
     // PDF Report
     generatePdfReport: build.query({
       query: ({ startDate, endDate }) => ({
-        url: `api/reports/pdf?startDate=${startDate}&endDate=${endDate}`,
+        url: `/api/reports/pdf?startDate=${startDate}&endDate=${endDate}`,
       }),
     }),
     // Employee
     createEmployee: build.mutation({
       query: (newEmployee) => ({
-        url: "api/employees",
+        url: "/api/employees",
         method: "POST",
         body: newEmployee,
       }),
       invalidatesTags: ["Employee"],
     }),
     getAllEmployees: build.query({
-      query: () => "api/employees",
+      query: () => "/api/employees",
       providesTags: ["Employee"],
     }),
     getEmployeeById: build.query({
-      query: (employeeId) => `api/employees/${employeeId}`,
+      query: (employeeId) => `/api/employees/${employeeId}`,
       providesTags: ["Employee"],
     }),
     updateEmployee: build.mutation({
       query: ({ employeeId, ...data }) => ({
-        url: `api/employees/${employeeId}`,
+        url: `/api/employees/${employeeId}`,
         method: "PATCH",
         body: data,
       }),
@@ -297,14 +298,14 @@ export const api = createApi({
     }),
     deleteEmployee: build.mutation({
       query: (employeeId) => ({
-        url: `api/employees/${employeeId}`,
+        url: `/api/employees/${employeeId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Employee"],
     }),
     addAvailability: build.mutation({
       query: ({ employeeId, ...availabilityData }) => ({
-        url: `api/employees/${employeeId}/availability`,
+        url: `/api/employees/${employeeId}/availability`,
         method: "PATCH",
         body: availabilityData,
       }),
