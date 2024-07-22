@@ -30,6 +30,8 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -40,7 +42,7 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/signout");
+      await fetch(`${API_URL}/api/auth/signout`);
       handleMenuClose();
       dispatch(signOut());
       navigate("/login", { replace: true });

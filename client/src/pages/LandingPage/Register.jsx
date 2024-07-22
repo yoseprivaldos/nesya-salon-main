@@ -20,6 +20,8 @@ export default function Register() {
   const navigate = useNavigate();
   const [showError, setShowError] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -29,7 +31,7 @@ export default function Register() {
     try {
       setLoading(true);
       setError(false);
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch(`${API_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

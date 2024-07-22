@@ -49,17 +49,43 @@ app.use(
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'"],
+      defaultSrc: ["'self'"], // Sumber default yang diizinkan adalah domain itu sendiri
       imgSrc: [
         "'self'",
-        "https://firebasestorage.googleapis.com",
-        "https://*.firebaseapp.com",
-        "https://*.googleusercontent.com",
-        "data:", // Jika menggunakan gambar base64
+        "https://firebasestorage.googleapis.com", // Domain untuk gambar Firebase
+        "https://*.firebaseapp.com", // Domain untuk Firebase
+        "https://*.googleusercontent.com", // Domain untuk Google
+        "data:", // Untuk gambar base64 jika diperlukan
       ],
-      connectSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: [
+        "'self'",
+        "https://apis.google.com", // Domain untuk Google OAuth
+        "https://firebasestorage.googleapis.com", // Domain untuk Firebase API
+        "https://*.firebaseapp.com", // Domain untuk Firebase API
+        "https://*.googleusercontent.com", // Domain untuk Google API
+        "https://www.googleapis.com", // Domain tambahan untuk API Google
+        "wss://*",
+      ],
+      scriptSrc: [
+        "'self'",
+        "https://apis.google.com", // Domain untuk skrip Google OAuth
+        "https://www.gstatic.com", // Skrip Google tambahan
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Jika menggunakan style inline, pastikan untuk menambahkan ini
+        "https://fonts.googleapis.com", // Domain untuk Google Fonts
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com", // Domain untuk font Google
+      ],
+      frameSrc: [
+        "'self'",
+        "https://accounts.google.com", // Domain untuk Google OAuth
+      ],
+      objectSrc: ["'none'"], // Mencegah penggunaan <object>, <embed>, atau <applet>
+      frameAncestors: ["'self'"], // Mencegah situs dari menempatkan konten Anda dalam frame atau iframe
     },
   })
 );
