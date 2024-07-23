@@ -256,7 +256,7 @@ const EditService = () => {
               gutterBottom
               sx={{ color: "secondary.main" }}
             >
-              Deskripsi Utama Produk
+              Deskripsi Utama Layanan
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -388,7 +388,7 @@ const EditService = () => {
               gutterBottom
               sx={{ color: "secondary.main" }}
             >
-              Masukkan Gambar Produk
+              Ubah Gambar Layanan
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -406,7 +406,7 @@ const EditService = () => {
                   <ImageListItem key={image}>
                     <img
                       src={image}
-                      alt="Gambar Produk"
+                      alt="Gambar Layanan"
                       loading="lazy"
                       style={{
                         cursor: "pointer",

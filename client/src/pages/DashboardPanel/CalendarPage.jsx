@@ -53,7 +53,7 @@ const CalendarPage = () => {
     type: "",
     notes: "",
   });
-  const [todayDate, setTodayDate] = useState(new Date()); // State to hold today's date
+  const [todayDate, setTodayDate] = useState(new Date());
 
   useEffect(() => {
     if (schedules) {

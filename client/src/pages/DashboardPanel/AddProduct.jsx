@@ -195,7 +195,7 @@ const AddProduct = () => {
         setProses(false);
         setShowAlert(true);
         setAlertSeverity("success");
-        setAlertMessage("Berhasil membuat layanan");
+        setAlertMessage("Berhasil membuat produk");
         setProses(false);
 
         setName("");

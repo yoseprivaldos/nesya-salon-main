@@ -198,8 +198,8 @@ const AddEmployee = () => {
         </Alert>
       </Snackbar>
       <Header
-        title="Halaman Tambah Layanan"
-        subtitle="Pastikan data layanan yang dimasukkan valid"
+        title="Halaman Tambah Staff"
+        subtitle="Pastikan data Staff yang dimasukkan valid"
       />
       {/* Button confirmation */}
       <Grid container justifyContent="flex-end">
@@ -239,10 +239,10 @@ const AddEmployee = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ mb: 1 }}>Nama Layanan</FormLabel>
+                  <FormLabel sx={{ mb: 1 }}>Nama Staff</FormLabel>
                   <TextField
                     variant="outlined"
-                    placeholder="nama layanan harus unik"
+                    placeholder="nama Staff harus unik"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -251,7 +251,7 @@ const AddEmployee = () => {
 
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ mb: 1 }}>Harga Layanan</FormLabel>
+                  <FormLabel sx={{ mb: 1 }}>Harga Staff</FormLabel>
                   <TextField
                     type="number"
                     variant="outlined"
@@ -271,7 +271,7 @@ const AddEmployee = () => {
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <FormLabel sx={{ mb: 1 }}>
-                    Durasi Layanan (dalam menit){" "}
+                    Durasi Staff (dalam menit){" "}
                   </FormLabel>
                   <TextField
                     type="number"
@@ -288,10 +288,10 @@ const AddEmployee = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ mb: 1 }}>Deskripsi Layanan</FormLabel>
+                  <FormLabel sx={{ mb: 1 }}>Deskripsi Staff</FormLabel>
                   <TextareaAutosize
                     minRows={6}
-                    placeholder="masukkan deskripsi dari layanan"
+                    placeholder="masukkan deskripsi dari Staff"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     style={{
@@ -313,7 +313,7 @@ const AddEmployee = () => {
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6}>
-          {/* pilih kategori layanan */}
+          {/* pilih kategori staff */}
           <Paper elevation={3} sx={{ p: 3, bgcolor: "background.alt" }}>
             <Accordion sx={{ backgroundColor: "primary.main" }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -323,7 +323,7 @@ const AddEmployee = () => {
                   gutterBottom
                   sx={{ color: "secondary.main" }}
                 >
-                  Pilih Kategori Layanan
+                  Pilih Kategori Staff
                 </Typography>
               </AccordionSummary>
 

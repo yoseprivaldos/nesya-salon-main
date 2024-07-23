@@ -72,7 +72,7 @@ const AddService = () => {
     } else if (!isLoading && !isError && createdServiceData) {
       setShowAlert(true);
       setAlertSeverity("success");
-      setAlertMessage("Berhasil update produk");
+      setAlertMessage("Berhasil update layanan");
     }
   }, [isLoading, isError, createdServiceData]);
 
@@ -175,7 +175,7 @@ const AddService = () => {
         setSelectedCategories([]);
         setImageFiles([]);
       } else if (error) {
-        //tangain kesalahan saat membuat produk
+        //tangain kesalahan saat membuat layanan
         console.error("Error saat membuat service");
         setShowAlert(true);
         setAlertSeverity("error");
@@ -240,7 +240,7 @@ const AddService = () => {
               gutterBottom
               sx={{ color: "secondary.main" }}
             >
-              Deskripsi Utama Produk
+              Deskripsi Utama Layanan
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={12}>

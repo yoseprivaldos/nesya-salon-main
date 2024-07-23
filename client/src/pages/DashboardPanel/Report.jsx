@@ -23,13 +23,29 @@ const ReportDownload = () => {
       const response = await fetch(
         `/api/report/pdf?startDate=${startDate}&endDate=${endDate}`
       );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok.");
+      }
       const blob = await response.blob();
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPdfData(reader.result); // Simpan data base64 ke state
-        setShowPreview(true);
-      };
-      reader.readAsDataURL(blob);
+      console.log("Data yang didapat:", blob);
+
+      const url = window.URL.createObjectURL(
+        new Blob([blob], { type: "application/pdf" })
+      );
+      setPdfData(url); // Simpan URL blob ke state
+      setShowPreview(true);
+
+      // const reader = new FileReader();
+      // reader.onloadend = () => {
+      //   if (reader.result.startsWith("data:application/pdf;base64,")) {
+      //     setPdfData(reader.result); // Simpan data base64 ke state
+      //     setShowPreview(true);
+      //   } else {
+      //     console.error("Invalid PDF base64 data");
+      //   }
+      // };
+      // reader.readAsDataURL(blob);
     } catch (error) {
       console.error("Error fetching PDF:", error);
     }
@@ -149,7 +165,7 @@ const ReportDownload = () => {
         <Box mt={4}>
           <Typography variant="h6">Preview PDF:</Typography>
           {/* Gunakan <embed> untuk menampilkan preview PDF */}
-          <embed
+          <iframe
             title="PDF Preview"
             src={pdfData} // Gunakan data base64 dari state
             type="application/pdf"
