@@ -382,7 +382,7 @@ const EditProduct = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl fullWidth>
-                    <FormLabel sx={{ mb: 1 }}>Bahan Produk</FormLabel>
+                    <FormLabel sx={{ mb: 1 }}>Brand Produk</FormLabel>
                     <TextField
                       value={newIngredient}
                       onChange={(e) => setNewIngredient(e.target.value)}

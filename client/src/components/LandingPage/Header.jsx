@@ -25,7 +25,7 @@ import { FiberManualRecord } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 
 const drawerWidth = "100%";
-const navItems = ["SERVICES", "PRODUCTS", "NEWS"];
+const navItems = ["SERVICES", "PRODUCTS"];
 const settings = ["Akun Saya", "Reservasi Saya", "Log Out"];
 
 function Header(props) {
@@ -126,7 +126,7 @@ function Header(props) {
                   margin={0}
                   onClick={handleDrawerToggle}
                 >
-                  <MenuIcon sx={{ width: "40px", height: "40px" }} />
+                  <MenuIcon sx={{ width: "30px", height: "30px" }} />
                 </IconButton>
               </Grid>
               <Grid item display="flex">

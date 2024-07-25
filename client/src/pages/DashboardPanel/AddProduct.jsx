@@ -413,7 +413,7 @@ const AddProduct = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <FormLabel sx={{ mb: 1 }}>Bahan Produk</FormLabel>
+                  <FormLabel sx={{ mb: 1 }}>Brand Produk</FormLabel>
                   <TextField
                     value={newIngredient}
                     onChange={(e) => setNewIngredient(e.target.value)}
@@ -424,7 +424,7 @@ const AddProduct = () => {
                       }
                     }}
                     variant="outlined"
-                    placeholder="Masukkan bahan dan tekan Enter"
+                    placeholder="Masukkan brand dan tekan Enter"
                   />
                   <Stack
                     direction="row"

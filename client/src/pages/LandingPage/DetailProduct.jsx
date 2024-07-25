@@ -91,7 +91,7 @@ const DetailProduct = () => {
             <strong>Kategori:</strong> {product.category.join(", ")}
           </Typography>
           <Typography variant="body1" fontSize="1.1rem" gutterBottom>
-            <strong>Bahan:</strong> {product.ingredients.join(", ")}
+            <strong>Brand Tersedia:</strong> {product.ingredients.join(", ")}
           </Typography>
           <Button
             variant="contained"

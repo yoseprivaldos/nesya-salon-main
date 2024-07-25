@@ -62,7 +62,7 @@ const ServiceDetail = () => {
                   key={index}
                   sx={{
                     bgcolor: "#fff8f",
-                    height: { xs: "350px", sm: "520px", md: "420px" },
+                    height: { xs: "350px", sm: "520px", md: "500px" },
                     marginBottom: 2,
                     overflow: "hidden",
                     "&:hover": !isMobile

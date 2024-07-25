@@ -120,7 +120,7 @@ const Product = ({
           color={theme.palette.secondary[700]}
           gutterBottom
         >
-          {category}
+          {category.join(", ")}
         </Typography>
         <Typography variant="h5" component="div">
           {name}
@@ -129,7 +129,7 @@ const Product = ({
           Rp.{Number(price).toFixed(2)}
         </Typography>
         <Typography color={theme.palette.secondary[400]}>
-          Stock: {stock}
+          Stok: {stock}
         </Typography>
       </CardContent>
 
@@ -144,8 +144,8 @@ const Product = ({
         <CardContent>
           <Typography>Deskripsi Produk:</Typography>
           <Typography>{description}</Typography>
-          <Typography>Bahan:</Typography>
-          <Typography>{ingredients}</Typography>
+          <Typography>Produk Tersedia:</Typography>
+          <Typography>{ingredients.join(", ")}</Typography>
         </CardContent>
       </Collapse>
       <CardActions sx={{ display: "flex" }}>

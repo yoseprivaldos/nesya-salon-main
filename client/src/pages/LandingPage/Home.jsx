@@ -303,7 +303,7 @@ export default function Home() {
         >
           {bestProduct.map((product, index) => (
             <SwiperSlide key={index}>
-              <Link to={`/products/${product._id}`}>
+              <Link to={`/product/${product._id}`}>
                 <Grid
                   sx={{
                     display: "flex",
@@ -333,26 +333,30 @@ export default function Home() {
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
-                      margin: "1rem 0.5rem 1rem 0.5rem",
+                      margin: "0.3rem 0.3rem 0.3rem 0.2rem",
                     }}
                   >
-                    <Box marginBottom="0.5rem" marginTop="0.25rem">
+                    <Box marginBottom="0.4rem" marginTop="0.15rem">
                       <Typography
-                        variant="h3"
+                        variant="h4"
                         fontWeight="bold"
                         sx={{ letterSpacing: "0.18px" }}
                       >
                         {product.name}
                       </Typography>
                     </Box>
-                    <Box marginBottom="0.5rem">
-                      <Typography variant="h4">
-                        {product.description}
+                    <Box marginBottom="0.4rem">
+                      <Typography variant="h5">
+                        {product.description.length > 50
+                          ? window.innerWidth < 600
+                            ? `${product.description.substring(0, 40)}...`
+                            : `${product.description.substring(0, 80)}...`
+                          : product.description}
                       </Typography>
                     </Box>
-                    <Box marginBottom="0.5rem">
+                    <Box marginBottom="0.4rem">
                       <Typography variant="h4" fontWeight="bold">
-                        Rp.{product.price}
+                        Mulai Rp.{product.price}
                       </Typography>
                     </Box>
                   </Box>
