@@ -62,6 +62,7 @@ app.use(
       ],
       connectSrc: [
         "'self'",
+        "https://nesya-salon-65393417f4a9.herokuapp.com",
         "https://apis.google.com",
         "https://firebasestorage.googleapis.com",
         "https://*.firebaseapp.com",
