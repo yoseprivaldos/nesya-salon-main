@@ -43,7 +43,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: [process.env.CLIENT_URL, "https://www.nesya.online"],
     credentials: true,
   })
 );
@@ -63,6 +63,7 @@ app.use(
       connectSrc: [
         "'self'",
         "https://nesya-salon-65393417f4a9.herokuapp.com",
+        "https://www.nesya.online",
         "https://apis.google.com",
         "https://firebasestorage.googleapis.com",
         "https://*.firebaseapp.com",
