@@ -34,6 +34,7 @@ import {
 } from "../../redux/api/api";
 import { useSelector } from "react-redux";
 import SelectedServices from "../../components/LandingPage/SelectedServices";
+import { useNavigate } from "react-router-dom";
 
 dayjs.extend(duration);
 dayjs.extend(localizedFormat);
@@ -68,7 +69,7 @@ const FormReservation = () => {
   const [alertSeverity, setAlertSeverity] = useState("success");
   const [createReservation, { isLoading, isError }] =
     useCreateReservationMutation();
-
+  const navigate = useNavigate();
   // mengambil data layanan
   const services = useMemo(
     () =>
@@ -214,6 +215,7 @@ const FormReservation = () => {
         setShowAlert(true);
         setAlertSeverity("success");
         setAlertMessage("Berhasil membuat reservasi");
+        navigate("/reservation-success");
 
         console.log(data);
         //resetStateForm

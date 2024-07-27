@@ -58,6 +58,7 @@ app.use(
         "https://firebasestorage.googleapis.com",
         "https://*.firebaseapp.com",
         "https://*.googleusercontent.com",
+        "https://cdn.pixabay.com",
         "data:",
       ],
       connectSrc: [

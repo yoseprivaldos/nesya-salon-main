@@ -38,12 +38,20 @@ const Account = () => {
   const [imageError, setImageError] = useState(false);
   const [newPassword, setNewPassword] = useState("");
 
+  const [errors, setErrors] = useState({
+    username: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+  });
+
+  const API_URL = import.meta.env.VITE_API_URL;
   const userId = currentUser._id;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/user/${userId}`);
+        const response = await fetch(`${API_URL}/api/user/${userId}`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -54,12 +62,12 @@ const Account = () => {
       }
     };
     fetchData();
-  }, [userId]);
+  }, [userId, API_URL]);
 
   const handleDeleteAccount = async () => {
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`api/user/delete/${currentUser._id}`, {
+      const res = await fetch(`${API_URL}/api/user/delete/${currentUser._id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -110,14 +118,44 @@ const Account = () => {
 
   const handleChange = (e) => {
     if (e.target.id === "password") {
-      setNewPassword(e.target.value); // Update newPassword state only
+      setNewPassword(e.target.value);
     } else {
       setFormData({ ...formData, [e.target.id]: e.target.value });
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.username || formData.username.trim() === "") {
+      newErrors.username = "Username is required.";
+    }
+
+    if (!formData.email || formData.email.trim() === "") {
+      newErrors.email = "Email is required.";
+    }
+
+    if (!formData.phoneNumber || formData.phoneNumber.trim() === "") {
+      newErrors.phoneNumber = "Phone number is required.";
+    }
+
+    if (!newPassword) {
+      newErrors.password = "Password is required.";
+    }
+
+    setErrors(newErrors);
+
+    // Return true if no errors, false otherwise
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate form data
+    if (!validateForm()) {
+      return; // Stop submission if there are validation errors
+    }
 
     const dataToUpdate = { ...formData };
 
@@ -126,7 +164,7 @@ const Account = () => {
       dataToUpdate.password = newPassword;
     }
     try {
-      const response = await fetch(`/api/user/update/${userId}`, {
+      const response = await fetch(`${API_URL}/api/user/update/${userId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -239,7 +277,7 @@ const Account = () => {
                       }}
                       variant="h6"
                     >
-                      RESERVASI
+                      RESERVASIKU
                     </Typography>
                   </Link>
                 </ListItem>
@@ -283,7 +321,7 @@ const Account = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={8}>
                     <Box>
-                      <Typography fontWeight="bold">Ubah Username</Typography>
+                      <Typography fontWeight="bold">Ubah Nama</Typography>
                       <TextField
                         margin="dense"
                         fullWidth
@@ -293,6 +331,8 @@ const Account = () => {
                         onChange={handleChange}
                         autoComplete="username"
                         autoFocus
+                        error={!!errors.username}
+                        helperText={errors.username}
                       />
                       <Typography fontWeight="bold">Ubah Email</Typography>
                       <TextField
@@ -303,6 +343,8 @@ const Account = () => {
                         value={formData.email || ""}
                         onChange={handleChange}
                         autoComplete="email"
+                        error={!!errors.email}
+                        helperText={errors.email}
                       />
                       <Typography fontWeight="bold">Ubah Nomor HP</Typography>
                       <TextField
@@ -313,6 +355,8 @@ const Account = () => {
                         value={formData.phoneNumber || ""}
                         onChange={handleChange}
                         autoComplete="phoneNumber"
+                        error={!!errors.phoneNumber}
+                        helperText={errors.phoneNumber}
                       />
                       <Typography mb="0.5px" mt="3px" fontWeight="bold">
                         Ubah Password
@@ -326,6 +370,8 @@ const Account = () => {
                         onChange={handleChange}
                         autoComplete="current-password"
                         type="password"
+                        error={!!errors.password}
+                        helperText={errors.password}
                       />
                       <Typography mb="0.5px" mt="3px" fontWeight="bold">
                         Ubah Alamat
@@ -404,7 +450,7 @@ const Account = () => {
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Konfirmasi
+                    Ubah
                   </Button>
                   <Button
                     type="button"

@@ -42,7 +42,6 @@ import ReservationSuccess from "./pages/LandingPage/SuccessNotification.jsx";
 
 //test
 import ReservationCart from "./components/LandingPage/ReservationCart.jsx";
-
 //protected route public
 import ProtectedRoutePublic from "./pages/LandingPage/ProtectedRoutePublic.jsx";
 

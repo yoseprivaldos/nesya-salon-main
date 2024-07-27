@@ -10,16 +10,17 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import OAuth from "../../components/LandingPage/OAuth";
 import bannerImg from "../../assets/Banner.jpg";
+import { IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export default function Register() {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [showError, setShowError] = useState(false);
-
+  const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
   const handleChange = (e) => {
@@ -54,6 +55,8 @@ export default function Register() {
       setShowError(true);
     }
   };
+
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
 
   return (
     <Grid
@@ -126,7 +129,6 @@ export default function Register() {
               label="Alamat Email"
               name="email"
               autoComplete="email"
-              autoFocus
               onChange={handleChange}
             />
             <TextField
@@ -135,10 +137,23 @@ export default function Register() {
               fullWidth
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               autoComplete="current-password"
               onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <Box></Box>
@@ -151,10 +166,6 @@ export default function Register() {
             >
               {loading ? "Memproses..." : "Daftar"}
             </Button>
-            <Typography variant="h6" sx={{ textAlign: "center" }}>
-              | atau |
-            </Typography>
-            <OAuth />
 
             <Grid container justifyContent="space-between">
               <Grid item xs>

@@ -187,7 +187,7 @@ const Reservation = () => {
                       }}
                       variant="h6"
                     >
-                      RESERVASI
+                      RESERVASIKU
                     </Typography>
                   </Link>
                 </ListItem>
@@ -196,7 +196,13 @@ const Reservation = () => {
           </Grid>
 
           {/* bagian kanan */}
-          <Grid item xs={12} sm={10} border={1}>
+          <Grid
+            item
+            xs={12}
+            sm={10}
+            border={1}
+            sx={{ backgroundColor: "white" }}
+          >
             {/* filter button */}
             <Box>
               <Grid

@@ -8,7 +8,6 @@ import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import OAuth from "../../components/LandingPage/OAuth";
 import {
   signInStart,
   signInSuccess,
@@ -19,8 +18,9 @@ import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "@emotion/react";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, IconButton, InputAdornment, Snackbar } from "@mui/material";
 import bannerImg from "../../assets/Banner.jpg";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export default function Login() {
   const [formData, setFormData] = useState({});
@@ -31,6 +31,7 @@ export default function Login() {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -95,6 +96,8 @@ export default function Login() {
     }
   };
 
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+
   return (
     <>
       {/* notifikasi jika ada */}
@@ -114,7 +117,7 @@ export default function Login() {
         container
         component="main"
         sx={{
-          backgroundColor: theme.palette.background.alt,
+          backgroundColor: "#fffff0",
         }}
       >
         <CssBaseline />
@@ -144,6 +147,11 @@ export default function Login() {
           square
           fontWeight="bold"
           backgroundColor="#fffff0"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
         >
           <Box
             sx={{
@@ -182,10 +190,23 @@ export default function Login() {
                 fullWidth
                 name="password"
                 label="Password"
-                type="password"
                 id="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 onChange={handleChange}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <Button
@@ -197,10 +218,6 @@ export default function Login() {
               >
                 Login
               </Button>
-              <Typography variant="h6" sx={{ textAlign: "center" }}>
-                | atau |
-              </Typography>
-              <OAuth />
 
               <Grid container justifyContent="space-between">
                 <Grid item>

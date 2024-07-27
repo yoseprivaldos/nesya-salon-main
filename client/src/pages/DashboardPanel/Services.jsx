@@ -42,7 +42,9 @@ const Services = () => {
   return (
     <Box m="1.5rem 2.5rem">
       <Header title="LAYANAN" subtitle="Daftar Layanan" />
-      {data || !isLoading ? (
+      {isLoading ? (
+        <>Loading...</>
+      ) : data ? (
         <Box
           mt="20px"
           display="grid"
@@ -65,15 +67,14 @@ const Services = () => {
                     refetch();
                   })
                   .catch((error) => {
-                    //tangani jika ada error
                     console.error("Gagal Menghapus Service: ", error);
-                  }); // untuk mendapatkan hasil atau error
+                  });
               }}
             />
           ))}
         </Box>
       ) : (
-        <>Loading...</>
+        <>Data tidak tersedia</>
       )}
     </Box>
   );
