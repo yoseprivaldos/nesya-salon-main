@@ -16,7 +16,10 @@ const LayoutLandingPage = () => {
       }}
     >
       <Header />
-      <Box flexGrow={1} sx={{ position: "relative", backgroundColor: "white" }}>
+      <Box
+        flexGrow={1}
+        sx={{ position: "relative", backgroundColor: "white", pt: "81px" }}
+      >
         <Outlet />
       </Box>
       <Footer />

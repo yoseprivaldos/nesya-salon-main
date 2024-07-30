@@ -31,8 +31,7 @@ const settings = ["Akun Saya", "Reservasi Saya", "Log Out"];
 function Header(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
-  // const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
   const theme = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -49,11 +48,15 @@ function Header(props) {
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
+    document.body.style.overflowY = "scroll"; // Ensure scroll is not hidden
   };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+    document.body.style.overflowY = "auto"; // Revert overflow style
   };
 
   const handleLogout = async () => {
@@ -69,6 +72,7 @@ function Header(props) {
   const handleLogin = () => {
     navigate("/login");
   };
+
   const drawer = (
     <Box
       onClick={handleDrawerToggle}
@@ -102,9 +106,11 @@ function Header(props) {
           component="nav"
           sx={{
             backgroundColor: theme.palette.background.alt,
-            position: "static",
+            position: "fixed", // Use fixed position to keep header at top
+            width: "100%", // Ensure full width
             padding: 1,
             borderBottom: `0.5px solid ${theme.palette.secondary.main}`,
+            zIndex: theme.zIndex.appBar, // Ensure it's on top
           }}
         >
           <Toolbar
@@ -117,7 +123,9 @@ function Header(props) {
               alignItems="center"
               justifyContent="space-between"
               color={theme.palette.secondary.main}
+              wrap="nowrap"
             >
+              {/* Icon Menu Untuk Drawer */}
               <Grid item>
                 <IconButton
                   color="inherit"
@@ -129,6 +137,8 @@ function Header(props) {
                   <MenuIcon sx={{ width: "30px", height: "30px" }} />
                 </IconButton>
               </Grid>
+
+              {/* Bagian Logo Nesya Salon */}
               <Grid item display="flex">
                 <Link to="/">
                   <Typography
@@ -147,9 +157,14 @@ function Header(props) {
                   </Typography>
                 </Link>
               </Grid>
+
+              {/* Bagian Menu Untuk Login */}
               <Grid item>
                 <Box
-                  sx={{ flexGrow: 0, position: "relative" }}
+                  sx={{
+                    flexGrow: 0,
+                    position: "relative",
+                  }}
                   onMouseEnter={currentUser ? handleOpenUserMenu : undefined}
                   onMouseLeave={currentUser ? handleCloseUserMenu : undefined}
                 >
@@ -165,6 +180,7 @@ function Header(props) {
                             border: 1,
                             borderColor: "secondary.main",
                             backgroundColor: "grey",
+                            display: "inline-flex",
                           }}
                         />
                       </IconButton>
@@ -181,7 +197,13 @@ function Header(props) {
                   </Tooltip>
 
                   <Menu
-                    sx={{ mt: "45px" }}
+                    sx={{
+                      mt: "45px",
+                      position: "absolute", // Absolute positioning
+                      zIndex: theme.zIndex.modal, // Ensure it's above other elements
+                      right: 0, // Align to the right
+                      overflow: "visible", // Ensure overflow doesn't add extra scroll
+                    }}
                     id="menu-appbar"
                     anchorEl={anchorElUser}
                     anchorOrigin={{
@@ -195,6 +217,7 @@ function Header(props) {
                     }}
                     open={Boolean(anchorElUser)}
                     onClose={handleCloseUserMenu}
+                    disableScrollLock
                   >
                     {settings.map((setting) => (
                       <MenuItem key={setting} onClick={handleCloseUserMenu}>
@@ -204,7 +227,6 @@ function Header(props) {
                               to="/account"
                               onClick={() => {
                                 handleCloseUserMenu();
-                                // Menambahkan sedikit delay sebelum navigasi untuk memastikan menu ditutup
                                 setTimeout(() => {
                                   navigate("/account");
                                 }, 100);

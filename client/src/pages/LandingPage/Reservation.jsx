@@ -25,13 +25,17 @@ const Reservation = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        const response = await fetch("/api/reservations/my-reservation", {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${API_URL}/api/reservations/my-reservation`,
+          {
+            credentials: "include",
+          }
+        );
 
         if (response.status === 404) {
           console.log("Kamu belum membuat reservasi");
